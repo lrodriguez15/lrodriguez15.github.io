@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 04: Operator Overloading — OOP C++14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">~/oop-cpp</a>
+      <span class="nav-course">Object-Oriented Programming · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 04: Operator Overloading</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 04 · C++14</p>
+      <h1>Operator Overloading</h1>
+      <div class="chips">
+        <span class="chip chip-blue">operator+</span>
+        <span class="chip chip-blue">operator==</span>
+        <span class="chip chip-green">friend</span>
+        <span class="chip chip-orange">stream I/O</span>
+      </div>
+    </header>
+
+    <!-- ── Overview ─────────────────────────────────────────────────────────── -->
+    <section class="section">
+      <h2>Overview</h2>
+      <p>
+        C++ allows you to redefine the behaviour of built-in operators (<code>+</code>, <code>==</code>, <code>&lt;&lt;</code>, …)
+        for user-defined types. This is called <strong>operator overloading</strong>. Used well, it makes
+        user-defined types feel as natural as built-in ones; used poorly, it produces unreadable code.
+      </p>
+      <p>Key topics:</p>
+      <ul>
+        <li>Syntax and general rules</li>
+        <li>Member vs non-member (free / <code>friend</code>) implementation</li>
+        <li>Arithmetic and compound-assignment operators</li>
+        <li>Comparison operators</li>
+        <li>Stream insertion (<code>&lt;&lt;</code>) and extraction (<code>&gt;&gt;</code>)</li>
+        <li>Subscript and call operators</li>
+      </ul>
+    </section>
+
+    <!-- ── Notes ────────────────────────────────────────────────────────────── -->
+    <section class="section">
+      <h2>Notes</h2>
+
+      <h3>General Rules</h3>
+      <ul>
+        <li>You cannot change operator <strong>arity</strong> (a binary operator stays binary).</li>
+        <li>You cannot invent new operators or change precedence/associativity.</li>
+        <li>At least one operand must be a user-defined type — you cannot overload <code>int + int</code>.</li>
+        <li>Operators <code>::</code>, <code>.</code>, <code>.*</code>, <code>?:</code>, and <code>sizeof</code> cannot be overloaded.</li>
+        <li>Overloading <code>&amp;&amp;</code> and <code>||</code> loses short-circuit evaluation — avoid it.</li>
+      </ul>
+
+      <h3>Member vs Non-Member</h3>
+      <p>
+        An operator overloaded as a <strong>member function</strong> receives the left-hand operand as the implicit
+        <code>this</code> pointer. An operator overloaded as a <strong>non-member (free) function</strong>
+        takes both operands explicitly.
+      </p>
+      <ul>
+        <li>Use a <strong>member</strong> for operators that modify the object: <code>+=</code>, <code>-=</code>, <code>[]</code>, <code>()</code>, <code>=</code>, unary <code>-</code>.</li>
+        <li>Use a <strong>non-member</strong> for symmetric binary operators (<code>+</code>, <code>==</code>, <code>&lt;</code>) so that implicit conversions apply to both sides equally.</li>
+        <li>Declare the non-member as a <code>friend</code> if it needs access to private members.</li>
+      </ul>
+
+      <h3>Canonical Forms</h3>
+      <p>
+        Most operators follow a canonical pattern. Implementing <code>+=</code> first and then defining
+        <code>+</code> in terms of it avoids code duplication:
+      </p>
+<pre><code class="language-cpp">T& operator+=(const T& rhs);            // member — modifies *this
+T  operator+ (T lhs, const T& rhs) {    // free — lhs is a copy
+    lhs += rhs;
+    return lhs;
+}</code></pre>
+
+      <h3>Comparison Operators</h3>
+      <p>
+        Define <code>operator==</code> and <code>operator&lt;</code>; the rest can be written in terms of those two
+        (or use the standard library utilities from <code>&lt;utility&gt;</code>).
+      </p>
+
+      <h3>Stream Operators</h3>
+      <p>
+        <code>operator&lt;&lt;</code> and <code>operator&gt;&gt;</code> must be non-member functions because
+        the left operand is a stream (<code>std::ostream</code> / <code>std::istream</code>), not your type.
+        They return a reference to the stream to allow chaining.
+      </p>
+    </section>
+
+    <!-- ── Code Examples ─────────────────────────────────────────────────────── -->
+    <section class="section">
+      <h2>Code Examples</h2>
+
+      <h3>Arithmetic &amp; Compound Assignment</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Vector2D {
+public:
+    double x, y;
+    Vector2D(double x = 0, double y = 0) : x(x), y(y) {}
+
+    // Compound assignment — member
+    Vector2D& operator+=(const Vector2D& rhs) {
+        x += rhs.x;
+        y += rhs.y;
+        return *this;
+    }
+    Vector2D& operator-=(const Vector2D& rhs) {
+        x -= rhs.x;
+        y -= rhs.y;
+        return *this;
+    }
+
+    // Unary negation — member
+    Vector2D operator-() const { return {-x, -y}; }
+};
+
+// Binary + built from += — free function (no private access needed)
+Vector2D operator+(Vector2D lhs, const Vector2D& rhs) {
+    lhs += rhs;
+    return lhs;
+}
+Vector2D operator-(Vector2D lhs, const Vector2D& rhs) {
+    lhs -= rhs;
+    return lhs;
+}
+
+int main() {
+    Vector2D a{1, 2}, b{3, 4};
+    Vector2D c = a + b;       // (4, 6)
+    Vector2D d = c - a;       // (3, 4)
+    std::cout &lt;&lt; c.x &lt;&lt; " " &lt;&lt; c.y &lt;&lt; "\n";  // 4 6
+    std::cout &lt;&lt; d.x &lt;&lt; " " &lt;&lt; d.y &lt;&lt; "\n";  // 3 4
+}</code></pre>
+
+      <h3>Comparison Operators</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Fraction {
+public:
+    int num, den;
+    Fraction(int n, int d) : num(n), den(d) {}
+
+    // Equality — free friend
+    friend bool operator==(const Fraction& a, const Fraction& b) {
+        return a.num * b.den == b.num * a.den;
+    }
+    friend bool operator!=(const Fraction& a, const Fraction& b) {
+        return !(a == b);
+    }
+    friend bool operator&lt;(const Fraction& a, const Fraction& b) {
+        return a.num * b.den &lt; b.num * a.den;
+    }
+};
+
+int main() {
+    Fraction half{1, 2}, twoFourths{2, 4}, third{1, 3};
+    std::cout &lt;&lt; (half == twoFourths) &lt;&lt; "\n";  // 1 (true)
+    std::cout &lt;&lt; (third &lt; half)       &lt;&lt; "\n";  // 1 (true)
+}</code></pre>
+
+      <h3>Stream Insertion &amp; Extraction</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+class Point {
+public:
+    double x, y;
+    Point(double x = 0, double y = 0) : x(x), y(y) {}
+
+    // Must be non-member: left operand is std::ostream, not Point
+    friend std::ostream& operator&lt;&lt;(std::ostream& os, const Point& p) {
+        return os &lt;&lt; "(" &lt;&lt; p.x &lt;&lt; ", " &lt;&lt; p.y &lt;&lt; ")";
+    }
+    friend std::istream& operator&gt;&gt;(std::istream& is, Point& p) {
+        return is &gt;&gt; p.x &gt;&gt; p.y;
+    }
+};
+
+int main() {
+    Point p{3, 4};
+    std::cout &lt;&lt; p &lt;&lt; "\n";           // (3, 4)
+
+    Point q;
+    // std::cin &gt;&gt; q;                 // reads two doubles
+    // std::cout &lt;&lt; "Read: " &lt;&lt; q;
+}</code></pre>
+
+      <h3>Subscript Operator</h3>
+<pre><code class="language-cpp">#include &lt;stdexcept&gt;
+
+class FixedArray {
+    int data[10];
+public:
+    FixedArray() { for (auto& v : data) v = 0; }
+
+    int& operator[](int i) {
+        if (i &lt; 0 || i &gt;= 10) throw std::out_of_range("index out of range");
+        return data[i];
+    }
+    const int& operator[](int i) const {   // const overload for read-only access
+        if (i &lt; 0 || i &gt;= 10) throw std::out_of_range("index out of range");
+        return data[i];
+    }
+};
+
+int main() {
+    FixedArray arr;
+    arr[3] = 42;
+    std::cout &lt;&lt; arr[3] &lt;&lt; "\n";   // 42
+}</code></pre>
+
+      <h3>Call Operator (Functor)</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Multiplier {
+    int factor;
+public:
+    explicit Multiplier(int f) : factor(f) {}
+
+    int operator()(int x) const { return x * factor; }
+};
+
+int main() {
+    Multiplier triple{3};
+    std::cout &lt;&lt; triple(7)  &lt;&lt; "\n";  // 21
+    std::cout &lt;&lt; triple(10) &lt;&lt; "\n";  // 30
+}</code></pre>
+    </section>
+
+    <!-- ── Slides ─────────────────────────────────────────────────────────────── -->
+    <section class="section">
+      <h2>Slides</h2>
+      <div class="slide-link-box">
+        <span class="icon">📑</span>
+        <div class="info">
+          <strong>Lecture 04 Slide Deck</strong>
+          <span>Operator Overloading</span>
+        </div>
+        <span class="slide-placeholder">Slides not yet uploaded</span>
+      </div>
+    </section>
+
+    <!-- ── Exercises ──────────────────────────────────────────────────────────── -->
+    <section class="section">
+      <h2>Exercises</h2>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 1</p>
+        <p>
+          Implement a <code>Matrix2x2</code> class (2×2 matrix of <code>double</code>). Overload:
+          <code>operator+</code>, <code>operator-</code>, <code>operator*</code> (matrix multiplication),
+          <code>operator==</code>, and <code>operator&lt;&lt;</code>.
+          Use the canonical form: implement compound-assignment members first, then free binary operators on top of them.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 2</p>
+        <p>
+          Create a <code>String</code> class that wraps a <code>std::string</code> and overloads:
+          <code>operator+</code> (concatenation), <code>operator[]</code> (character access with bounds check),
+          <code>operator==</code>, and <code>operator&lt;&lt;</code>.
+          Ensure the const and non-const overloads of <code>operator[]</code> are both present.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 3</p>
+        <p>
+          Write a <code>Counter</code> functor class that keeps an internal count.
+          Overload <code>operator()</code> so that each call increments the count and returns the new value.
+          Also overload prefix <code>operator++</code> and <code>operator--</code> (member functions)
+          and postfix <code>operator++</code> and <code>operator--</code> (note the dummy <code>int</code> parameter).
+          Verify all four increment/decrement variants behave correctly.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Object-Oriented Programming with C++14 · Tec de Monterrey · Spring 2026
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
