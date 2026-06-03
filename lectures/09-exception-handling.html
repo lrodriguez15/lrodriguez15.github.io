@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 09: Exception Handling — OOP C++14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">~/oop-cpp</a>
+      <span class="nav-course">Object-Oriented Programming · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 09: Exception Handling</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 09 · C++14</p>
+      <h1>Exception Handling</h1>
+      <div class="chips">
+        <span class="chip chip-blue">try / catch</span>
+        <span class="chip chip-blue">throw</span>
+        <span class="chip chip-green">std::exception</span>
+        <span class="chip chip-orange">noexcept</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Overview</h2>
+      <p>
+        <strong>Exception handling</strong> separates error-detection code from error-recovery code.
+        Instead of checking return codes at every call site, a function <em>throws</em> an exception object
+        when something goes wrong; the runtime unwinds the call stack until a matching <em>catch</em> block handles it.
+      </p>
+      <p>Key topics:</p>
+      <ul>
+        <li><code>try</code>, <code>throw</code>, <code>catch</code> mechanics</li>
+        <li>The standard exception hierarchy (<code>std::exception</code>)</li>
+        <li>Writing custom exception classes</li>
+        <li>Stack unwinding and RAII — why smart pointers matter here</li>
+        <li><code>noexcept</code> and when to use it</li>
+        <li>Exception safety guarantees</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Notes</h2>
+
+      <h3>try / throw / catch</h3>
+      <p>
+        Code that might fail goes inside a <code>try</code> block. If a problem is detected, a <code>throw</code>
+        expression creates an exception object and immediately exits the current scope. The runtime searches
+        up the call stack for a <code>catch</code> block whose type matches the thrown object.
+      </p>
+      <ul>
+        <li>Throw any copyable type — by convention, throw objects of types derived from <code>std::exception</code>.</li>
+        <li>Catch by <strong>const reference</strong>: <code>catch (const std::exception&amp; e)</code> — avoids slicing and unnecessary copies.</li>
+        <li><code>catch (...)</code> catches everything — use as a last resort or in <code>main</code>.</li>
+        <li>Re-throw with a bare <code>throw;</code> inside a catch block — preserves the original exception type.</li>
+      </ul>
+
+      <h3>Standard Exception Hierarchy</h3>
+      <p>All standard exceptions inherit from <code>std::exception</code> (in <code>&lt;stdexcept&gt;</code>):</p>
+      <ul>
+        <li><code>std::logic_error</code> — bugs detectable before runtime (invalid_argument, out_of_range, length_error)</li>
+        <li><code>std::runtime_error</code> — problems only detectable at runtime (overflow_error, underflow_error)</li>
+        <li><code>std::bad_alloc</code> — thrown by <code>new</code> when memory is exhausted</li>
+        <li><code>std::bad_cast</code> — thrown by a failing reference <code>dynamic_cast</code></li>
+      </ul>
+      <p>Every standard exception exposes <code>.what()</code> returning a <code>const char*</code> description.</p>
+
+      <h3>Custom Exception Classes</h3>
+      <p>
+        Derive from <code>std::runtime_error</code> or <code>std::logic_error</code> to create domain-specific
+        exceptions that carry extra context and can be caught specifically or generically.
+      </p>
+
+      <h3>Stack Unwinding &amp; RAII</h3>
+      <p>
+        When an exception propagates, C++ <strong>destroys all local objects</strong> in scope in reverse
+        construction order. This is called <em>stack unwinding</em>. RAII-managed resources
+        (smart pointers, containers, file streams) are automatically cleaned up — no resource leak even when
+        exceptions bypass normal control flow.
+      </p>
+      <p class="note">
+        <strong>Never</strong> manage raw <code>new</code>/<code>delete</code> in exception-prone code without a RAII wrapper —
+        a <code>delete</code> after a <code>throw</code> will never execute.
+      </p>
+
+      <h3>noexcept</h3>
+      <p>
+        Marking a function <code>noexcept</code> promises it will never throw.
+        The compiler may generate better code; the standard library uses this to prefer moves over copies in containers.
+        If a <code>noexcept</code> function <em>does</em> throw, <code>std::terminate()</code> is called immediately.
+      </p>
+      <p>Always mark move constructors and move assignment operators <code>noexcept</code> when possible.</p>
+
+      <h3>Exception Safety Guarantees</h3>
+      <ul>
+        <li><strong>No-throw guarantee</strong> — the operation never throws (<code>noexcept</code>). Strongest.</li>
+        <li><strong>Strong guarantee</strong> — if an operation throws, the program state is unchanged (commit-or-rollback).</li>
+        <li><strong>Basic guarantee</strong> — if an operation throws, no resources are leaked and objects remain in a valid (but possibly changed) state.</li>
+        <li><strong>No guarantee</strong> — avoid; leads to resource leaks and corrupt state.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Code Examples</h2>
+
+      <h3>Basic try / catch / throw</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+double divide(double a, double b) {
+    if (b == 0.0)
+        throw std::invalid_argument("Division by zero");
+    return a / b;
+}
+
+int main() {
+    try {
+        std::cout &lt;&lt; divide(10, 2) &lt;&lt; "\n";   // 5
+        std::cout &lt;&lt; divide(10, 0) &lt;&lt; "\n";   // throws
+    }
+    catch (const std::invalid_argument&amp; e) {
+        std::cerr &lt;&lt; "Caught: " &lt;&lt; e.what() &lt;&lt; "\n";
+    }
+    std::cout &lt;&lt; "Program continues\n";
+}
+</code></pre>
+
+      <h3>Catching Multiple Exception Types</h3>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;stdexcept&gt;
+#include &lt;iostream&gt;
+
+int safeAt(const std::vector&lt;int&gt;&amp; v, int i) {
+    if (i &lt; 0)
+        throw std::invalid_argument("Negative index");
+    return v.at(i);   // throws std::out_of_range if i >= v.size()
+}
+
+int main() {
+    std::vector&lt;int&gt; data = {10, 20, 30};
+
+    for (int idx : {1, -1, 99}) {
+        try {
+            std::cout &lt;&lt; "data[" &lt;&lt; idx &lt;&lt; "] = " &lt;&lt; safeAt(data, idx) &lt;&lt; "\n";
+        }
+        catch (const std::invalid_argument&amp; e) {
+            std::cerr &lt;&lt; "Bad argument: " &lt;&lt; e.what() &lt;&lt; "\n";
+        }
+        catch (const std::out_of_range&amp; e) {
+            std::cerr &lt;&lt; "Out of range: " &lt;&lt; e.what() &lt;&lt; "\n";
+        }
+    }
+}
+</code></pre>
+
+      <h3>Custom Exception Classes</h3>
+<pre><code class="language-cpp">#include &lt;stdexcept&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+class InsufficientFundsError : public std::runtime_error {
+    double available;
+    double requested;
+public:
+    InsufficientFundsError(double avail, double req)
+        : std::runtime_error("Insufficient funds")
+        , available(avail), requested(req) {}
+
+    double getAvailable() const { return available; }
+    double getRequested() const { return requested; }
+};
+
+class BankAccount {
+    double balance;
+public:
+    explicit BankAccount(double initial) : balance(initial) {}
+
+    void withdraw(double amount) {
+        if (amount &gt; balance)
+            throw InsufficientFundsError(balance, amount);
+        balance -= amount;
+    }
+    double getBalance() const { return balance; }
+};
+
+int main() {
+    BankAccount acc(100.0);
+    try {
+        acc.withdraw(40.0);
+        std::cout &lt;&lt; "Balance: " &lt;&lt; acc.getBalance() &lt;&lt; "\n";  // 60
+        acc.withdraw(80.0);   // throws
+    }
+    catch (const InsufficientFundsError&amp; e) {
+        std::cerr &lt;&lt; e.what()
+                  &lt;&lt; " — have: " &lt;&lt; e.getAvailable()
+                  &lt;&lt; ", need: "  &lt;&lt; e.getRequested() &lt;&lt; "\n";
+    }
+}
+</code></pre>
+
+      <h3>Stack Unwinding &amp; RAII</h3>
+<pre><code class="language-cpp">#include &lt;memory&gt;
+#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+struct Resource {
+    std::string name;
+    Resource(const std::string&amp; n) : name(n) { std::cout &lt;&lt; "Acquired " &lt;&lt; name &lt;&lt; "\n"; }
+    ~Resource()                               { std::cout &lt;&lt; "Released " &lt;&lt; name &lt;&lt; "\n"; }
+};
+
+void riskyOperation() {
+    auto r1 = std::make_unique&lt;Resource&gt;("DB connection");
+    auto r2 = std::make_unique&lt;Resource&gt;("File handle");
+
+    throw std::runtime_error("Something went wrong");
+
+    // r1 and r2 are never "manually" deleted,
+    // but their destructors run during stack unwinding — no leak.
+}
+
+int main() {
+    try {
+        riskyOperation();
+    }
+    catch (const std::runtime_error&amp; e) {
+        std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+    }
+    std::cout &lt;&lt; "Clean exit\n";
+}
+</code></pre>
+
+      <h3>noexcept and Re-throw</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+// Unconditionally does not throw — terminate() if it does
+void swapInts(int&amp; a, int&amp; b) noexcept {
+    int tmp = a; a = b; b = tmp;
+}
+
+void processFile(const std::string&amp; path) {
+    try {
+        if (path.empty())
+            throw std::invalid_argument("Empty path");
+        // ... open and process file
+    }
+    catch (const std::exception&amp; e) {
+        std::cerr &lt;&lt; "[processFile] caught: " &lt;&lt; e.what() &lt;&lt; "\n";
+        throw;   // re-throw to caller — bare 'throw' preserves type
+    }
+}
+
+int main() {
+    try {
+        processFile("");
+    }
+    catch (const std::invalid_argument&amp; e) {
+        std::cerr &lt;&lt; "[main] handled: " &lt;&lt; e.what() &lt;&lt; "\n";
+    }
+}
+</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>Slides</h2>
+      <div class="slide-link-box">
+        <span class="icon">📑</span>
+        <div class="info">
+          <strong>Lecture 09 Slide Deck</strong>
+          <span>Exception Handling</span>
+        </div>
+        <span class="slide-placeholder">Slides not yet uploaded</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercises</h2>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 1</p>
+        <p>
+          Implement a <code>Stack&lt;T&gt;</code> class backed by a <code>std::vector</code> with:
+          <code>push()</code>, <code>pop()</code>, <code>top()</code>, and <code>isEmpty()</code>.
+          <code>pop()</code> and <code>top()</code> should throw <code>std::underflow_error</code> on an empty stack.
+          Write a test in <code>main</code> that catches this exception and prints a helpful message without crashing.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 2</p>
+        <p>
+          Create a hierarchy of custom exceptions for a university registration system:
+          <code>RegistrationError</code> (base) with two derived types: <code>CourseFull</code> and <code>PrerequisiteNotMet</code>.
+          Each should carry relevant data (e.g., course name, maximum capacity, or the missing prerequisite).
+          Write a <code>enroll()</code> function that throws the appropriate exception, and a <code>main</code>
+          that catches them both specifically and handles each with a different message.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 3</p>
+        <p>
+          Demonstrate the difference between a <strong>memory leak</strong> and <strong>safe cleanup</strong> under exceptions.
+          Write two versions of a function that acquires two resources and then throws:
+          (a) using raw <code>new</code>/<code>delete</code> — show where the leak occurs;
+          (b) using <code>unique_ptr</code> — show that both resources are cleaned up automatically.
+          Add destructor messages to verify.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Object-Oriented Programming with C++14 · Tec de Monterrey · Spring 2026
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 08: STL Containers — OOP C++14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">~/oop-cpp</a>
+      <span class="nav-course">Object-Oriented Programming · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 08: STL Containers &amp; Algorithms</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 08 · C++14</p>
+      <h1>STL Containers &amp; Algorithms</h1>
+      <div class="chips">
+        <span class="chip chip-blue">vector</span>
+        <span class="chip chip-blue">map</span>
+        <span class="chip chip-green">iterators</span>
+        <span class="chip chip-orange">algorithms</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Overview</h2>
+      <p>
+        The <strong>Standard Template Library (STL)</strong> provides generic, type-safe containers and
+        algorithms that replace manual data structure implementation. Every container manages its own
+        memory, grows dynamically where needed, and exposes a uniform <em>iterator</em> interface that
+        algorithms work against.
+      </p>
+      <p>This lecture covers the most commonly used containers:</p>
+      <ul>
+        <li><code>std::vector</code> — dynamic array (the default container)</li>
+        <li><code>std::array</code> — fixed-size stack array with STL interface</li>
+        <li><code>std::list</code> — doubly-linked list for frequent insertions/removals</li>
+        <li><code>std::map</code> / <code>std::unordered_map</code> — ordered and hash key-value stores</li>
+        <li><code>std::set</code> — sorted unique elements</li>
+      </ul>
+      <p>And key algorithms from <code>&lt;algorithm&gt;</code>: <code>sort</code>, <code>find</code>, <code>count_if</code>, <code>for_each</code>, <code>transform</code>.</p>
+    </section>
+
+    <section class="section">
+      <h2>Notes</h2>
+
+      <h3>std::vector — The Default Container</h3>
+      <p>
+        A contiguous, dynamically resizable array. Elements are stored next to each other in memory —
+        ideal cache behaviour. Random access is O(1); push_back is amortised O(1); insertion in the middle is O(n).
+      </p>
+      <ul>
+        <li><code>push_back(v)</code> / <code>emplace_back(args…)</code> — add to end</li>
+        <li><code>pop_back()</code> — remove last element</li>
+        <li><code>size()</code>, <code>empty()</code>, <code>reserve(n)</code> — avoid reallocations</li>
+        <li><code>operator[]</code> — unchecked access; <code>.at(i)</code> — bounds-checked</li>
+        <li><code>begin()</code> / <code>end()</code> — iterator range</li>
+      </ul>
+
+      <h3>std::array — Fixed-Size Stack Array</h3>
+      <p>
+        Wraps a C-style array with the full STL interface. Size is a compile-time constant — no heap allocation.
+        Prefer over C arrays when the size is known at compile time.
+      </p>
+
+      <h3>std::map &amp; std::unordered_map</h3>
+      <ul>
+        <li><code>std::map&lt;K,V&gt;</code> — sorted by key (red-black tree); O(log n) lookup/insert.</li>
+        <li><code>std::unordered_map&lt;K,V&gt;</code> — hash table; O(1) average lookup/insert.</li>
+        <li>Both expose <code>operator[]</code>, <code>.at(key)</code>, <code>.find(key)</code>, <code>.count(key)</code>.</li>
+        <li><code>operator[]</code> on a map <em>inserts a default value</em> if the key is absent — use <code>.at()</code> or <code>.find()</code> to avoid this.</li>
+      </ul>
+
+      <h3>Iterators</h3>
+      <p>
+        An iterator is an object that points into a container, similar to a pointer. All STL containers
+        expose <code>begin()</code> (points to first element) and <code>end()</code> (one-past-last).
+        The range-based <code>for</code> loop desugars to iterator usage.
+      </p>
+
+      <h3>Common Algorithms (&lt;algorithm&gt;)</h3>
+      <ul>
+        <li><code>std::sort(begin, end)</code> — sort in-place</li>
+        <li><code>std::find(begin, end, val)</code> — returns iterator to first match</li>
+        <li><code>std::count_if(begin, end, pred)</code> — count elements satisfying a predicate</li>
+        <li><code>std::for_each(begin, end, fn)</code> — call <code>fn</code> on each element</li>
+        <li><code>std::transform(in_begin, in_end, out_begin, fn)</code> — map a function over a range</li>
+        <li><code>std::accumulate(begin, end, init)</code> — fold/reduce (in <code>&lt;numeric&gt;</code>)</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Code Examples</h2>
+
+      <h3>std::vector — Core Operations</h3>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::vector&lt;int&gt; nums;
+    nums.reserve(5);           // pre-allocate — avoids repeated reallocations
+
+    for (int i = 1; i &lt;= 5; ++i)
+        nums.push_back(i * 10);
+
+    // Range-based for
+    for (int n : nums)
+        std::cout &lt;&lt; n &lt;&lt; " ";   // 10 20 30 40 50
+    std::cout &lt;&lt; "\n";
+
+    nums.erase(nums.begin() + 2);  // remove element at index 2 (value 30)
+
+    std::cout &lt;&lt; "size: " &lt;&lt; nums.size() &lt;&lt; "\n";  // 4
+    std::cout &lt;&lt; "at(1): " &lt;&lt; nums.at(1) &lt;&lt; "\n";  // 20 (bounds-checked)
+}
+</code></pre>
+
+      <h3>vector of Polymorphic Objects</h3>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;memory&gt;
+#include &lt;iostream&gt;
+
+class Shape {
+public:
+    virtual void draw() const = 0;
+    virtual ~Shape() = default;
+};
+class Circle    : public Shape { public: void draw() const override { std::cout &lt;&lt; "Circle\n";    } };
+class Rectangle : public Shape { public: void draw() const override { std::cout &lt;&lt; "Rectangle\n"; } };
+class Triangle  : public Shape { public: void draw() const override { std::cout &lt;&lt; "Triangle\n";  } };
+
+int main() {
+    std::vector&lt;std::unique_ptr&lt;Shape&gt;&gt; scene;
+    scene.push_back(std::make_unique&lt;Circle&gt;());
+    scene.push_back(std::make_unique&lt;Rectangle&gt;());
+    scene.push_back(std::make_unique&lt;Triangle&gt;());
+
+    for (const auto&amp; s : scene)
+        s-&gt;draw();   // runtime dispatch per element
+}
+</code></pre>
+
+      <h3>std::array — Fixed-Size</h3>
+<pre><code class="language-cpp">#include &lt;array&gt;
+#include &lt;numeric&gt;   // std::accumulate
+#include &lt;iostream&gt;
+
+int main() {
+    std::array&lt;double, 4&gt; temps = {36.5, 37.1, 36.8, 38.0};
+
+    double avg = std::accumulate(temps.begin(), temps.end(), 0.0) / temps.size();
+    std::cout &lt;&lt; "Average temp: " &lt;&lt; avg &lt;&lt; "\n";
+
+    // Structured bindings (C++17 preview — works in C++14 with indices)
+    for (std::size_t i = 0; i &lt; temps.size(); ++i)
+        std::cout &lt;&lt; "Day " &lt;&lt; i+1 &lt;&lt; ": " &lt;&lt; temps[i] &lt;&lt; "\n";
+}
+</code></pre>
+
+      <h3>std::map — Key-Value Store</h3>
+<pre><code class="language-cpp">#include &lt;map&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::map&lt;std::string, int&gt; grades;
+    grades["Alice"] = 95;
+    grades["Bob"]   = 82;
+    grades["Carol"] = 88;
+
+    // Iterate in alphabetical key order
+    for (const auto&amp; pair : grades)
+        std::cout &lt;&lt; pair.first &lt;&lt; ": " &lt;&lt; pair.second &lt;&lt; "\n";
+
+    // Safe lookup — .find() doesn't insert a default value
+    auto it = grades.find("Bob");
+    if (it != grades.end())
+        std::cout &lt;&lt; "Bob's grade: " &lt;&lt; it-&gt;second &lt;&lt; "\n";
+
+    // Check existence
+    std::cout &lt;&lt; grades.count("Dave") &lt;&lt; "\n";  // 0 — not found
+}
+</code></pre>
+
+      <h3>Algorithms: sort, find_if, count_if, transform</h3>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Student {
+    std::string name;
+    int         grade;
+};
+
+int main() {
+    std::vector&lt;Student&gt; students = {
+        {"Alice", 95}, {"Bob", 72}, {"Carol", 88}, {"Dave", 60}, {"Eve", 91}
+    };
+
+    // Sort by grade descending
+    std::sort(students.begin(), students.end(),
+        [](const Student&amp; a, const Student&amp; b) { return a.grade &gt; b.grade; });
+
+    // Count students who passed (grade >= 70)
+    int passed = std::count_if(students.begin(), students.end(),
+        [](const Student&amp; s) { return s.grade &gt;= 70; });
+    std::cout &lt;&lt; "Passed: " &lt;&lt; passed &lt;&lt; "\n";  // 4
+
+    // Find first student with grade < 70
+    auto it = std::find_if(students.begin(), students.end(),
+        [](const Student&amp; s) { return s.grade &lt; 70; });
+    if (it != students.end())
+        std::cout &lt;&lt; "At risk: " &lt;&lt; it-&gt;name &lt;&lt; "\n";
+
+    // Print sorted ranking
+    for (const auto&amp; s : students)
+        std::cout &lt;&lt; s.name &lt;&lt; " - " &lt;&lt; s.grade &lt;&lt; "\n";
+}
+</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>Slides</h2>
+      <div class="slide-link-box">
+        <span class="icon">📑</span>
+        <div class="info">
+          <strong>Lecture 08 Slide Deck</strong>
+          <span>STL Containers &amp; Algorithms</span>
+        </div>
+        <span class="slide-placeholder">Slides not yet uploaded</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercises</h2>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 1</p>
+        <p>
+          Read a sequence of integers from the user until 0 is entered. Store them in a <code>std::vector</code>.
+          Then: (a) print the sorted sequence; (b) print the sum and average using <code>std::accumulate</code>;
+          (c) print only the even numbers using <code>std::copy_if</code> into a second vector;
+          (d) remove all duplicates (hint: sort first, then <code>std::unique</code> + <code>erase</code>).
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 2</p>
+        <p>
+          Build a simple word-frequency counter using <code>std::unordered_map&lt;std::string, int&gt;</code>.
+          Read words from a hardcoded string (split by spaces). Print the top-5 most frequent words
+          by transferring the map contents into a <code>vector&lt;pair&lt;string,int&gt;&gt;</code> and sorting by frequency.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 3</p>
+        <p>
+          Model a student roster using <code>std::map&lt;std::string, std::vector&lt;int&gt;&gt;</code>
+          where the key is the student's name and the value is a list of assignment scores.
+          Write functions to: add a score for a student, compute each student's average,
+          and print the class ranked by average (highest first). Use STL algorithms throughout.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Object-Oriented Programming with C++14 · Tec de Monterrey · Spring 2026
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

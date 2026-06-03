@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 10: Capstone — OOP C++14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">~/oop-cpp</a>
+      <span class="nav-course">Object-Oriented Programming · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 10: Capstone — University Course System</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 10 · C++14 · Capstone</p>
+      <h1>Capstone: University Course System</h1>
+      <div class="chips">
+        <span class="chip chip-blue">full OOP</span>
+        <span class="chip chip-green">smart pointers</span>
+        <span class="chip chip-orange">exceptions</span>
+        <span class="chip chip-blue">STL</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Overview</h2>
+      <p>
+        This capstone ties together every concept from the course in a single, self-contained real-world example:
+        a simplified <strong>University Course Registration System</strong>.
+        The problem is realistic enough to motivate every design decision, yet small enough to read in one sitting.
+      </p>
+      <p>Concepts exercised:</p>
+      <ul>
+        <li><strong>Lectures 01–02</strong> — class relationships (composition, aggregation, association), inheritance</li>
+        <li><strong>Lecture 03</strong> — polymorphism &amp; virtual dispatch</li>
+        <li><strong>Lecture 04</strong> — operator overloading (<code>&lt;&lt;</code>, <code>==</code>, <code>&lt;</code>)</li>
+        <li><strong>Lectures 05–06</strong> — Rule of Five on a resource-owning class; Rule of Zero on others</li>
+        <li><strong>Lecture 07</strong> — <code>unique_ptr</code> / <code>shared_ptr</code> for ownership</li>
+        <li><strong>Lecture 08</strong> — <code>vector</code>, <code>map</code>, STL algorithms</li>
+        <li><strong>Lecture 09</strong> — custom exceptions, RAII safety under throws</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Design</h2>
+
+      <h3>Class Diagram (text)</h3>
+<pre><code class="language-text">Person  (abstract base)
+ ├── Student      — has a list of enrolled Course IDs, a GPA
+ └── Professor    — has a specialisation string
+
+Course              — has a title, code, capacity, enrolled count
+                      composed of a Gradebook (owns it)
+                      associated with a Professor (non-owning ptr)
+
+Gradebook           — owned by Course (composition)
+                      maps student IDs → Grade records
+
+Department          — aggregates Professor shared_ptrs
+                      owns Course unique_ptrs
+
+RegistrationError   ← std::runtime_error  (custom exception base)
+ ├── CourseFullError
+ └── AlreadyEnrolledError</code></pre>
+
+      <h3>Ownership Summary</h3>
+      <ul>
+        <li><code>Department</code> <strong>owns</strong> its <code>Course</code> objects via <code>unique_ptr</code> (composition)</li>
+        <li><code>Department</code> <strong>shares</strong> <code>Professor</code> objects with the rest of the system via <code>shared_ptr</code></li>
+        <li><code>Course</code> holds a <strong>non-owning raw pointer</strong> to its <code>Professor</code> (association — professor outlives course)</li>
+        <li><code>Course</code> <strong>owns</strong> its <code>Gradebook</code> by value (composition — Rule of Zero)</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Full Source</h2>
+      <p>
+        The implementation below is structured in header-order (each class after its dependencies).
+        In a real project these would be split into <code>.h</code> / <code>.cpp</code> pairs.
+      </p>
+
+      <h3>Exceptions</h3>
+<pre><code class="language-cpp">// ── Exceptions ────────────────────────────────────────────────────────────────
+#include &lt;stdexcept&gt;
+#include &lt;string&gt;
+
+class RegistrationError : public std::runtime_error {
+public:
+    explicit RegistrationError(const std::string&amp; msg)
+        : std::runtime_error(msg) {}
+};
+
+class CourseFullError : public RegistrationError {
+    std::string courseCode;
+public:
+    explicit CourseFullError(const std::string&amp; code)
+        : RegistrationError("Course " + code + " is full")
+        , courseCode(code) {}
+    const std::string&amp; getCourseCode() const { return courseCode; }
+};
+
+class AlreadyEnrolledError : public RegistrationError {
+public:
+    AlreadyEnrolledError(const std::string&amp; sid, const std::string&amp; code)
+        : RegistrationError("Student " + sid + " already enrolled in " + code) {}
+};
+</code></pre>
+
+      <h3>Gradebook</h3>
+<pre><code class="language-cpp">// ── Gradebook ─────────────────────────────────────────────────────────────────
+#include &lt;map&gt;
+#include &lt;vector&gt;
+#include &lt;numeric&gt;    // std::accumulate
+#include &lt;iostream&gt;
+
+struct Grade {
+    std::vector&lt;double&gt; scores;   // individual assignment scores
+
+    void addScore(double s) { scores.push_back(s); }
+
+    double average() const {
+        if (scores.empty()) return 0.0;
+        return std::accumulate(scores.begin(), scores.end(), 0.0) / scores.size();
+    }
+};
+
+class Gradebook {
+    std::map&lt;std::string, Grade&gt; records;  // studentId → Grade
+public:
+    void addScore(const std::string&amp; studentId, double score) {
+        records[studentId].addScore(score);
+    }
+
+    double getAverage(const std::string&amp; studentId) const {
+        auto it = records.find(studentId);
+        if (it == records.end()) return 0.0;
+        return it-&gt;second.average();
+    }
+
+    void printReport() const {
+        for (const auto&amp; pair : records)
+            std::cout &lt;&lt; "  " &lt;&lt; pair.first
+                      &lt;&lt; " avg: " &lt;&lt; pair.second.average() &lt;&lt; "\n";
+    }
+};
+</code></pre>
+
+      <h3>Person, Student, Professor</h3>
+<pre><code class="language-cpp">// ── Person hierarchy ──────────────────────────────────────────────────────────
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+class Person {
+protected:
+    std::string id;
+    std::string name;
+public:
+    Person(std::string id, std::string name)
+        : id(std::move(id)), name(std::move(name)) {}
+
+    virtual ~Person() = default;
+
+    // Pure virtual — every person can introduce themselves differently
+    virtual void introduce() const = 0;
+
+    const std::string&amp; getId()   const { return id;   }
+    const std::string&amp; getName() const { return name; }
+
+    // Operator overloading
+    friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Person&amp; p) {
+        p.introduce();
+        return os;
+    }
+    bool operator==(const Person&amp; other) const { return id == other.id; }
+    bool operator&lt;(const Person&amp; other)  const { return name &lt; other.name; }
+};
+
+class Student : public Person {
+    std::vector&lt;std::string&gt; enrolledCourses;  // course codes
+    double gpa = 0.0;
+public:
+    Student(std::string id, std::string name)
+        : Person(std::move(id), std::move(name)) {}
+
+    void introduce() const override {
+        std::cout &lt;&lt; "[Student] " &lt;&lt; name &lt;&lt; " (ID: " &lt;&lt; id
+                  &lt;&lt; ", GPA: " &lt;&lt; gpa &lt;&lt; ")\n";
+    }
+
+    void addCourse(const std::string&amp; code) { enrolledCourses.push_back(code); }
+    bool isEnrolled(const std::string&amp; code) const {
+        return std::find(enrolledCourses.begin(), enrolledCourses.end(), code)
+               != enrolledCourses.end();
+    }
+    void setGpa(double g) { gpa = g; }
+    double getGpa()  const { return gpa; }
+};
+
+class Professor : public Person {
+    std::string specialisation;
+public:
+    Professor(std::string id, std::string name, std::string spec)
+        : Person(std::move(id), std::move(name))
+        , specialisation(std::move(spec)) {}
+
+    void introduce() const override {
+        std::cout &lt;&lt; "[Professor] Dr. " &lt;&lt; name
+                  &lt;&lt; " — " &lt;&lt; specialisation &lt;&lt; "\n";
+    }
+    const std::string&amp; getSpecialisation() const { return specialisation; }
+};
+</code></pre>
+
+      <h3>Course</h3>
+<pre><code class="language-cpp">// ── Course ────────────────────────────────────────────────────────────────────
+#include &lt;unordered_set&gt;
+
+class Course {
+    std::string   code;
+    std::string   title;
+    int           capacity;
+    Professor*    instructor;   // non-owning association
+    Gradebook     gradebook;    // owned by composition (Rule of Zero)
+    std::unordered_set&lt;std::string&gt; enrolled;  // set of student IDs
+public:
+    Course(std::string code, std::string title, int cap, Professor* prof)
+        : code(std::move(code)), title(std::move(title))
+        , capacity(cap), instructor(prof) {}
+
+    // Non-copyable — each course is unique in a department
+    Course(const Course&amp;)            = delete;
+    Course&amp; operator=(const Course&amp;) = delete;
+    Course(Course&amp;&amp;)                 = default;
+    Course&amp; operator=(Course&amp;&amp;)      = default;
+
+    void enroll(Student&amp; student) {
+        if ((int)enrolled.size() &gt;= capacity)
+            throw CourseFullError(code);
+        if (enrolled.count(student.getId()))
+            throw AlreadyEnrolledError(student.getId(), code);
+
+        enrolled.insert(student.getId());
+        student.addCourse(code);
+    }
+
+    void addScore(const std::string&amp; studentId, double score) {
+        gradebook.addScore(studentId, score);
+    }
+
+    void printRoster() const {
+        std::cout &lt;&lt; "Course: " &lt;&lt; code &lt;&lt; " — " &lt;&lt; title
+                  &lt;&lt; " (" &lt;&lt; enrolled.size() &lt;&lt; "/" &lt;&lt; capacity &lt;&lt; " enrolled)\n";
+        if (instructor)
+            std::cout &lt;&lt; "  Instructor: Dr. " &lt;&lt; instructor-&gt;getName() &lt;&lt; "\n";
+        gradebook.printReport();
+    }
+
+    const std::string&amp; getCode()  const { return code;  }
+    const std::string&amp; getTitle() const { return title; }
+    int  getEnrolledCount()       const { return (int)enrolled.size(); }
+
+    // Operator overloading for sorting / printing
+    bool operator==(const Course&amp; o) const { return code == o.code; }
+    bool operator&lt;(const Course&amp; o)  const { return code &lt; o.code;  }
+    friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Course&amp; c) {
+        return os &lt;&lt; c.code &lt;&lt; ": " &lt;&lt; c.title;
+    }
+};
+</code></pre>
+
+      <h3>Department</h3>
+<pre><code class="language-cpp">// ── Department ────────────────────────────────────────────────────────────────
+#include &lt;memory&gt;
+#include &lt;algorithm&gt;
+
+class Department {
+    std::string name;
+    // Shared ownership: professors may be referenced from elsewhere
+    std::vector&lt;std::shared_ptr&lt;Professor&gt;&gt; professors;
+    // Sole ownership: courses exist only within this department
+    std::vector&lt;std::unique_ptr&lt;Course&gt;&gt;    courses;
+public:
+    explicit Department(std::string name) : name(std::move(name)) {}
+
+    // Rule of Zero — all members handle their own lifetime
+    ~Department() = default;
+
+    std::shared_ptr&lt;Professor&gt; hireProfessor(
+            const std::string&amp; id,
+            const std::string&amp; name,
+            const std::string&amp; spec) {
+        auto prof = std::make_shared&lt;Professor&gt;(id, name, spec);
+        professors.push_back(prof);
+        return prof;  // caller may also hold a shared_ptr
+    }
+
+    Course&amp; addCourse(const std::string&amp; code,
+                      const std::string&amp; title,
+                      int capacity,
+                      const std::shared_ptr&lt;Professor&gt;&amp; prof) {
+        courses.push_back(
+            std::make_unique&lt;Course&gt;(code, title, capacity, prof.get()));
+        return *courses.back();
+    }
+
+    Course* findCourse(const std::string&amp; code) {
+        auto it = std::find_if(courses.begin(), courses.end(),
+            [&amp;code](const std::unique_ptr&lt;Course&gt;&amp; c) {
+                return c-&gt;getCode() == code;
+            });
+        return it != courses.end() ? it-&gt;get() : nullptr;
+    }
+
+    void printSummary() const {
+        std::cout &lt;&lt; "=== Department: " &lt;&lt; name &lt;&lt; " ===\n";
+        std::cout &lt;&lt; "Professors (" &lt;&lt; professors.size() &lt;&lt; "):\n";
+        for (const auto&amp; p : professors) p-&gt;introduce();
+        std::cout &lt;&lt; "Courses (" &lt;&lt; courses.size() &lt;&lt; "):\n";
+        for (const auto&amp; c : courses)   c-&gt;printRoster();
+    }
+};
+</code></pre>
+
+      <h3>main — Putting It All Together</h3>
+<pre><code class="language-cpp">// ── main ──────────────────────────────────────────────────────────────────────
+int main() {
+    // Build the department
+    Department cs("Computer Science");
+
+    auto profA = cs.hireProfessor("P01", "Garcia",  "Object-Oriented Systems");
+    auto profB = cs.hireProfessor("P02", "Martinez","Algorithms &amp; Data Structures");
+
+    Course&amp; oop    = cs.addCourse("CS101", "OOP with C++14",    3, profA);
+    Course&amp; algos  = cs.addCourse("CS201", "Algorithms",        2, profB);
+
+    // Create students (not owned by the department — they live in a registry)
+    std::vector&lt;Student&gt; students = {
+        {"S01", "Alice"},
+        {"S02", "Bob"},
+        {"S03", "Carol"},
+        {"S04", "Dave"},
+    };
+
+    // Enroll students — exceptions handled gracefully
+    auto tryEnroll = [&amp;](Course&amp; course, Student&amp; student) {
+        try {
+            course.enroll(student);
+            std::cout &lt;&lt; student.getName() &lt;&lt; " enrolled in " &lt;&lt; course &lt;&lt; "\n";
+        }
+        catch (const CourseFullError&amp; e) {
+            std::cerr &lt;&lt; "  [FULL]   " &lt;&lt; e.what() &lt;&lt; "\n";
+        }
+        catch (const AlreadyEnrolledError&amp; e) {
+            std::cerr &lt;&lt; "  [DUP]    " &lt;&lt; e.what() &lt;&lt; "\n";
+        }
+    };
+
+    tryEnroll(oop,   students[0]);  // Alice   → OK
+    tryEnroll(oop,   students[1]);  // Bob     → OK
+    tryEnroll(oop,   students[2]);  // Carol   → OK
+    tryEnroll(oop,   students[3]);  // Dave    → CourseFullError (capacity 3)
+    tryEnroll(oop,   students[0]);  // Alice   → AlreadyEnrolledError
+
+    tryEnroll(algos, students[0]);  // Alice   → OK
+    tryEnroll(algos, students[1]);  // Bob     → OK
+
+    // Add some grades
+    oop.addScore("S01", 92); oop.addScore("S01", 88);
+    oop.addScore("S02", 76); oop.addScore("S02", 81);
+    oop.addScore("S03", 95); oop.addScore("S03", 97);
+
+    algos.addScore("S01", 85); algos.addScore("S01", 90);
+    algos.addScore("S02", 70); algos.addScore("S02", 65);
+
+    std::cout &lt;&lt; "\n";
+    cs.printSummary();
+
+    // Polymorphic iteration — virtual dispatch in action
+    std::cout &lt;&lt; "\n--- All people ---\n";
+    std::vector&lt;Person*&gt; people;
+    for (auto&amp; s : students) people.push_back(&amp;s);
+    // professors are shared_ptr — get raw non-owning ptr for the loop
+    people.push_back(profA.get());
+    people.push_back(profB.get());
+
+    std::sort(people.begin(), people.end(),
+        [](const Person* a, const Person* b) { return *a &lt; *b; });
+
+    for (const auto* p : people) p-&gt;introduce();
+}</code></pre>
+
+      <h3>Expected Output</h3>
+<pre><code class="language-text">Alice enrolled in CS101: OOP with C++14
+Bob enrolled in CS101: OOP with C++14
+Carol enrolled in CS101: OOP with C++14
+  [FULL]   Course CS101 is full
+  [DUP]    Student S01 already enrolled in CS101
+Alice enrolled in CS201: Algorithms
+Bob enrolled in CS201: Algorithms
+
+=== Department: Computer Science ===
+Professors (2):
+[Professor] Dr. Garcia — Object-Oriented Systems
+[Professor] Dr. Martinez — Algorithms &amp; Data Structures
+Courses (2):
+Course: CS101 — OOP with C++14 (3/3 enrolled)
+  Instructor: Dr. Garcia
+  S01 avg: 90
+  S02 avg: 78.5
+  S03 avg: 96
+Course: CS201 — Algorithms (2/2 enrolled)
+  Instructor: Dr. Martinez
+  S01 avg: 87.5
+  S02 avg: 67.5
+
+--- All people ---
+[Student]   Alice   (ID: S01, GPA: 0)
+[Student]   Bob     (ID: S02, GPA: 0)
+[Student]   Carol   (ID: S03, GPA: 0)
+[Student]   Dave    (ID: S04, GPA: 0)
+[Professor] Dr. Garcia — Object-Oriented Systems
+[Professor] Dr. Martinez — Algorithms &amp; Data Structures</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>Slides</h2>
+      <div class="slide-link-box">
+        <span class="icon">📑</span>
+        <div class="info">
+          <strong>Lecture 10 Slide Deck</strong>
+          <span>Capstone — University Course System</span>
+        </div>
+        <span class="slide-placeholder">Slides not yet uploaded</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercises</h2>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 1 — Extend the Model</p>
+        <p>
+          Add a <code>Semester</code> class that owns multiple <code>Department</code> objects and has a start/end date
+          (store as a string for simplicity). A <code>Semester</code> should expose a method that prints a full
+          academic report: all departments, all courses, and their grade averages. Use only
+          <code>unique_ptr</code> for ownership and STL algorithms where possible.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 2 — GPA Calculation</p>
+        <p>
+          Implement GPA calculation. After all scores are entered, compute each student's GPA as the
+          average of all their course averages across the system. You will need the department to expose
+          a way to query a student's average per course. Update <code>Student::setGpa</code> and verify
+          the printed introduction reflects the updated GPA.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <p class="exercise-label">Exercise 3 — Waiting List</p>
+        <p>
+          When a course is full, instead of throwing <code>CourseFullError</code>, add the student to a
+          <strong>waiting list</strong> (a <code>std::queue</code> of student pointers). When any enrolled
+          student drops the course (add a <code>drop()</code> method), automatically enroll the first
+          student from the waiting list. Write a test that fills a capacity-2 course, adds two students to
+          the waiting list, then drops one enrolled student and verifies the first waiting student is enrolled.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Object-Oriented Programming with C++14 · Tec de Monterrey · Spring 2026
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
