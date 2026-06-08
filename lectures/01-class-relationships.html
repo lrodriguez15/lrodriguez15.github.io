@@ -30,10 +30,11 @@
       <p class="lecture-num">Lecture 01 · C++14</p>
       <h1>Fundamental Relationships Between Classes</h1>
       <div class="chips">
-        <span class="chip chip-blue">association</span>
-        <span class="chip chip-blue">aggregation</span>
-        <span class="chip chip-blue">composition</span>
-        <span class="chip chip-orange">dependency</span>
+        <span class="chip chip-blue">oop</span>
+        <span class="chip chip-blue">cpp</span>
+        <span class="chip chip-green">uml</span>
+        <span class="chip chip-orange">ownership</span>
+        <span class="chip chip-orange">lifetime</span>
       </div>
     </header>
 
@@ -41,67 +42,115 @@
     <section class="section">
       <h2>Overview</h2>
       <p>
-        Before designing class hierarchies, it is essential to understand <strong>how classes relate to one another</strong>.
-        UML defines four fundamental inter-class relationships, each expressing a different degree of coupling and ownership.
-        Choosing the right relationship affects object lifetime, memory management, and the overall coupling of a design.
+        Before designing class hierarchies, you have to answer a more basic question: <strong>how do two
+        classes relate?</strong> UML names four fundamental relationships, and the only thing that really
+        separates them is <strong>who owns whose lifetime</strong>. Get the relationship wrong and you get one of
+        two bugs: a dangling pointer (you destroyed something another object still needed) or a
+        double-free (two objects both think they own the same thing).
       </p>
-      <ul>
-        <li><strong>Association</strong> — a general "knows about" link</li>
-        <li><strong>Aggregation</strong> — a "has-a" link with independent lifetimes</li>
-        <li><strong>Composition</strong> — a "has-a" link with dependent lifetimes</li>
-        <li><strong>Dependency</strong> — a temporary "uses" link</li>
-      </ul>
+      <p>The four relationships, from loosest to tightest coupling:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Relationship</th>
+            <th>Meaning</th>
+            <th>Lifetime</th>
+            <th>Typical C++ member</th>
+            <th>UML</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Association</strong></td>
+            <td>"knows about"</td>
+            <td>independent</td>
+            <td>raw <code>*</code> / <code>&amp;</code> (non-owning)</td>
+            <td>solid arrow →</td>
+          </tr>
+          <tr>
+            <td><strong>Aggregation</strong></td>
+            <td>"has-a" (shared part)</td>
+            <td>independent</td>
+            <td>non-owning <code>*</code> / container of <code>*</code></td>
+            <td>open diamond ◇—</td>
+          </tr>
+          <tr>
+            <td><strong>Composition</strong></td>
+            <td>"has-a" (owned part)</td>
+            <td><strong>dependent</strong></td>
+            <td>by-value member or <code>unique_ptr</code></td>
+            <td>filled diamond ◆—</td>
+          </tr>
+          <tr>
+            <td><strong>Dependency</strong></td>
+            <td>"uses"</td>
+            <td>transient</td>
+            <td>parameter / local / return</td>
+            <td>dashed arrow ⤍</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>The discriminator between these relationships is <strong>lifetime ownership</strong>, not syntax.</li>
+          <li>Association &amp; aggregation are <strong>non-owning</strong>: the pointed-to object outlives, or is unaffected
+            by, the holder. Composition is <strong>owning</strong>: destroy the whole and the part dies with it.</li>
+          <li>"Who calls <code>delete</code>?" answers almost every design question on this topic.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ── Notes ────────────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Notes</h2>
 
-      <h3>Association</h3>
+      <h3>Association — "knows about"</h3>
       <p>
-        An <strong>association</strong> is the loosest relationship: one class holds a reference or pointer to another,
-        but neither object owns the other. Both objects can exist independently and outlive each other.
+        The loosest relationship: one object holds a <strong>non-owning</strong> pointer or reference to another.
+        Both can exist independently and either can outlive the other.
       </p>
       <ul>
-        <li>Implemented as a pointer or reference member (often raw <code>*</code> or <code>&amp;</code>)</li>
-        <li>The associated object is <em>not</em> destroyed when the holder is destroyed</li>
-        <li>Example: a <code>Student</code> associated with a <code>Teacher</code> — both exist in the system independently</li>
+        <li>Implemented as a raw pointer or reference member (non-owning by convention).</li>
+        <li>The associated object is <strong>not</strong> destroyed when the holder is destroyed.</li>
+        <li>Example: a <code>Student</code> knows its advisor <code>Teacher</code>; both live in the system independently.</li>
       </ul>
-      <p class="note"><strong>UML notation:</strong> simple solid arrow (→)</p>
+      <p class="note"><strong>UML notation:</strong> solid arrow (→)</p>
 
-      <h3>Aggregation</h3>
+      <h3>Aggregation — "has-a", shared part</h3>
       <p>
-        <strong>Aggregation</strong> is a specialised association expressing a whole-part relationship where the part
-        can exist without the whole. The container does not own the contained object's lifetime.
+        A specialised association: a whole-part link where the <strong>part can exist without the whole</strong>.
+        The container does not control the part's lifetime.
       </p>
       <ul>
-        <li>Typically implemented via a pointer or reference to an externally created object</li>
-        <li>Destroying the aggregate does <em>not</em> destroy the component</li>
-        <li>Example: a <code>Department</code> aggregates <code>Employee</code> objects — employees exist outside the department</li>
+        <li>Typically a non-owning pointer, or a container of non-owning pointers, to externally created objects.</li>
+        <li>Destroying the aggregate does <strong>not</strong> destroy the components.</li>
+        <li>Example: a <code>Department</code> aggregates <code>Employee</code> objects that exist outside the department.</li>
       </ul>
       <p class="note"><strong>UML notation:</strong> open diamond (◇—)</p>
 
-      <h3>Composition</h3>
+      <h3>Composition — "has-a", owned part</h3>
       <p>
-        <strong>Composition</strong> is the strongest form of aggregation. The component's lifetime is strictly controlled
-        by the composite: when the composite is destroyed, so are its parts.
+        The strongest whole-part relationship. The part's lifetime is <strong>strictly controlled</strong> by the
+        composite: destroy the composite and its parts go with it.
       </p>
       <ul>
-        <li>Implemented as a <em>by-value</em> member or a smart pointer (<code>std::unique_ptr</code>)</li>
-        <li>The composite is solely responsible for the component's lifetime</li>
-        <li>Example: a <code>Car</code> is composed of an <code>Engine</code> — the engine cannot exist without the car in this design</li>
+        <li>Implemented as a <strong>by-value</strong> member or an owning <code>std::unique_ptr</code>.</li>
+        <li>The composite is solely responsible for the part's lifetime — RAII does the cleanup for free.</li>
+        <li>Example: a <code>Car</code> owns its <code>Engine</code>; the engine doesn't outlive the car.</li>
       </ul>
       <p class="note"><strong>UML notation:</strong> filled diamond (◆—)</p>
 
-      <h3>Dependency</h3>
+      <h3>Dependency — "uses"</h3>
       <p>
-        A <strong>dependency</strong> is a transient relationship: class A depends on class B if A uses B as a parameter
-        type, a local variable, or a return type in one of its operations, but does not hold a persistent reference.
+        A transient relationship: class <code>A</code> depends on <code>B</code> if <code>A</code> uses <code>B</code> as a parameter,
+        local variable, or return type — but stores no persistent reference.
       </p>
       <ul>
-        <li>The weakest form of coupling — no member variable involved</li>
-        <li>Changes to B's interface may require A to be recompiled</li>
-        <li>Example: a <code>Printer</code> depends on a <code>Document</code> passed to its <code>print()</code> method</li>
+        <li>The weakest coupling: <strong>no member variable</strong> involved.</li>
+        <li>A change to <code>B</code>'s interface may force <code>A</code> to recompile.</li>
+        <li>Example: a <code>Printer</code> depends on a <code>Document</code> only during the <code>print()</code> call.</li>
       </ul>
       <p class="note"><strong>UML notation:</strong> dashed arrow (- - →)</p>
     </section>
@@ -109,6 +158,7 @@
     <!-- ── Code Examples ─────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Code Examples</h2>
+      <p>Full runnable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
 
       <h3>Association</h3>
 <pre><code class="language-cpp">// Association: Student "knows about" a Teacher via a non-owning pointer.
@@ -119,7 +169,7 @@ public:
 };
 
 class Student {
-    Teacher* advisor; // non-owning pointer
+    Teacher* advisor;            // non-owning: Student does NOT delete this
 public:
     Student(Teacher* t) : advisor(t) {}
     void greet() const {
@@ -129,12 +179,12 @@ public:
 
 int main() {
     Teacher t("Dr. Smith");
-    Student s(&amp;t);  // Teacher created externally; Student doesn't own it
+    Student s(&amp;t);               // Teacher created externally; Student doesn't own it
     s.greet();
 }</code></pre>
 
       <h3>Aggregation</h3>
-<pre><code class="language-cpp">// Aggregation: Department holds pointers to Employee objects it does not own.
+<pre><code class="language-cpp">// Aggregation: Department holds non-owning pointers to Employees it did not create.
 class Employee {
 public:
     std::string name;
@@ -142,67 +192,37 @@ public:
 };
 
 class Department {
-    std::vector&lt;Employee*&gt; members; // non-owning
+    std::vector&lt;Employee*&gt; members;   // non-owning
 public:
     void add(Employee* e) { members.push_back(e); }
     void list() const {
-        for (auto* e : members)
-            std::cout &lt;&lt; e-&gt;name &lt;&lt; "\n";
+        for (auto* e : members) std::cout &lt;&lt; e-&gt;name &lt;&lt; "\n";
     }
-};
-
-int main() {
-    Employee e1("Alice"), e2("Bob");
-    Department d;
-    d.add(&amp;e1);
-    d.add(&amp;e2);
-    d.list();
-    // e1, e2 outlive d — no double-free
-}</code></pre>
+};                                    // ~Department does NOT delete the employees</code></pre>
 
       <h3>Composition</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
-
-// Composition: Car owns its Engine; Engine cannot exist independently.
+// Composition: Car owns its Engine; the Engine dies with the Car.
 class Engine {
 public:
     void start() { std::cout &lt;&lt; "Engine started\n"; }
 };
 
 class Car {
-    std::unique_ptr&lt;Engine&gt; engine; // owning — Engine destroyed with Car
+    std::unique_ptr&lt;Engine&gt; engine;   // owning — destroyed automatically with Car
 public:
     Car() : engine(std::make_unique&lt;Engine&gt;()) {}
     void drive() { engine-&gt;start(); std::cout &lt;&lt; "Driving\n"; }
-};
-
-int main() {
-    Car car;
-    car.drive();
-    // When 'car' goes out of scope, engine is automatically destroyed.
-}</code></pre>
+};                                    // unique_ptr's destructor frees the Engine. No manual delete.</code></pre>
 
       <h3>Dependency</h3>
-<pre><code class="language-cpp">// Dependency: Printer uses a Document only during the print() call.
-class Document {
-public:
-    std::string content;
-    Document(const std::string&amp; c) : content(c) {}
-};
-
+<pre><code class="language-cpp">// Dependency: Printer uses a Document only during print(); stores nothing.
 class Printer {
 public:
-    // Document is a parameter — no persistent reference stored
     void print(const Document&amp; doc) const {
         std::cout &lt;&lt; "[Printing] " &lt;&lt; doc.content &lt;&lt; "\n";
     }
-};
-
-int main() {
-    Document d("Hello, World!");
-    Printer p;
-    p.print(d);
-}</code></pre>
+};</code></pre>
     </section>
 
     <!-- ── Slides ─────────────────────────────────────────────────────────────── -->
@@ -225,34 +245,33 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Model a <strong>Library</strong> system. A <code>Library</code> manages a collection of <code>Book</code> objects.
-          Books can exist independently of the library (e.g., be on loan). Implement the correct relationship, add a
-          method to add/remove books, and print all titles.
-          Justify your relationship choice (association vs. aggregation vs. composition).
+          <strong>Library (choose &amp; justify).</strong> Model a <code>Library</code> that manages <code>Book</code> objects. Books can
+          exist independently of the library (e.g. out on loan). Implement the correct relationship,
+          add methods to add/remove books and print all titles, and <strong>write one sentence justifying</strong>
+          association vs. aggregation vs. composition for your choice.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Design a <code>House</code> class that is composed of <code>Room</code> objects.
-          Each <code>Room</code> has a name and an area (in m²). The <code>House</code> should expose a method that
-          returns the total floor area. Ensure that destroying a <code>House</code> automatically cleans up all its rooms.
-          Use C++14 smart pointers.
+          <strong>House (composition + RAII).</strong> Design a <code>House</code> composed of <code>Room</code> objects, each with a
+          name and an area (m²). Expose <code>totalArea()</code>. Ensure destroying a <code>House</code> cleans up every
+          <code>Room</code> automatically. Use C++14 smart pointers — no raw <code>new</code>/<code>delete</code>.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Identify each relationship in the following scenario and justify your answer:
+          <strong>Classify (read &amp; defend).</strong> For each scenario, state association / aggregation /
+          composition / dependency, then implement a minimal C++14 snippet:
         </p>
-        <ul>
-          <li>A <code>University</code> <em>offers</em> several <code>Course</code> objects. Courses can exist in a catalog before any university is assigned.</li>
+        <ol>
+          <li>A <code>University</code> <em>offers</em> <code>Course</code> objects; courses exist in a catalog before any university.</li>
           <li>A <code>Course</code> is <em>taught by</em> a <code>Professor</code>.</li>
-          <li>A <code>Gradebook</code> <em>calculates</em> the final grade using a <code>GradingPolicy</code> passed to it at call time.</li>
-        </ul>
-        <p>For each bullet, state: association, aggregation, composition, or dependency — and implement a minimal C++14 snippet.</p>
+          <li>A <code>Gradebook</code> <em>computes</em> a grade using a <code>GradingPolicy</code> passed at call time.</li>
+        </ol>
       </div>
     </section>
 

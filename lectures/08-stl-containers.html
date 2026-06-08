@@ -32,28 +32,104 @@
       <div class="chips">
         <span class="chip chip-blue">vector</span>
         <span class="chip chip-blue">map</span>
+        <span class="chip chip-blue">set</span>
         <span class="chip chip-green">iterators</span>
         <span class="chip chip-orange">algorithms</span>
+        <span class="chip chip-orange">stl</span>
       </div>
     </header>
 
     <section class="section">
       <h2>Overview</h2>
       <p>
-        The <strong>Standard Template Library (STL)</strong> provides generic, type-safe containers and
-        algorithms that replace manual data structure implementation. Every container manages its own
-        memory, grows dynamically where needed, and exposes a uniform <em>iterator</em> interface that
-        algorithms work against.
+        The <strong>Standard Template Library</strong> hands you a toolbox of production-quality, type-safe
+        containers and algorithms. The choice of container is not cosmetic — pick the wrong one and
+        you pay O(n) where you should pay O(1), or you silently corrupt memory when an iterator
+        you're holding gets invalidated. This lecture teaches you how to choose, how to use, and —
+        critically — where the traps are.
       </p>
-      <p>This lecture covers the most commonly used containers:</p>
-      <ul>
-        <li><code>std::vector</code> — dynamic array (the default container)</li>
-        <li><code>std::array</code> — fixed-size stack array with STL interface</li>
-        <li><code>std::list</code> — doubly-linked list for frequent insertions/removals</li>
-        <li><code>std::map</code> / <code>std::unordered_map</code> — ordered and hash key-value stores</li>
-        <li><code>std::set</code> — sorted unique elements</li>
-      </ul>
-      <p>And key algorithms from <code>&lt;algorithm&gt;</code>: <code>sort</code>, <code>find</code>, <code>count_if</code>, <code>for_each</code>, <code>transform</code>.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Container</th>
+            <th>Internal structure</th>
+            <th>Access</th>
+            <th>Insert (end)</th>
+            <th>Insert (middle)</th>
+            <th>Search</th>
+            <th>Ordered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>std::vector&lt;T&gt;</code></td>
+            <td>contiguous array</td>
+            <td>O(1)</td>
+            <td>amortised O(1)</td>
+            <td>O(n)</td>
+            <td>O(n)</td>
+            <td>insertion order</td>
+          </tr>
+          <tr>
+            <td><code>std::array&lt;T,N&gt;</code></td>
+            <td>stack array</td>
+            <td>O(1)</td>
+            <td>— (fixed)</td>
+            <td>— (fixed)</td>
+            <td>O(n)</td>
+            <td>fixed</td>
+          </tr>
+          <tr>
+            <td><code>std::list&lt;T&gt;</code></td>
+            <td>doubly-linked list</td>
+            <td>O(n)</td>
+            <td>O(1)</td>
+            <td>O(1) given iterator</td>
+            <td>O(n)</td>
+            <td>insertion order</td>
+          </tr>
+          <tr>
+            <td><code>std::map&lt;K,V&gt;</code></td>
+            <td>red-black tree</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>sorted by key</td>
+          </tr>
+          <tr>
+            <td><code>std::unordered_map&lt;K,V&gt;</code></td>
+            <td>hash table</td>
+            <td>O(1) avg</td>
+            <td>O(1) avg</td>
+            <td>O(1) avg</td>
+            <td>O(1) avg</td>
+            <td>none</td>
+          </tr>
+          <tr>
+            <td><code>std::set&lt;T&gt;</code></td>
+            <td>red-black tree</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+            <td>sorted</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>Default rule:</strong> reach for <code>std::vector</code> first. Switch to another container only when you have a concrete complexity or ownership reason.</p>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>Every STL container manages its own memory and exposes an <strong>iterator</strong> interface that algorithms work against uniformly.</li>
+          <li><strong>Iterator invalidation</strong> is the most common STL bug: certain operations (e.g. <code>push_back</code>, <code>erase</code>) destroy existing iterators. Using a dead iterator is undefined behaviour.</li>
+          <li><code>std::map</code> gives O(log n) sorted access; <code>std::unordered_map</code> gives O(1) average unsorted access. Know which you need before you type the name.</li>
+          <li>Prefer algorithms (<code>std::sort</code>, <code>std::find_if</code>, <code>std::count_if</code>) over hand-written loops: they are harder to get wrong and their intent is self-documenting.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="section">
@@ -61,46 +137,172 @@
 
       <h3>std::vector — The Default Container</h3>
       <p>
-        A contiguous, dynamically resizable array. Elements are stored next to each other in memory —
-        ideal cache behaviour. Random access is O(1); push_back is amortised O(1); insertion in the middle is O(n).
+        A contiguous, dynamically-resizable array. Elements sit next to each other in memory —
+        excellent cache behaviour. Random access is O(1); <code>push_back</code> is amortised O(1); insertion
+        or removal in the middle is O(n) because every subsequent element shifts.
       </p>
+      <p>Key operations:</p>
       <ul>
-        <li><code>push_back(v)</code> / <code>emplace_back(args…)</code> — add to end</li>
-        <li><code>pop_back()</code> — remove last element</li>
-        <li><code>size()</code>, <code>empty()</code>, <code>reserve(n)</code> — avoid reallocations</li>
-        <li><code>operator[]</code> — unchecked access; <code>.at(i)</code> — bounds-checked</li>
-        <li><code>begin()</code> / <code>end()</code> — iterator range</li>
+        <li><code>push_back(v)</code> / <code>emplace_back(args…)</code> — add to end (prefer <code>emplace_back</code> to avoid an extra copy)</li>
+        <li><code>pop_back()</code> — remove last element in O(1)</li>
+        <li><code>reserve(n)</code> — pre-allocate capacity; avoids repeated reallocations in a known-size loop</li>
+        <li><code>operator[]</code> — unchecked access (no exception on out-of-bounds); <code>.at(i)</code> — bounds-checked</li>
+        <li><code>begin()</code> / <code>end()</code> — iterator range used by all standard algorithms</li>
+        <li><code>erase(it)</code> — removes the element at <code>it</code>, returns the iterator to the next element</li>
       </ul>
+      <p class="note">
+        <strong>When not to use vector:</strong> if you need O(1) insertion/removal in the middle and you already
+        hold an iterator to that position, consider <code>std::list</code>. If you need O(1) lookup by key, use
+        <code>std::unordered_map</code>.
+      </p>
 
       <h3>std::array — Fixed-Size Stack Array</h3>
       <p>
-        Wraps a C-style array with the full STL interface. Size is a compile-time constant — no heap allocation.
-        Prefer over C arrays when the size is known at compile time.
+        Wraps a C-style array with the full STL interface. Size is a compile-time constant — no heap
+        allocation at all. Prefer over raw C arrays (<code>int a[4]</code>) whenever the size is known at
+        compile time: you get <code>.size()</code>, <code>.at()</code>, iterators, and copy semantics for free.
+      </p>
+
+      <h3>std::list — Doubly-Linked List</h3>
+      <p>
+        O(1) insertion and removal at any position <em>given an iterator to that position</em>. Pays for it
+        with O(n) random access and poor cache locality. Use when:
+      </p>
+      <ul>
+        <li>you frequently insert or delete in the middle of the sequence, and</li>
+        <li>you hold iterators to nodes that must remain valid after those operations.</li>
+      </ul>
+      <p class="note">
+        <code>std::list::erase(it)</code> does <strong>not</strong> invalidate any other iterators (unlike vector).
       </p>
 
       <h3>std::map &amp; std::unordered_map</h3>
+      <p>Both map keys to values; they differ in ordering guarantees and complexity:</p>
       <ul>
-        <li><code>std::map&lt;K,V&gt;</code> — sorted by key (red-black tree); O(log n) lookup/insert.</li>
-        <li><code>std::unordered_map&lt;K,V&gt;</code> — hash table; O(1) average lookup/insert.</li>
-        <li>Both expose <code>operator[]</code>, <code>.at(key)</code>, <code>.find(key)</code>, <code>.count(key)</code>.</li>
-        <li><code>operator[]</code> on a map <em>inserts a default value</em> if the key is absent — use <code>.at()</code> or <code>.find()</code> to avoid this.</li>
+        <li><code>std::map&lt;K,V&gt;</code> — red-black tree; keys always sorted; O(log n) for every operation.</li>
+        <li><code>std::unordered_map&lt;K,V&gt;</code> — hash table; no ordering; O(1) average for lookup/insert (worst case O(n) under hash collision).</li>
+      </ul>
+      <p>Both expose the same interface:</p>
+      <ul>
+        <li><code>operator[]</code> — inserts a <strong>default-constructed</strong> value if the key is absent. Avoid when you only want to <em>read</em> — use <code>.find()</code> or <code>.at()</code> instead.</li>
+        <li><code>.at(key)</code> — throws <code>std::out_of_range</code> if absent; safe read.</li>
+        <li><code>.find(key)</code> — returns <code>end()</code> if absent; fastest explicit check.</li>
+        <li><code>.count(key)</code> — returns 0 or 1 (use to test existence without inserting).</li>
       </ul>
 
       <h3>Iterators</h3>
       <p>
-        An iterator is an object that points into a container, similar to a pointer. All STL containers
-        expose <code>begin()</code> (points to first element) and <code>end()</code> (one-past-last).
-        The range-based <code>for</code> loop desugars to iterator usage.
+        An iterator is an object that behaves like a pointer into a container. All STL containers
+        expose <code>begin()</code> (first element) and <code>end()</code> (one-past-last). The range-based
+        <code>for</code> loop is syntactic sugar for iterator traversal:
+      </p>
+<pre><code class="language-cpp">// These two are equivalent:
+for (int n : nums) { /* … */ }
+
+for (auto it = nums.begin(); it != nums.end(); ++it) {
+    int n = *it;
+    /* … */
+}</code></pre>
+      <p>
+        Use <code>cbegin()</code> / <code>cend()</code> when you only need read access (communicates intent,
+        prevents accidental mutation).
       </p>
 
-      <h3>Common Algorithms (&lt;algorithm&gt;)</h3>
+      <h3>Iterator Invalidation — The Trap</h3>
+      <p>
+        <strong>Certain operations invalidate all existing iterators into a container.</strong> Using an
+        invalidated iterator is undefined behaviour — it may crash, silently corrupt data, or appear
+        to work and fail only in production.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Containers affected</th>
+            <th>Iterators invalidated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>push_back</code> / <code>emplace_back</code> (triggers reallocation)</td>
+            <td><code>vector</code></td>
+            <td><strong>all</strong></td>
+          </tr>
+          <tr>
+            <td><code>insert</code> / <code>erase</code> at a position</td>
+            <td><code>vector</code></td>
+            <td>that position and all after it</td>
+          </tr>
+          <tr>
+            <td><code>erase</code> a node</td>
+            <td><code>list</code>, <code>map</code>, <code>unordered_map</code></td>
+            <td>only the erased iterator</td>
+          </tr>
+          <tr>
+            <td><code>rehash</code> / heavy insert</td>
+            <td><code>unordered_map</code></td>
+            <td><strong>all</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        The most common mistake: erasing elements from a <code>vector</code> inside a range-based
+        <code>for</code>, or storing an iterator before a <code>push_back</code> and using it after.
+      </p>
+
+      <h3>The Erase-Remove Idiom</h3>
+      <p>To remove all elements satisfying a predicate from a <code>vector</code>:</p>
+<pre><code class="language-cpp">// WRONG — UB: erasing invalidates the iterator the range-for holds
+for (auto it = v.begin(); it != v.end(); ++it) {
+    if (*it % 2 == 0) v.erase(it);   // it is now invalid
+}
+
+// CORRECT — erase-remove idiom
+#include &lt;algorithm&gt;
+v.erase(std::remove_if(v.begin(), v.end(),
+    [](int x) { return x % 2 == 0; }), v.end());</code></pre>
+      <p>
+        <code>std::remove_if</code> shuffles matching elements to the end and returns an iterator to the new
+        logical end. <code>vector::erase</code> then chops off that tail — one allocation-free pass.
+      </p>
+      <p>Alternatively, use the iterator-returning form of <code>erase</code>:</p>
+<pre><code class="language-cpp">for (auto it = v.begin(); it != v.end(); ) {
+    if (*it % 2 == 0)
+        it = v.erase(it);   // erase returns next valid iterator
+    else
+        ++it;
+}</code></pre>
+
+      <h3>Choosing the Right Container — The Cost of Getting It Wrong</h3>
+      <p>Wrong-container bugs are performance bugs that look like correct code:</p>
+<pre><code class="language-cpp">// O(n) lookup — fine for 10 elements, unusable for 10 000
+std::vector&lt;std::pair&lt;std::string, int&gt;&gt; scores;
+auto it = std::find_if(scores.begin(), scores.end(),
+    [](const auto&amp; p){ return p.first == "Alice"; });
+
+// O(1) lookup — use this when you lookup by key
+std::unordered_map&lt;std::string, int&gt; scores;
+auto it = scores.find("Alice");   // hash lookup, O(1) average</code></pre>
+      <p>Rule of thumb: if you are repeatedly <strong>looking up by a key</strong>, you want a map, not a vector.</p>
+
+      <h3>Common Algorithms (<code>&lt;algorithm&gt;</code>)</h3>
+      <p>
+        All algorithms operate on iterator ranges <code>[begin, end)</code> and work with any container that
+        provides the right iterator category.
+      </p>
       <ul>
-        <li><code>std::sort(begin, end)</code> — sort in-place</li>
-        <li><code>std::find(begin, end, val)</code> — returns iterator to first match</li>
-        <li><code>std::count_if(begin, end, pred)</code> — count elements satisfying a predicate</li>
-        <li><code>std::for_each(begin, end, fn)</code> — call <code>fn</code> on each element</li>
-        <li><code>std::transform(in_begin, in_end, out_begin, fn)</code> — map a function over a range</li>
-        <li><code>std::accumulate(begin, end, init)</code> — fold/reduce (in <code>&lt;numeric&gt;</code>)</li>
+        <li><code>std::sort(begin, end, cmp)</code> — sort in-place (requires random-access iterators: vector, array)</li>
+        <li><code>std::find(begin, end, val)</code> — first element equal to <code>val</code>; returns <code>end()</code> if not found</li>
+        <li><code>std::find_if(begin, end, pred)</code> — first element satisfying predicate</li>
+        <li><code>std::count_if(begin, end, pred)</code> — count elements satisfying predicate</li>
+        <li><code>std::for_each(begin, end, fn)</code> — call <code>fn</code> on each element (side-effect focused)</li>
+        <li><code>std::transform(in_b, in_e, out_b, fn)</code> — map a function over a range into an output range</li>
+        <li><code>std::remove_if(begin, end, pred)</code> — shuffle matching elements to the end (pair with <code>erase</code>)</li>
+        <li><code>std::copy_if(in_b, in_e, out_b, pred)</code> — copy matching elements to output range</li>
+        <li><code>std::unique(begin, end)</code> — collapse consecutive duplicates (sort first for full dedup)</li>
+        <li><code>std::accumulate(begin, end, init)</code> — fold/reduce; lives in <code>&lt;numeric&gt;</code></li>
       </ul>
     </section>
 
@@ -127,8 +329,7 @@ int main() {
 
     std::cout &lt;&lt; "size: " &lt;&lt; nums.size() &lt;&lt; "\n";  // 4
     std::cout &lt;&lt; "at(1): " &lt;&lt; nums.at(1) &lt;&lt; "\n";  // 20 (bounds-checked)
-}
-</code></pre>
+}</code></pre>
 
       <h3>vector of Polymorphic Objects</h3>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -152,8 +353,48 @@ int main() {
 
     for (const auto&amp; s : scene)
         s-&gt;draw();   // runtime dispatch per element
-}
-</code></pre>
+}</code></pre>
+
+      <h3>Failure &rarr; Fix: Iterator Invalidation in a Loop</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// WRONG — undefined behaviour: erasing inside a range-for on vector
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+for (int n : v) {
+    if (n % 2 == 0)
+        v.erase(std::find(v.begin(), v.end(), n));  // UB: range-for iterator invalidated
+}</code></pre>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// FIX 1 — erase-remove idiom (preferred)
+std::vector&lt;int&gt; v = {1, 2, 3, 4, 5};
+v.erase(std::remove_if(v.begin(), v.end(),
+    [](int x){ return x % 2 == 0; }), v.end());
+// v is now {1, 3, 5}
+
+// FIX 2 — manual iterator loop using the return value of erase()
+for (auto it = v.begin(); it != v.end(); ) {
+    if (*it % 2 == 0)
+        it = v.erase(it);   // erase() returns the next valid iterator
+    else
+        ++it;
+}</code></pre>
+
+      <h3>Failure &rarr; Fix: Wrong Container for Key Lookup</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// WRONG — O(n) linear scan per lookup; unusable at scale
+std::vector&lt;std::pair&lt;std::string, int&gt;&gt; scores = {
+    {"Alice", 95}, {"Bob", 82}, {"Carol", 88}
+};
+// Finding "Carol" scans every element
+auto it = std::find_if(scores.begin(), scores.end(),
+    [](const auto&amp; p){ return p.first == "Carol"; });</code></pre>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// FIX — O(1) average with unordered_map
+std::unordered_map&lt;std::string, int&gt; scores = {
+    {"Alice", 95}, {"Bob", 82}, {"Carol", 88}
+};
+auto it = scores.find("Carol");   // hash lookup
+if (it != scores.end())
+    std::cout &lt;&lt; it-&gt;second &lt;&lt; "\n";  // 88</code></pre>
 
       <h3>std::array — Fixed-Size</h3>
 <pre><code class="language-cpp">#include &lt;array&gt;
@@ -166,11 +407,9 @@ int main() {
     double avg = std::accumulate(temps.begin(), temps.end(), 0.0) / temps.size();
     std::cout &lt;&lt; "Average temp: " &lt;&lt; avg &lt;&lt; "\n";
 
-    // Structured bindings (C++17 preview — works in C++14 with indices)
     for (std::size_t i = 0; i &lt; temps.size(); ++i)
-        std::cout &lt;&lt; "Day " &lt;&lt; i+1 &lt;&lt; ": " &lt;&lt; temps[i] &lt;&lt; "\n";
-}
-</code></pre>
+        std::cout &lt;&lt; "Day " &lt;&lt; i + 1 &lt;&lt; ": " &lt;&lt; temps[i] &lt;&lt; "\n";
+}</code></pre>
 
       <h3>std::map — Key-Value Store</h3>
 <pre><code class="language-cpp">#include &lt;map&gt;
@@ -187,17 +426,16 @@ int main() {
     for (const auto&amp; pair : grades)
         std::cout &lt;&lt; pair.first &lt;&lt; ": " &lt;&lt; pair.second &lt;&lt; "\n";
 
-    // Safe lookup — .find() doesn't insert a default value
+    // Safe lookup — .find() does NOT insert a default value
     auto it = grades.find("Bob");
     if (it != grades.end())
         std::cout &lt;&lt; "Bob's grade: " &lt;&lt; it-&gt;second &lt;&lt; "\n";
 
-    // Check existence
+    // Existence check without insertion
     std::cout &lt;&lt; grades.count("Dave") &lt;&lt; "\n";  // 0 — not found
-}
-</code></pre>
+}</code></pre>
 
-      <h3>Algorithms: sort, find_if, count_if, transform</h3>
+      <h3>Algorithms: sort, find_if, count_if</h3>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 #include &lt;algorithm&gt;
 #include &lt;iostream&gt;
@@ -222,7 +460,7 @@ int main() {
         [](const Student&amp; s) { return s.grade &gt;= 70; });
     std::cout &lt;&lt; "Passed: " &lt;&lt; passed &lt;&lt; "\n";  // 4
 
-    // Find first student with grade < 70
+    // Find first student with grade &lt; 70
     auto it = std::find_if(students.begin(), students.end(),
         [](const Student&amp; s) { return s.grade &lt; 70; });
     if (it != students.end())
@@ -231,8 +469,7 @@ int main() {
     // Print sorted ranking
     for (const auto&amp; s : students)
         std::cout &lt;&lt; s.name &lt;&lt; " - " &lt;&lt; s.grade &lt;&lt; "\n";
-}
-</code></pre>
+}</code></pre>
     </section>
 
     <section class="section">
@@ -253,30 +490,42 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Read a sequence of integers from the user until 0 is entered. Store them in a <code>std::vector</code>.
-          Then: (a) print the sorted sequence; (b) print the sum and average using <code>std::accumulate</code>;
-          (c) print only the even numbers using <code>std::copy_if</code> into a second vector;
-          (d) remove all duplicates (hint: sort first, then <code>std::unique</code> + <code>erase</code>).
+          <strong>Vector pipeline.</strong> Read a sequence of integers from the user until 0 is entered. Store
+          them in a <code>std::vector</code>. Then:
         </p>
+        <ul>
+          <li>(a) print the sorted sequence;</li>
+          <li>(b) print the sum and average using <code>std::accumulate</code>;</li>
+          <li>(c) copy only the even numbers into a second vector using <code>std::copy_if</code>;</li>
+          <li>(d) remove all duplicates using the sort + <code>std::unique</code> + <code>erase</code> pattern.</li>
+        </ul>
+        <p>Discuss: why does <code>std::unique</code> require a sorted range first?</p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Build a simple word-frequency counter using <code>std::unordered_map&lt;std::string, int&gt;</code>.
-          Read words from a hardcoded string (split by spaces). Print the top-5 most frequent words
-          by transferring the map contents into a <code>vector&lt;pair&lt;string,int&gt;&gt;</code> and sorting by frequency.
+          <strong>Word frequency counter.</strong> Build a word-frequency counter using
+          <code>std::unordered_map&lt;std::string, int&gt;</code>. Read words from a hardcoded string (split on
+          spaces). Print the top-5 most frequent words by transferring the map into a
+          <code>vector&lt;pair&lt;string,int&gt;&gt;</code> and sorting by frequency descending.
         </p>
+        <p>Discuss: why <code>unordered_map</code> and not <code>map</code> here? When would you prefer <code>map</code>?</p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Model a student roster using <code>std::map&lt;std::string, std::vector&lt;int&gt;&gt;</code>
-          where the key is the student's name and the value is a list of assignment scores.
-          Write functions to: add a score for a student, compute each student's average,
-          and print the class ranked by average (highest first). Use STL algorithms throughout.
+          <strong>Student roster with algorithms.</strong> Model a student roster using
+          <code>std::map&lt;std::string, std::vector&lt;int&gt;&gt;</code> where the key is the student's name and the value
+          is a list of assignment scores. Write functions to:
         </p>
+        <ul>
+          <li>add a score for a student,</li>
+          <li>compute each student's average (use <code>std::accumulate</code>),</li>
+          <li>print the class ranked by average (highest first) — you will need to sort a derived <code>vector&lt;pair&lt;string,double&gt;&gt;</code>.</li>
+        </ul>
+        <p>Use STL algorithms throughout; no hand-written index loops.</p>
       </div>
     </section>
   </main>

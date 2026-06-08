@@ -30,8 +30,9 @@
       <p class="lecture-num">Lecture 02 · C++14</p>
       <h1>Inheritance</h1>
       <div class="chips">
+        <span class="chip chip-blue">oop</span>
         <span class="chip chip-blue">inheritance</span>
-        <span class="chip chip-blue">access specifiers</span>
+        <span class="chip chip-blue">access-specifiers</span>
         <span class="chip chip-green">protected</span>
         <span class="chip chip-green">virtual</span>
       </div>
@@ -41,18 +42,54 @@
     <section class="section">
       <h2>Overview</h2>
       <p>
-        <strong>Inheritance</strong> is a mechanism that lets a new class (the <em>derived</em> class) acquire the members
-        of an existing class (the <em>base</em> class), enabling code reuse and the foundation of polymorphism.
-        In C++ inheritance is declared with a colon and an access specifier.
+        <strong>Inheritance</strong> lets a new class (the <em>derived</em> class) acquire the members of an existing class
+        (the <em>base</em> class), enabling code reuse and laying the groundwork for polymorphism. The derived
+        class gets everything the base exposes, and can extend or override it.
       </p>
-      <p>Key concepts covered in this lecture:</p>
-      <ul>
-        <li>Syntax for single inheritance</li>
-        <li>Public, protected, and private inheritance and what each exposes</li>
-        <li>How constructors and destructors chain through a hierarchy</li>
-        <li>The role of <code>protected</code> members</li>
-        <li>Declaring <code>virtual</code> functions as a bridge to polymorphism</li>
-      </ul>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>One-liner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Syntax</td>
+            <td><code>class Derived : public Base { };</code></td>
+          </tr>
+          <tr>
+            <td>Access specifiers</td>
+            <td>Controls what inherited members look like from outside</td>
+          </tr>
+          <tr>
+            <td>Constructor chaining</td>
+            <td>Base ctor fires first; derived ctor last. Destruction is the reverse.</td>
+          </tr>
+          <tr>
+            <td><code>protected</code></td>
+            <td>Visible inside the hierarchy; hidden from outside code</td>
+          </tr>
+          <tr>
+            <td><code>virtual</code> destructor</td>
+            <td><strong>Required</strong> when deleting via a base pointer — the failure-first demo shows exactly why</td>
+          </tr>
+          <tr>
+            <td><code>override</code> keyword</td>
+            <td>Compile-time check that you really are overriding a virtual function</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>Public inheritance models <em>is-a</em>. Private/protected inheritance models <em>implemented-in-terms-of</em> and is rare.</li>
+          <li>Construction order is base → derived; destruction order is derived → base. Break this mental model and you break everything.</li>
+          <li>A non-virtual destructor in a base class is a silent resource leak waiting to happen. Make it <code>virtual</code> the moment a class is designed to be subclassed.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ── Notes ────────────────────────────────────────────────────────────── -->
@@ -65,42 +102,71 @@
     // additional members
 };</code></pre>
       <p>
-        The access specifier controls which inherited members are visible outside the derived class.
-        Most real-world hierarchies use <code>public</code> inheritance.
+        The access specifier controls the <em>maximum visibility</em> of inherited members outside the derived
+        class. Most real-world hierarchies use <code>public</code> inheritance.
       </p>
 
       <h3>Access Specifiers in Inheritance</h3>
-      <p>
-        The access specifier on the inheritance declaration adjusts the <em>maximum visibility</em> of inherited members:
-      </p>
-      <ul>
-        <li><strong>public</strong> — <code>public</code> members of Base stay <code>public</code>; <code>protected</code> stays <code>protected</code></li>
-        <li><strong>protected</strong> — both <code>public</code> and <code>protected</code> members of Base become <code>protected</code> in Derived</li>
-        <li><strong>private</strong> — all inherited members become <code>private</code> in Derived (implementation inheritance)</li>
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Inheritance kind</th>
+            <th><code>public</code> members of Base</th>
+            <th><code>protected</code> members of Base</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>public</code></td>
+            <td>remain <code>public</code></td>
+            <td>remain <code>protected</code></td>
+          </tr>
+          <tr>
+            <td><code>protected</code></td>
+            <td>become <code>protected</code></td>
+            <td>become <code>protected</code></td>
+          </tr>
+          <tr>
+            <td><code>private</code></td>
+            <td>become <code>private</code></td>
+            <td>become <code>private</code></td>
+          </tr>
+        </tbody>
+      </table>
       <p class="note">
-        <strong>Rule of thumb:</strong> use <code>public</code> when modelling an <em>is-a</em> relationship (a Dog is-a Animal).
-        Private/protected inheritance models <em>implemented-in-terms-of</em> and is rarely needed.
+        <strong>Rule of thumb:</strong> use <code>public</code> when modelling <em>is-a</em> (a <code>Dog</code> is-a <code>Animal</code>).
+        Private and protected inheritance model <em>implemented-in-terms-of</em> and are rarely needed.
       </p>
 
-      <h3>Constructor &amp; Destructor Chaining</h3>
+      <h3>Constructor and Destructor Chaining</h3>
       <p>
-        When a derived object is created, the <strong>base constructor runs first</strong>, then the derived constructor.
-        Destruction is the reverse: derived destructor first, then base. You select which base constructor to call
-        in the derived class's <em>member initialiser list</em>.
+        When a derived object is created, the <strong>base constructor runs first</strong>, then the derived
+        constructor. You pick which base constructor to call in the derived class's <em>member initialiser
+        list</em>. Destruction fires in strict reverse order: derived destructor first, base destructor last.
       </p>
 
       <h3>The <code>protected</code> Access Level</h3>
       <p>
-        Members declared <code>protected</code> are inaccessible to external code (like <code>private</code>) but <em>are</em>
-        accessible in derived classes. Use <code>protected</code> sparingly — it tightly couples the base and derived implementations.
+        Members declared <code>protected</code> behave like <code>private</code> to outside code but are readable and writable
+        in derived classes. Use <code>protected</code> sparingly: it couples the base and derived implementations
+        tightly, making both harder to refactor independently.
       </p>
 
       <h3>Introducing <code>virtual</code></h3>
       <p>
-        Marking a base-class member function <code>virtual</code> tells the compiler to dispatch calls through the object's
-        actual runtime type rather than its declared type. This is the entry point to polymorphism (covered in Lecture 03).
-        Always declare the base destructor <code>virtual</code> when the class is intended to be subclassed.
+        Marking a base-class member function <code>virtual</code> tells the compiler to dispatch calls through the
+        object's <em>actual runtime type</em> rather than its declared type. This is the gateway to
+        polymorphism (Lecture 03). For now, the one rule to internalize:
+      </p>
+      <p class="note">
+        <strong>Always declare the base class destructor <code>virtual</code> when the class is designed to be
+        subclassed.</strong> Without it, <code>delete base_ptr</code> where <code>base_ptr</code> points at a derived object
+        invokes undefined behaviour — typically, the derived destructor never runs.
+      </p>
+      <p>
+        The <code>override</code> keyword (C++11) tells the compiler to verify that the function really does
+        override a virtual in the base. If you mistype the name or get the signature wrong, you get a
+        compile error instead of a silent new virtual.
       </p>
     </section>
 
@@ -108,14 +174,13 @@
     <section class="section">
       <h2>Code Examples</h2>
 
-      <h3>Single Inheritance &amp; Access Specifiers</h3>
+      <h3>Single Inheritance and Access Specifiers</h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
 class Animal {
 public:
     std::string name;
-
     Animal(const std::string&amp; n) : name(n) {}
 
     void breathe() const {
@@ -123,12 +188,12 @@ public:
     }
 };
 
-class Dog : public Animal {  // public inheritance — is-a Animal
+class Dog : public Animal {   // public inheritance — Dog is-a Animal
 public:
-    Dog(const std::string&amp; n) : Animal(n) {}  // delegate to base ctor
+    Dog(const std::string&amp; n) : Animal(n) {}   // delegate to base ctor
 
     void bark() const {
-        std::cout &lt;&lt; name &lt;&lt; " says: Woof!\n";  // 'name' is inherited
+        std::cout &lt;&lt; name &lt;&lt; " says: Woof!\n"; // 'name' is inherited
     }
 };
 
@@ -143,7 +208,7 @@ int main() {
 
 class Shape {
 protected:
-    double x, y;  // position — accessible in derived classes
+    double x, y;   // position — accessible in derived classes
 public:
     Shape(double x, double y) : x(x), y(y) {
         std::cout &lt;&lt; "Shape constructed at (" &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ")\n";
@@ -157,7 +222,7 @@ class Circle : public Shape {
     double radius;
 public:
     Circle(double x, double y, double r)
-        : Shape(x, y), radius(r) {    // base constructor in initialiser list
+        : Shape(x, y), radius(r) {   // base constructor in initialiser list
         std::cout &lt;&lt; "Circle constructed, radius=" &lt;&lt; radius &lt;&lt; "\n";
     }
     ~Circle() override {
@@ -169,7 +234,7 @@ public:
 int main() {
     Circle c(0, 0, 5);
     std::cout &lt;&lt; "Area: " &lt;&lt; c.area() &lt;&lt; "\n";
-    // Destructors fire in reverse order: Circle then Shape
+    // Destructors fire in reverse: Circle first, then Shape
 }</code></pre>
 
       <h3>Using <code>protected</code> Members</h3>
@@ -177,7 +242,7 @@ int main() {
 
 class BankAccount {
 protected:
-    double balance;  // derived classes can read/write, outside code cannot
+    double balance;   // derived classes can read/write; outside code cannot
 public:
     BankAccount(double initial) : balance(initial) {}
     double getBalance() const { return balance; }
@@ -190,23 +255,67 @@ public:
         : BankAccount(initial), interestRate(rate) {}
 
     void applyInterest() {
-        balance *= (1.0 + interestRate);  // direct access to protected member
+        balance *= (1.0 + interestRate);   // direct access to protected member
     }
 };
 
 int main() {
     SavingsAccount sa(1000.0, 0.05);
     sa.applyInterest();
-    std::cout &lt;&lt; "Balance: " &lt;&lt; sa.getBalance() &lt;&lt; "\n"; // 1050
+    std::cout &lt;&lt; "Balance: " &lt;&lt; sa.getBalance() &lt;&lt; "\n";  // 1050
     // sa.balance = 0;  // ERROR: protected — not accessible outside the hierarchy
 }</code></pre>
 
+      <h3>FAILURE FIRST — The Non-Virtual Destructor Leak</h3>
+      <p>
+        This is the trap. The code below compiles cleanly. It even runs without crashing in a simple
+        test. But every <code>delete</code> through a <code>Base*</code> leaves <code>Derived</code>'s destructor un-called — leaking
+        whatever <code>Derived</code> owns.
+      </p>
+
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// *** BROKEN — do not ship this ***
+#include &lt;iostream&gt;
+
+class Base {
+public:
+    ~Base() { std::cout &lt;&lt; "Base destructor\n"; }      // NOT virtual
+    virtual void greet() { std::cout &lt;&lt; "Hello from Base\n"; }
+};
+
+class Derived : public Base {
+public:
+    ~Derived() { std::cout &lt;&lt; "Derived destructor\n"; }
+    void greet() override { std::cout &lt;&lt; "Hello from Derived\n"; }
+};
+
+int main() {
+    Base* obj = new Derived();
+    obj-&gt;greet();   // correctly calls Derived::greet — virtual dispatch works
+    delete obj;     // calls Base::~Base only. Derived::~Derived NEVER runs.
+                    // Undefined behaviour. Any resources Derived holds are leaked.
+}</code></pre>
+
+      <p><strong>The fix — one keyword:</strong></p>
+
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">class Base {
+public:
+    virtual ~Base() { std::cout &lt;&lt; "Base destructor\n"; }   // virtual — now safe
+    virtual void greet() { std::cout &lt;&lt; "Hello from Base\n"; }
+};</code></pre>
+      <p>
+        With <code>virtual ~Base()</code>, <code>delete obj</code> dispatches to <code>Derived::~Derived</code> first, then
+        <code>Base::~Base</code>. Correct and safe.
+      </p>
+
       <h3>Virtual Functions Preview</h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;memory&gt;
 
 class Animal {
 public:
-    virtual void speak() const {      // virtual — runtime dispatch
+    virtual void speak() const {        // virtual — runtime dispatch
         std::cout &lt;&lt; "...\n";
     }
     virtual ~Animal() = default;
@@ -214,16 +323,16 @@ public:
 
 class Cat : public Animal {
 public:
-    void speak() const override {     // override keyword — compile-time safety check
+    void speak() const override {       // override — compile-time safety check
         std::cout &lt;&lt; "Meow!\n";
     }
 };
 
 int main() {
-    Animal* a = new Cat();
+    // Smart pointer instead of raw new/delete
+    std::unique_ptr&lt;Animal&gt; a = std::make_unique&lt;Cat&gt;();
     a-&gt;speak();   // prints "Meow!" — dispatched to Cat::speak at runtime
-    delete a;     // safe because ~Animal is virtual
-}</code></pre>
+}   // unique_ptr calls the correct destructor automatically</code></pre>
     </section>
 
     <!-- ── Slides ─────────────────────────────────────────────────────────────── -->
@@ -246,27 +355,32 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Create a class <code>Vehicle</code> with <code>protected</code> members <code>brand</code> (string) and
-          <code>speed</code> (double). Derive <code>Car</code> and <code>Motorcycle</code> from it.
-          Each subclass should have an additional attribute (e.g., number of doors for Car, handlebar type for Motorcycle)
-          and a method to display full vehicle info. Use proper constructor chaining.
+          <strong>Vehicle hierarchy (constructor chaining + protected).</strong> Create a class <code>Vehicle</code> with
+          <code>protected</code> members <code>brand</code> (string) and <code>speed</code> (double). Derive <code>Car</code> and <code>Motorcycle</code> from it.
+          Each subclass should carry one additional attribute (<code>Car</code>: number of doors; <code>Motorcycle</code>:
+          handlebar type as a string) and a method that prints full vehicle info. Use proper constructor
+          chaining in every initialiser list. Add a <code>virtual</code> destructor to <code>Vehicle</code>.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Implement a three-level hierarchy: <code>LivingThing → Animal → Mammal</code>.
-          Each class should add one attribute and call the base constructor in its initialiser list.
-          In <code>main</code>, create a <code>Mammal</code> object and verify that all attributes are correctly initialised
-          by printing them. Trace the constructor and destructor call order with <code>std::cout</code> statements.
+          <strong>Three-level chain (trace construction/destruction order).</strong> Build the hierarchy
+          <code>LivingThing → Animal → Mammal</code>. Each level adds one attribute and calls the base constructor in
+          its initialiser list. In <code>main</code>, create a <code>Mammal</code> object and print all attributes. Add a
+          <code>std::cout</code> statement to every constructor and destructor so you can see the exact call order.
+          Run the program and record the output — then predict what the output would be if you reversed
+          the construction order (impossible in C++, but think through <em>why</em>).
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Explain what happens in the following code and identify the bug. Then fix it:
+          <strong>Diagnose and fix the non-virtual destructor (read, explain, fix).</strong> The code below
+          compiles without warnings but has undefined behaviour. Explain precisely what goes wrong, then
+          fix it with the minimum possible change:
         </p>
 <pre><code class="language-cpp">class Base {
 public:
@@ -285,7 +399,12 @@ int main() {
     obj-&gt;greet();
     delete obj;   // What is the problem here?
 }</code></pre>
+        <p>
+          After fixing, convert the example to use <code>std::unique_ptr&lt;Base&gt;</code> so the heap allocation is
+          managed automatically.
+        </p>
       </div>
+
     </section>
 
   </main>

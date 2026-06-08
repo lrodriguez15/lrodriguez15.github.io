@@ -30,10 +30,10 @@
       <p class="lecture-num">Lecture 04 · C++14</p>
       <h1>Operator Overloading</h1>
       <div class="chips">
-        <span class="chip chip-blue">operator+</span>
-        <span class="chip chip-blue">operator==</span>
+        <span class="chip chip-blue">operator-overloading</span>
         <span class="chip chip-green">friend</span>
-        <span class="chip chip-orange">stream I/O</span>
+        <span class="chip chip-orange">stream-io</span>
+        <span class="chip chip-blue">functors</span>
       </div>
     </header>
 
@@ -41,19 +41,72 @@
     <section class="section">
       <h2>Overview</h2>
       <p>
-        C++ allows you to redefine the behaviour of built-in operators (<code>+</code>, <code>==</code>, <code>&lt;&lt;</code>, …)
-        for user-defined types. This is called <strong>operator overloading</strong>. Used well, it makes
-        user-defined types feel as natural as built-in ones; used poorly, it produces unreadable code.
+        C++ lets you redefine the behaviour of built-in operators (<code>+</code>, <code>==</code>, <code>&lt;&lt;</code>, …) for
+        user-defined types. Done right, it makes your types feel as natural as <code>int</code> or
+        <code>double</code>. Done wrong, it produces surprising bugs and unreadable code.
       </p>
-      <p>Key topics:</p>
-      <ul>
-        <li>Syntax and general rules</li>
-        <li>Member vs non-member (free / <code>friend</code>) implementation</li>
-        <li>Arithmetic and compound-assignment operators</li>
-        <li>Comparison operators</li>
-        <li>Stream insertion (<code>&lt;&lt;</code>) and extraction (<code>&gt;&gt;</code>)</li>
-        <li>Subscript and call operators</li>
-      </ul>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Operator family</th>
+            <th>Canonical form</th>
+            <th>Member or free?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compound assignment (<code>+=</code>, <code>-=</code>, …)</td>
+            <td>returns <code>T&amp;</code></td>
+            <td><strong>member</strong></td>
+          </tr>
+          <tr>
+            <td>Binary arithmetic (<code>+</code>, <code>-</code>, …)</td>
+            <td>takes <code>lhs</code> by value, calls <code>+=</code>, returns <code>T</code></td>
+            <td><strong>free</strong></td>
+          </tr>
+          <tr>
+            <td>Comparison (<code>==</code>, <code>&lt;</code>, …)</td>
+            <td>returns <code>bool</code></td>
+            <td>free (symmetric conversions)</td>
+          </tr>
+          <tr>
+            <td>Stream (<code>&lt;&lt;</code>, <code>&gt;&gt;</code>)</td>
+            <td>returns <code>std::ostream&amp;</code> / <code>std::istream&amp;</code></td>
+            <td><strong>free</strong> (left operand is stream)</td>
+          </tr>
+          <tr>
+            <td>Subscript (<code>[]</code>)</td>
+            <td>provide <code>const</code> + non-<code>const</code> overloads</td>
+            <td><strong>member</strong></td>
+          </tr>
+          <tr>
+            <td>Call (<code>()</code>) — functor</td>
+            <td>any signature</td>
+            <td><strong>member</strong></td>
+          </tr>
+          <tr>
+            <td>Assignment (<code>=</code>)</td>
+            <td>returns <code>T&amp;</code>, guards self-assignment</td>
+            <td><strong>member</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li><strong>Member vs. free</strong>: compound-assignment and subscript are members; symmetric binary
+            operators and stream operators are free functions (declare <code>friend</code> for private access).</li>
+          <li><strong>Canonical form</strong>: implement <code>+=</code> first; define <code>+</code> as a free function that takes <code>lhs</code>
+            by value and calls <code>+=</code>. This avoids duplicating logic and lets copy-elision work.</li>
+          <li><strong>Return types matter</strong>: compound-assignment returns <code>T&amp;</code> (to allow chaining); binary
+            arithmetic returns <code>T</code> by value (never a reference — the result is a temporary).
+            Stream operators return <code>std::ostream&amp;</code> / <code>std::istream&amp;</code> to allow chaining (<code>&lt;&lt; a &lt;&lt; b</code>).</li>
+          <li><strong>Operator= must guard self-assignment</strong> (<code>if (this == &amp;rhs) return *this;</code>) and must
+            return <code>*this</code> — forgetting either is a classic bug.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ── Notes ────────────────────────────────────────────────────────────── -->
@@ -69,64 +122,119 @@
         <li>Overloading <code>&amp;&amp;</code> and <code>||</code> loses short-circuit evaluation — avoid it.</li>
       </ul>
 
-      <h3>Member vs Non-Member</h3>
+      <h3>Member vs. Non-Member</h3>
       <p>
-        An operator overloaded as a <strong>member function</strong> receives the left-hand operand as the implicit
-        <code>this</code> pointer. An operator overloaded as a <strong>non-member (free) function</strong>
+        An operator overloaded as a <strong>member function</strong> receives the left-hand operand as the
+        implicit <code>this</code> pointer. An operator overloaded as a <strong>non-member (free) function</strong>
         takes both operands explicitly.
       </p>
       <ul>
-        <li>Use a <strong>member</strong> for operators that modify the object: <code>+=</code>, <code>-=</code>, <code>[]</code>, <code>()</code>, <code>=</code>, unary <code>-</code>.</li>
-        <li>Use a <strong>non-member</strong> for symmetric binary operators (<code>+</code>, <code>==</code>, <code>&lt;</code>) so that implicit conversions apply to both sides equally.</li>
-        <li>Declare the non-member as a <code>friend</code> if it needs access to private members.</li>
+        <li>Use a <strong>member</strong> for operators that naturally modify the object: <code>+=</code>, <code>-=</code>, <code>[]</code>, <code>()</code>,
+          <code>=</code>, prefix/postfix <code>++</code>/<code>--</code>, and unary <code>-</code>.</li>
+        <li>Use a <strong>non-member</strong> for symmetric binary operators (<code>+</code>, <code>==</code>, <code>&lt;</code>) so that implicit
+          conversions apply to both sides equally.</li>
+        <li>Declare the non-member as a <code>friend</code> only when it needs access to private members.</li>
       </ul>
 
       <h3>Canonical Forms</h3>
       <p>
-        Most operators follow a canonical pattern. Implementing <code>+=</code> first and then defining
-        <code>+</code> in terms of it avoids code duplication:
+        Implement <code>+=</code> first; define <code>+</code> in terms of it to avoid duplicating logic:
       </p>
-<pre><code class="language-cpp">T& operator+=(const T& rhs);            // member — modifies *this
-T  operator+ (T lhs, const T& rhs) {    // free — lhs is a copy
+<pre><code class="language-cpp">T&amp; operator+=(const T&amp; rhs);           // member — modifies *this, returns *this
+T  operator+(T lhs, const T&amp; rhs) {    // free — lhs is a copy, so we can modify it
     lhs += rhs;
     return lhs;
 }</code></pre>
 
       <h3>Comparison Operators</h3>
       <p>
-        Define <code>operator==</code> and <code>operator&lt;</code>; the rest can be written in terms of those two
-        (or use the standard library utilities from <code>&lt;utility&gt;</code>).
+        Define <code>operator==</code> and <code>operator&lt;</code>; derive the rest in terms of those two:
       </p>
+<pre><code class="language-cpp">friend bool operator!=(const T&amp; a, const T&amp; b) { return !(a == b); }
+friend bool operator&gt; (const T&amp; a, const T&amp; b) { return b &lt; a; }
+friend bool operator&lt;=(const T&amp; a, const T&amp; b) { return !(b &lt; a); }
+friend bool operator&gt;=(const T&amp; a, const T&amp; b) { return !(a &lt; b); }</code></pre>
 
       <h3>Stream Operators</h3>
       <p>
-        <code>operator&lt;&lt;</code> and <code>operator&gt;&gt;</code> must be non-member functions because
-        the left operand is a stream (<code>std::ostream</code> / <code>std::istream</code>), not your type.
-        They return a reference to the stream to allow chaining.
+        <code>operator&lt;&lt;</code> and <code>operator&gt;&gt;</code> <strong>must</strong> be non-member functions because the left operand is a
+        stream (<code>std::ostream</code> / <code>std::istream</code>), not your type. They return a reference to the
+        stream to allow chaining:
       </p>
+<pre><code class="language-cpp">friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const T&amp; obj) {
+    // write obj to os
+    return os;   // &lt;-- must return the stream
+}</code></pre>
+
+      <h3>Assignment Operator — Two Pitfalls</h3>
+      <p><code>operator=</code> is a member that must:</p>
+      <ul>
+        <li>Return <code>T&amp;</code> (not <code>T</code>) — so that <code>a = b = c</code> chains correctly.</li>
+        <li>Return <code>*this</code>.</li>
+        <li>Guard against self-assignment — otherwise you may free a resource and then read from it.</li>
+      </ul>
+      <p class="note">See the failure-first demonstration in <strong>Code Examples</strong> below.</p>
     </section>
 
     <!-- ── Code Examples ─────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Code Examples</h2>
 
-      <h3>Arithmetic &amp; Compound Assignment</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+      <p>Full compilable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
 
-class Vector2D {
+      <h3>FAILURE: <code>operator=</code> That Breaks Chaining and Corrupts on Self-Assignment</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BROKEN — two bugs: returns T (not T&amp;), and no self-assignment guard.
+class Buffer {
+    char* data;
+    size_t size;
+public:
+    Buffer(size_t n) : data(new char[n]()), size(n) {}
+    ~Buffer() { delete[] data; }
+
+    // Bug 1: returns Buffer by value — a = b = c does NOT chain (c is sliced into a copy)
+    // Bug 2: no self-assignment guard — a = a frees data then reads garbage
+    Buffer operator=(const Buffer&amp; rhs) {      // &lt;-- should be Buffer&amp;
+        delete[] data;                          // &lt;-- if rhs is *this, this nukes our own data
+        size = rhs.size;
+        data = new char[size];
+        std::copy(rhs.data, rhs.data + size, data);  // reads freed memory if self-assigning!
+        return *this;
+    }
+};
+
+int main() {
+    Buffer a(4), b(4), c(4);
+    a = b = c;          // silently wrong: b=c returns a temporary; a=&lt;temp&gt; copies the temp
+    Buffer x(4);
+    x = x;              // undefined behaviour: deletes x.data, then copies from x.data
+}</code></pre>
+
+      <h3>FIX: Correct <code>operator=</code></h3>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// FIXED — returns T&amp;, guards self-assignment
+Buffer&amp; operator=(const Buffer&amp; rhs) {
+    if (this == &amp;rhs) return *this;    // self-assignment guard
+    delete[] data;
+    size = rhs.size;
+    data = new char[size];
+    std::copy(rhs.data, rhs.data + size, data);
+    return *this;                      // return reference to *this, enabling chaining
+}</code></pre>
+
+      <h3>Arithmetic &amp; Compound Assignment (<code>Vector2D</code>)</h3>
+<pre><code class="language-cpp">class Vector2D {
 public:
     double x, y;
     Vector2D(double x = 0, double y = 0) : x(x), y(y) {}
 
     // Compound assignment — member
-    Vector2D& operator+=(const Vector2D& rhs) {
-        x += rhs.x;
-        y += rhs.y;
+    Vector2D&amp; operator+=(const Vector2D&amp; rhs) {
+        x += rhs.x; y += rhs.y;
         return *this;
     }
-    Vector2D& operator-=(const Vector2D& rhs) {
-        x -= rhs.x;
-        y -= rhs.y;
+    Vector2D&amp; operator-=(const Vector2D&amp; rhs) {
+        x -= rhs.x; y -= rhs.y;
         return *this;
     }
 
@@ -135,116 +243,89 @@ public:
 };
 
 // Binary + built from += — free function (no private access needed)
-Vector2D operator+(Vector2D lhs, const Vector2D& rhs) {
-    lhs += rhs;
-    return lhs;
-}
-Vector2D operator-(Vector2D lhs, const Vector2D& rhs) {
-    lhs -= rhs;
-    return lhs;
-}
+Vector2D operator+(Vector2D lhs, const Vector2D&amp; rhs) { lhs += rhs; return lhs; }
+Vector2D operator-(Vector2D lhs, const Vector2D&amp; rhs) { lhs -= rhs; return lhs; }</code></pre>
 
-int main() {
-    Vector2D a{1, 2}, b{3, 4};
-    Vector2D c = a + b;       // (4, 6)
-    Vector2D d = c - a;       // (3, 4)
-    std::cout &lt;&lt; c.x &lt;&lt; " " &lt;&lt; c.y &lt;&lt; "\n";  // 4 6
-    std::cout &lt;&lt; d.x &lt;&lt; " " &lt;&lt; d.y &lt;&lt; "\n";  // 3 4
-}</code></pre>
+      <p class="note">
+        Note that <code>lhs</code> is taken <strong>by value</strong> in the free binary operators — the caller's copy is
+        already made by the pass-by-value; we reuse that copy as our working buffer and return it.
+        Returning <code>Vector2D&amp;</code> here would be <strong>wrong</strong> (dangling reference to the local <code>lhs</code>).
+      </p>
 
-      <h3>Comparison Operators</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-class Fraction {
+      <h3>Comparison Operators (<code>Fraction</code>)</h3>
+<pre><code class="language-cpp">class Fraction {
 public:
     int num, den;
     Fraction(int n, int d) : num(n), den(d) {}
 
-    // Equality — free friend
-    friend bool operator==(const Fraction& a, const Fraction& b) {
+    friend bool operator==(const Fraction&amp; a, const Fraction&amp; b) {
         return a.num * b.den == b.num * a.den;
     }
-    friend bool operator!=(const Fraction& a, const Fraction& b) {
-        return !(a == b);
-    }
-    friend bool operator&lt;(const Fraction& a, const Fraction& b) {
+    friend bool operator!=(const Fraction&amp; a, const Fraction&amp; b) { return !(a == b); }
+    friend bool operator&lt; (const Fraction&amp; a, const Fraction&amp; b) {
         return a.num * b.den &lt; b.num * a.den;
     }
-};
+};</code></pre>
 
-int main() {
-    Fraction half{1, 2}, twoFourths{2, 4}, third{1, 3};
-    std::cout &lt;&lt; (half == twoFourths) &lt;&lt; "\n";  // 1 (true)
-    std::cout &lt;&lt; (third &lt; half)       &lt;&lt; "\n";  // 1 (true)
-}</code></pre>
-
-      <h3>Stream Insertion &amp; Extraction</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;string&gt;
-
-class Point {
+      <h3>Stream Insertion &amp; Extraction (<code>Point</code>)</h3>
+<pre><code class="language-cpp">class Point {
 public:
     double x, y;
     Point(double x = 0, double y = 0) : x(x), y(y) {}
 
     // Must be non-member: left operand is std::ostream, not Point
-    friend std::ostream& operator&lt;&lt;(std::ostream& os, const Point& p) {
+    friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Point&amp; p) {
         return os &lt;&lt; "(" &lt;&lt; p.x &lt;&lt; ", " &lt;&lt; p.y &lt;&lt; ")";
     }
-    friend std::istream& operator&gt;&gt;(std::istream& is, Point& p) {
+    friend std::istream&amp; operator&gt;&gt;(std::istream&amp; is, Point&amp; p) {
         return is &gt;&gt; p.x &gt;&gt; p.y;
     }
-};
+};</code></pre>
 
-int main() {
-    Point p{3, 4};
-    std::cout &lt;&lt; p &lt;&lt; "\n";           // (3, 4)
+      <p class="note">
+        <code>operator&lt;&lt;</code> takes <code>Point</code> as <code>const&amp;</code> because printing should never modify the object.
+        <code>operator&gt;&gt;</code> takes <code>Point</code> as <code>&amp;</code> (non-const) because reading must modify it.
+      </p>
 
-    Point q;
-    // std::cin &gt;&gt; q;                 // reads two doubles
-    // std::cout &lt;&lt; "Read: " &lt;&lt; q;
-}</code></pre>
-
-      <h3>Subscript Operator</h3>
-<pre><code class="language-cpp">#include &lt;stdexcept&gt;
-
-class FixedArray {
+      <h3>Subscript Operator (<code>FixedArray</code>)</h3>
+<pre><code class="language-cpp">class FixedArray {
     int data[10];
 public:
-    FixedArray() { for (auto& v : data) v = 0; }
+    FixedArray() { for (auto&amp; v : data) v = 0; }
 
-    int& operator[](int i) {
+    // Non-const overload — returns a writable reference
+    int&amp; operator[](int i) {
         if (i &lt; 0 || i &gt;= 10) throw std::out_of_range("index out of range");
         return data[i];
     }
-    const int& operator[](int i) const {   // const overload for read-only access
+    // Const overload — required so the operator works on const FixedArray objects
+    const int&amp; operator[](int i) const {
         if (i &lt; 0 || i &gt;= 10) throw std::out_of_range("index out of range");
         return data[i];
     }
-};
+};</code></pre>
 
-int main() {
-    FixedArray arr;
-    arr[3] = 42;
-    std::cout &lt;&lt; arr[3] &lt;&lt; "\n";   // 42
-}</code></pre>
+      <p class="note">
+        Always provide <strong>both</strong> const and non-const overloads for <code>operator[]</code>. Without the
+        <code>const</code> version, code that receives a <code>const FixedArray&amp;</code> cannot even read elements.
+      </p>
 
-      <h3>Call Operator (Functor)</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-class Multiplier {
+      <h3>Call Operator — Functor (<code>Multiplier</code>)</h3>
+<pre><code class="language-cpp">class Multiplier {
     int factor;
 public:
     explicit Multiplier(int f) : factor(f) {}
-
     int operator()(int x) const { return x * factor; }
 };
 
-int main() {
-    Multiplier triple{3};
-    std::cout &lt;&lt; triple(7)  &lt;&lt; "\n";  // 21
-    std::cout &lt;&lt; triple(10) &lt;&lt; "\n";  // 30
-}</code></pre>
+// Usage
+Multiplier triple{3};
+std::cout &lt;&lt; triple(7);    // 21 — object called like a function</code></pre>
+
+      <p class="note">
+        Functors let you pass <strong>stateful callable objects</strong> to STL algorithms — something plain
+        function pointers cannot do.
+      </p>
     </section>
 
     <!-- ── Slides ─────────────────────────────────────────────────────────────── -->
@@ -267,31 +348,34 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Implement a <code>Matrix2x2</code> class (2×2 matrix of <code>double</code>). Overload:
-          <code>operator+</code>, <code>operator-</code>, <code>operator*</code> (matrix multiplication),
-          <code>operator==</code>, and <code>operator&lt;&lt;</code>.
-          Use the canonical form: implement compound-assignment members first, then free binary operators on top of them.
+          <strong>Matrix2x2 (canonical form).</strong> Implement a <code>Matrix2x2</code> class (2x2 matrix of <code>double</code>).
+          Overload <code>operator+</code>, <code>operator-</code>, <code>operator*</code> (matrix multiplication), <code>operator==</code>, and
+          <code>operator&lt;&lt;</code>. Use the canonical form: implement compound-assignment members (<code>+=</code>, <code>-=</code>,
+          <code>*=</code>) first, then build the free binary operators on top. Verify with a <code>main()</code> that
+          multiplies two known matrices and checks the result with <code>operator==</code>.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Create a <code>String</code> class that wraps a <code>std::string</code> and overloads:
-          <code>operator+</code> (concatenation), <code>operator[]</code> (character access with bounds check),
-          <code>operator==</code>, and <code>operator&lt;&lt;</code>.
-          Ensure the const and non-const overloads of <code>operator[]</code> are both present.
+          <strong>String wrapper (subscript + const correctness).</strong> Create a <code>String</code> class that wraps a
+          <code>std::string</code> and overloads: <code>operator+</code> (concatenation), <code>operator[]</code> (character access with
+          bounds check via <code>std::out_of_range</code>), <code>operator==</code>, and <code>operator&lt;&lt;</code>. Ensure both the
+          <code>const</code> and non-<code>const</code> overloads of <code>operator[]</code> are present. Write a test that passes a
+          <code>const String</code> to a function and reads a character — confirm it compiles and prints correctly.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Write a <code>Counter</code> functor class that keeps an internal count.
-          Overload <code>operator()</code> so that each call increments the count and returns the new value.
-          Also overload prefix <code>operator++</code> and <code>operator--</code> (member functions)
-          and postfix <code>operator++</code> and <code>operator--</code> (note the dummy <code>int</code> parameter).
-          Verify all four increment/decrement variants behave correctly.
+          <strong>Counter functor (all four increment/decrement variants).</strong> Write a <code>Counter</code> functor
+          class with an internal <code>int count</code>. Overload <code>operator()</code> so each call increments the count
+          and returns the new value. Also overload prefix <code>operator++</code> and <code>operator--</code> (return <code>T&amp;</code>)
+          and postfix <code>operator++</code> and <code>operator--</code> (take a dummy <code>int</code> parameter, return <code>T</code> by
+          value). In <code>main()</code>, demonstrate that prefix <code>++c</code> returns the already-incremented value and
+          postfix <code>c++</code> returns the value <em>before</em> incrementing.
         </p>
       </div>
     </section>

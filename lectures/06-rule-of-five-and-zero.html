@@ -30,10 +30,12 @@
       <p class="lecture-num">Lecture 06 · C++14</p>
       <h1>Rule of Five &amp; Rule of Zero</h1>
       <div class="chips">
-        <span class="chip chip-blue">move constructor</span>
-        <span class="chip chip-blue">move assignment</span>
-        <span class="chip chip-green">std::move</span>
-        <span class="chip chip-orange">RAII</span>
+        <span class="chip chip-blue">move-semantics</span>
+        <span class="chip chip-blue">rule-of-five</span>
+        <span class="chip chip-green">rule-of-zero</span>
+        <span class="chip chip-green">smart-pointers</span>
+        <span class="chip chip-orange">raii</span>
+        <span class="chip chip-orange">noexcept</span>
       </div>
     </header>
 
@@ -41,132 +43,276 @@
     <section class="section">
       <h2>Overview</h2>
       <p>
-        C++11 introduced <strong>move semantics</strong>: the ability to transfer ownership of a resource from one
-        object to another without copying it. This extends the Rule of Three by two more special member functions,
-        giving us the <strong>Rule of Five</strong>:
+        C++11 extended the Rule of Three with two new special member functions, giving us the
+        <strong>Rule of Five</strong>. The Rule of Zero is the modern alternative: design classes so they own no
+        raw resources at all — delegate everything to STL types that already implement the Rule of Five.
       </p>
-      <ol>
-        <li>Destructor</li>
-        <li>Copy constructor</li>
-        <li>Copy assignment operator</li>
-        <li><strong>Move constructor</strong> (<code>T(T&amp;&amp;)</code>)</li>
-        <li><strong>Move assignment operator</strong> (<code>T&amp; operator=(T&amp;&amp;)</code>)</li>
-      </ol>
-      <p>
-        The <strong>Rule of Zero</strong> is the modern alternative: design classes so that they own no raw resources
-        directly — delegate resource management to members that already implement the Rule of Five
-        (<code>std::unique_ptr</code>, <code>std::vector</code>, <code>std::string</code>, …).
-        The compiler-generated special functions then do the right thing automatically.
-      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Special member function</th>
+            <th>Signature</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Destructor</td>
+            <td><code>~T()</code></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Copy constructor</td>
+            <td><code>T(const T&amp;)</code></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Copy assignment</td>
+            <td><code>T&amp; operator=(const T&amp;)</code></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>Move constructor</strong></td>
+            <td><code>T(T&amp;&amp;) noexcept</code></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Move assignment</strong></td>
+            <td><code>T&amp; operator=(T&amp;&amp;) noexcept</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Summary</th>
+            <th>When to use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Rule of Five</strong></td>
+            <td>If you define any of the five, define or <code>= default</code> / <code>= delete</code> all five.</td>
+            <td>Class owns a raw resource (<code>new[]</code>, file handle, …).</td>
+          </tr>
+          <tr>
+            <td><strong>Rule of Zero</strong></td>
+            <td>Define none of the five; let smart-pointer / STL members do the work.</td>
+            <td>Every member already manages its own lifetime.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>An <strong>rvalue</strong> is a temporary — it will be discarded. <code>&amp;&amp;</code> binds to rvalues and lets you <em>steal</em> resources instead of copying them.</li>
+          <li><code>std::move(x)</code> is a <em>cast</em>, not a move. It signals "you may take this object's resources." After the move, the moved-from object must be in a <strong>valid but unspecified</strong> (usually null/empty) state.</li>
+          <li>Mark move operations <code>noexcept</code> — the standard library (e.g. <code>std::vector</code> reallocation) will <em>prefer copies over moves</em> when moves might throw, killing the performance benefit.</li>
+          <li><strong>Rule of Zero is the goal.</strong> Rule of Five is the tool you reach for only when you genuinely need to manage a raw resource that no existing RAII wrapper covers.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ── Notes ────────────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Notes</h2>
 
-      <h3>Rvalues, Lvalues, and <code>std::move</code></h3>
+      <h3>Why Copies Are Expensive — The Motivation</h3>
       <p>
-        An <strong>lvalue</strong> is an expression that refers to a persistent object (has a name, an address).
-        An <strong>rvalue</strong> is a temporary — it will be discarded after the expression. The <code>&amp;&amp;</code>
-        syntax declares an <em>rvalue reference</em>, which can bind to temporaries and allow resources to be
-        <em>stolen</em> rather than copied.
+        Consider pushing <code>Buffer</code> objects (which own a heap array) into a <code>std::vector</code>. Every time the
+        vector needs to grow, it copies every existing element to the new storage — each copy allocates a
+        fresh array and memcpys the data. For a <code>Buffer</code> of 1 MB that's 1 MB of allocation + 1 MB of
+        copying, per element, per reallocation. A vector of 1 000 Buffers may copy the first element
+        nearly ten times by the time capacity stabilises.
       </p>
       <p>
-        <code>std::move(x)</code> is a cast — it does not move anything by itself. It converts <code>x</code> to
-        an rvalue reference, signalling that the caller permits the resource to be transferred.
-        After <code>std::move</code>, the moved-from object must be left in a <strong>valid but unspecified state</strong>
-        (typically null/empty).
+        The wasted work is obvious: those source objects are <em>temporaries being destroyed immediately after
+        the copy</em>. We're allocating memory only to free it a microsecond later. Move semantics let us
+        <strong>steal</strong> the heap array from the temporary instead of duplicating it.
+      </p>
+
+      <h3>Rvalues, Lvalues, and <code>std::move</code></h3>
+      <p>
+        An <strong>lvalue</strong> is an expression that names a persistent object — it has an address and a lifetime
+        beyond the current expression (<code>int x</code>, <code>buf</code>, <code>vec[0]</code>).
+      </p>
+      <p>
+        An <strong>rvalue</strong> is a temporary — it will be discarded after the enclosing full-expression. Examples:
+        <code>Buffer(1024)</code>, <code>std::string("hello") + "!"</code>, the return value of a function.
+      </p>
+      <p>
+        <code>&amp;&amp;</code> (rvalue reference) can bind to rvalues, allowing resources to be transferred — <em>stolen</em> —
+        rather than copied.
+      </p>
+      <p>
+        <code>std::move(x)</code> casts <code>x</code> to an rvalue reference. It does <strong>no</strong> moving itself; it just tells the
+        compiler "treat <code>x</code> as a temporary — the caller is done with it." After the move, <code>x</code> must remain
+        in a valid (destructible) state, but its value is unspecified.
       </p>
 
       <h3>Move Constructor</h3>
       <p>
-        Transfers ownership of resources from a temporary (or explicitly moved) object.
-        No allocation — just pointer/handle theft:
+        Transfers ownership of resources from a temporary (or explicitly moved) object. No new allocation —
+        just pointer/handle theft:
       </p>
-<pre><code class="language-cpp">T(T&& other) noexcept
-    : data(other.data), len(other.len)   // steal
+<pre><code class="language-cpp">T(T&amp;&amp; other) noexcept
+    : data(other.data), len(other.len)   // steal the pointer
 {
-    other.data = nullptr;                // leave in valid state
+    other.data = nullptr;                // leave source in valid state
     other.len  = 0;
 }</code></pre>
-      <p>Mark move operations <code>noexcept</code> whenever possible — the standard library uses this information
-      to choose moves over copies in containers.</p>
+      <p>
+        Marking it <code>noexcept</code> is critical. <code>std::vector::push_back</code> checks whether the move constructor
+        is <code>noexcept</code>; if it is not, the vector falls back to copying during reallocation to preserve
+        the strong exception guarantee.
+      </p>
 
       <h3>Move Assignment Operator</h3>
       <p>
-        Like move construction, but on an already-constructed object. Must release the existing resource first:
+        Like move construction, but the target object already owns a resource that must be released first:
       </p>
-<pre><code class="language-cpp">T& operator=(T&& other) noexcept {
-    if (this == &other) return *this;
-    delete[] data;           // release current resource
-    data = other.data;       // steal
+<pre><code class="language-cpp">T&amp; operator=(T&amp;&amp; other) noexcept {
+    if (this == &amp;other) return *this;   // self-move guard
+    delete[] data;                       // release current resource
+    data = other.data;                   // steal
     len  = other.len;
-    other.data = nullptr;    // leave in valid state
+    other.data = nullptr;                // null out source
     other.len  = 0;
     return *this;
 }</code></pre>
 
+      <h3>Common Bug: Forgetting to Null Out the Source Pointer</h3>
+      <p>
+        The single most frequent move-semantics bug is writing the move constructor without nulling out
+        <code>other.data</code>:
+      </p>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BROKEN move constructor — double-free waiting to happen
+Buffer(Buffer&amp;&amp; other) noexcept
+    : data(other.data), len(other.len)
+{
+    // BUG: other.data still points to the same heap block.
+    // When 'other' is destroyed, it will delete[] the same pointer
+    // that 'this' now owns — undefined behaviour / crash.
+}</code></pre>
+      <p>
+        When <code>other</code> goes out of scope, its destructor calls <code>delete[] other.data</code>. But <code>other.data</code>
+        still holds the same address that <code>this-&gt;data</code> now holds. Two destructors, one heap block — <strong>double-free</strong>.
+      </p>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">Buffer(Buffer&amp;&amp; other) noexcept
+    : data(other.data), len(other.len)
+{
+    other.data = nullptr;  // &lt;-- the critical line that prevents double-free
+    other.len  = 0;
+}</code></pre>
+      <p>
+        With <code>nullptr</code>, <code>other</code>'s destructor calls <code>delete[] nullptr</code>, which is a no-op.
+      </p>
+
       <h3>When the Compiler Generates (or Suppresses) Special Functions</h3>
       <p>
-        Declaring any of the five special functions suppresses automatic generation of some others:
+        Declaring any of the five suppresses automatic generation of some others:
       </p>
-      <ul>
-        <li>Declaring a <strong>destructor</strong> suppresses auto-generated move operations (but not copy).</li>
-        <li>Declaring a <strong>copy</strong> operation suppresses auto-generated move operations.</li>
-        <li>Declaring a <strong>move</strong> operation suppresses auto-generated copy operations.</li>
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>You declare…</th>
+            <th>Compiler suppresses…</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Destructor</td>
+            <td>auto-generated move operations (copy still generated, but deprecated)</td>
+          </tr>
+          <tr>
+            <td>Copy constructor or copy assignment</td>
+            <td>auto-generated move operations</td>
+          </tr>
+          <tr>
+            <td>Move constructor or move assignment</td>
+            <td>auto-generated copy operations</td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        Use <code>= default</code> to explicitly request the compiler-generated version, and <code>= delete</code>
-        to explicitly prohibit an operation.
-      </p>
-      <p class="note">
-        <strong>Guideline:</strong> if you define any of the five, define or <code>= default</code> / <code>= delete</code>
-        all five so the compiler's behaviour is always intentional.
+        Use <code>= default</code> to explicitly request the compiler-generated version and <code>= delete</code> to forbid an
+        operation. If you define any of the five, <strong>always</strong> provide all five explicitly — either
+        implemented, <code>= default</code>, or <code>= delete</code> — so the compiler's behaviour is always intentional.
       </p>
 
       <h3>Rule of Zero</h3>
       <p>
-        The cleanest solution is to avoid managing raw resources at all. Use RAII wrappers as members:
-        <code>std::unique_ptr</code> for sole ownership, <code>std::shared_ptr</code> for shared ownership,
-        <code>std::vector</code> / <code>std::string</code> for collections and buffers.
-        The compiler-generated copy/move/destructor will call the corresponding operations on those members —
-        which are already correct.
+        The cleanest solution is to avoid managing raw resources entirely. Use RAII wrappers as members:
       </p>
+      <ul>
+        <li><code>std::unique_ptr&lt;T&gt;</code> — sole ownership</li>
+        <li><code>std::shared_ptr&lt;T&gt;</code> — shared ownership</li>
+        <li><code>std::vector&lt;T&gt;</code>, <code>std::string</code> — dynamic collections and buffers</li>
+      </ul>
       <p>
-        A class following the Rule of Zero has <strong>zero special member function definitions</strong>.
+        The compiler-generated copy/move/destructor will call the corresponding operations on those members,
+        which are already correct. A class following the Rule of Zero has <strong>zero special member function
+        definitions</strong>.
+      </p>
+      <p class="note">
+        <strong>Note:</strong> <code>std::unique_ptr</code> is move-only. A class that contains a <code>unique_ptr</code> member
+        will have its copy constructor and copy assignment implicitly deleted. If you need the class to
+        be copyable, use <code>std::vector</code> or <code>std::shared_ptr</code> instead, or provide an explicit copy
+        constructor that clones the pointed-to object.
       </p>
     </section>
 
     <!-- ── Code Examples ─────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Code Examples</h2>
+      <p>Full runnable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
+
+      <h3>The Problem: Wasteful Copy of a Temporary</h3>
+      <p>
+        Before move semantics, the only way to add an object to a container was to copy it:
+      </p>
+<pre><code class="language-cpp">// Lecture 05 Buffer — copy-only (no move operations)
+Buffer makeBuffer(std::size_t n) {
+    return Buffer(n);          // constructs a temporary
+}
+
+int main() {
+    std::vector&lt;Buffer&gt; vec;
+    vec.reserve(4);
+
+    // Each push_back copies the temporary — allocates + memcpys, then destroys the source.
+    // The allocation and copy are pure waste: the source is discarded immediately after.
+    vec.push_back(makeBuffer(1024));   // copy construct — wasteful!
+    vec.push_back(makeBuffer(1024));   // copy construct — wasteful!
+}</code></pre>
+      <p>
+        The fix is to give <code>Buffer</code> a move constructor. <code>push_back</code> will then <em>steal</em> the temporary's
+        heap array rather than duplicating it.
+      </p>
 
       <h3>Full Rule of Five Implementation</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;cstring&gt;
-#include &lt;utility&gt;
-
-class Buffer {
+<pre><code class="language-cpp">class Buffer {
     int*        data;
     std::size_t size;
 public:
-    // Constructor
+    // User-defined constructor
     explicit Buffer(std::size_t n)
-        : data(new int[n]()), size(n) {
-        std::cout &lt;&lt; "construct\n";
-    }
+        : data(new int[n]()), size(n) {}
 
     // 1. Destructor
-    ~Buffer() {
-        delete[] data;
-        std::cout &lt;&lt; "destroy\n";
-    }
+    ~Buffer() { delete[] data; }
 
     // 2. Copy constructor
     Buffer(const Buffer&amp; other)
         : data(new int[other.size]), size(other.size) {
         std::memcpy(data, other.data, size * sizeof(int));
-        std::cout &lt;&lt; "copy construct\n";
     }
 
     // 3. Copy assignment
@@ -176,47 +322,30 @@ public:
         data = new int[other.size];
         size = other.size;
         std::memcpy(data, other.data, size * sizeof(int));
-        std::cout &lt;&lt; "copy assign\n";
         return *this;
     }
 
     // 4. Move constructor — steal, then null out source
     Buffer(Buffer&amp;&amp; other) noexcept
         : data(other.data), size(other.size) {
-        other.data = nullptr;
+        other.data = nullptr;  // &lt;-- the critical line that prevents double-free
         other.size = 0;
-        std::cout &lt;&lt; "move construct\n";
     }
 
     // 5. Move assignment
     Buffer&amp; operator=(Buffer&amp;&amp; other) noexcept {
         if (this == &amp;other) return *this;
-        delete[] data;          // release current
+        delete[] data;          // release current resource
         data = other.data;      // steal
         size = other.size;
-        other.data = nullptr;
+        other.data = nullptr;   // null out source
         other.size = 0;
-        std::cout &lt;&lt; "move assign\n";
         return *this;
     }
 
     std::size_t getSize() const { return size; }
     int&amp; operator[](std::size_t i) { return data[i]; }
-};
-
-int main() {
-    Buffer a(4);                  // construct
-    a[0] = 10;
-
-    Buffer b = a;                 // copy construct — b owns its own array
-    Buffer c = std::move(a);      // move construct — c steals a's array; a is now empty
-
-    std::cout &lt;&lt; "c size: " &lt;&lt; c.getSize() &lt;&lt; "\n";  // 4
-    std::cout &lt;&lt; "a size: " &lt;&lt; a.getSize() &lt;&lt; "\n";  // 0 (moved-from)
-
-    Buffer d(2);
-    d = std::move(b);             // move assign
-}</code></pre>
+};</code></pre>
 
       <h3>Move Enables Efficient Container Operations</h3>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -254,12 +383,13 @@ int main() {
 class Document {
     std::string              title;
     std::vector&lt;std::string&gt; lines;
-    std::unique_ptr&lt;int[]&gt;   cache;   // sole ownership, no raw delete needed
+    // Use vector&lt;int&gt; instead of unique_ptr&lt;int[]&gt; if copyability is needed.
+    std::vector&lt;int&gt;         cache;
 
 public:
     Document(std::string t, int cacheSize)
         : title(std::move(t))
-        , cache(std::make_unique&lt;int[]&gt;(cacheSize))
+        , cache(cacheSize, 0)
     {}
 
     void addLine(const std::string&amp; line) { lines.push_back(line); }
@@ -270,17 +400,13 @@ int main() {
     Document a("Notes", 64);
     a.addLine("First line");
 
-    Document b = a;              // deep copy: string, vector, and unique_ptr all copy correctly
+    Document b = a;              // deep copy: string, vector — all correct
     Document c = std::move(a);   // move: all resources transferred cheaply
 }</code></pre>
-      <p class="note">
-        <strong>Note:</strong> <code>std::unique_ptr</code> is move-only, so <code>Document</code>'s compiler-generated
-        copy constructor will be <code>= delete</code>d automatically. If you need copyable documents with a
-        cache, replace <code>unique_ptr</code> with <code>vector&lt;int&gt;</code>.
-      </p>
 
       <h3>Explicitly Defaulting / Deleting</h3>
-<pre><code class="language-cpp">class NonCopyable {
+<pre><code class="language-cpp">// Move-only type (e.g. a unique file handle)
+class NonCopyable {
 public:
     NonCopyable() = default;
     ~NonCopyable() = default;
@@ -292,6 +418,7 @@ public:
     NonCopyable&amp; operator=(NonCopyable&amp;&amp;) = default;
 };
 
+// Copyable-but-not-reassignable value type
 class ImmutableValue {
     int val;
 public:
@@ -326,39 +453,42 @@ public:
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Extend your <code>DynArray</code> class from Lecture 05 to satisfy the full Rule of Five.
-          Add a move constructor and move assignment operator, both marked <code>noexcept</code>.
-          In <code>main</code>, print a message inside each special function to trace which one is called
-          when you: construct, copy-construct, move-construct, copy-assign, and move-assign.
+          <strong>DynArray Rule of Five.</strong> Extend your <code>DynArray</code> class from Lecture 05 to satisfy the full
+          Rule of Five. Add a move constructor and move assignment operator, both marked <code>noexcept</code>. Inside
+          each of the five special members, print a one-line message so you can trace which one fires. In
+          <code>main</code>, trace the calls for: construct, copy-construct, move-construct, copy-assign, and
+          move-assign. Verify that after a move, the source array reports size 0.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Write a <code>UniqueHandle</code> class that wraps an integer file descriptor (simulate with an <code>int</code>,
-          value <code>-1</code> meaning "closed"). It should be <strong>move-only</strong>
-          (copy constructor and copy assignment <code>= delete</code>).
-          Implement the move constructor, move assignment, and destructor.
-          Demonstrate in <code>main</code> that ownership transfers correctly and the "file" is closed only once.
+          <strong>UniqueHandle (move-only).</strong> Write a <code>UniqueHandle</code> class that wraps an integer file
+          descriptor (simulate with an <code>int</code>; value <code>-1</code> means "closed"). It must be <strong>move-only</strong>: delete
+          the copy constructor and copy assignment operator. Implement the move constructor, move assignment,
+          and destructor. In <code>main</code>, transfer a handle between two <code>UniqueHandle</code> objects and verify that
+          the "file" is closed exactly once (print a message in the destructor when <code>fd != -1</code>).
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Redesign the following class to follow the <strong>Rule of Zero</strong>.
-          Replace the raw pointer management with appropriate standard-library types.
-          Verify that the resulting class requires zero special member function definitions
-          while still supporting copy and move correctly:
+          <strong>Rule of Zero refactor.</strong> The <code>Playlist</code> class below manages a raw dynamic array of
+          <code>std::string</code> tracks. Redesign it to follow the Rule of Zero by replacing the raw pointer with
+          an appropriate standard-library container. Verify that the resulting class (a) requires zero
+          special-member-function definitions, (b) supports copy, (c) supports move, and (d) correctly
+          prints all tracks.
         </p>
-<pre><code class="language-cpp">class Playlist {
+<pre><code class="language-cpp">// Starting point — owns a raw array, needs all five special members manually:
+class Playlist {
     std::string* tracks;
     int          count;
 public:
     Playlist() : tracks(nullptr), count(0) {}
     ~Playlist() { delete[] tracks; }
-    Playlist(const Playlist&amp; other);    // needs deep copy
+    Playlist(const Playlist&amp; other);         // needs deep copy
     Playlist&amp; operator=(const Playlist&amp; other);
     void add(const std::string&amp; track);
     int  size() const { return count; }

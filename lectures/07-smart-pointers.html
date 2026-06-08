@@ -28,12 +28,13 @@
 
     <header class="lecture-header">
       <p class="lecture-num">Lecture 07 · C++14</p>
-      <h1>Smart Pointers</h1>
+      <h1>Smart Pointers and RAII</h1>
       <div class="chips">
         <span class="chip chip-blue">unique_ptr</span>
         <span class="chip chip-blue">shared_ptr</span>
         <span class="chip chip-green">weak_ptr</span>
         <span class="chip chip-orange">RAII</span>
+        <span class="chip chip-orange">memory-management</span>
       </div>
     </header>
 
@@ -41,66 +42,235 @@
       <h2>Overview</h2>
       <p>
         A <strong>smart pointer</strong> is a class that wraps a raw pointer and manages the lifetime of the
-        pointed-to object automatically. When the smart pointer goes out of scope, it deletes the object —
-        no manual <code>delete</code> required. This is RAII applied to heap memory.
+        pointed-to object automatically. When the smart pointer goes out of scope it calls <code>delete</code>
+        for you — no manual cleanup required. This is RAII applied to heap memory.
       </p>
-      <p>C++14 provides three smart pointer types in <code>&lt;memory&gt;</code>:</p>
-      <ul>
-        <li><strong><code>unique_ptr</code></strong> — sole, non-shared ownership. Move-only.</li>
-        <li><strong><code>shared_ptr</code></strong> — shared ownership via reference counting.</li>
-        <li><strong><code>weak_ptr</code></strong> — non-owning observer of a <code>shared_ptr</code> resource; breaks reference cycles.</li>
-      </ul>
-      <p class="note">
-        <strong>Default rule:</strong> reach for <code>unique_ptr</code> first. Upgrade to <code>shared_ptr</code>
-        only when you genuinely need shared ownership. Use raw pointers only as non-owning observers.
-      </p>
+      <p>C++14 ships three smart pointer types in <code>&lt;memory&gt;</code>:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Smart pointer</th>
+            <th>Ownership</th>
+            <th>Copyable?</th>
+            <th>Overhead vs raw ptr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>std::unique_ptr&lt;T&gt;</code></td>
+            <td>Sole, exclusive</td>
+            <td>No — <strong>move-only</strong></td>
+            <td>Zero (release builds)</td>
+          </tr>
+          <tr>
+            <td><code>std::shared_ptr&lt;T&gt;</code></td>
+            <td>Shared via reference count</td>
+            <td>Yes — copy bumps the count</td>
+            <td>~2× pointer: atomic ref-count + control block</td>
+          </tr>
+          <tr>
+            <td><code>std::weak_ptr&lt;T&gt;</code></td>
+            <td><strong>Non-owning</strong> observer of a <code>shared_ptr</code> resource</td>
+            <td>Yes</td>
+            <td>Tracks count separately; no increment on copy</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>Reach for <code>unique_ptr</code> first. Upgrade to <code>shared_ptr</code> only when you genuinely need shared
+            ownership. Use raw pointers and references as non-owning <strong>observers</strong> — they are fine and
+            carry no overhead.</li>
+          <li>The rule is about <strong>ownership</strong>, not about access: a function that merely uses an object
+            should take <code>const T&amp;</code> or <code>T*</code>, not a smart pointer.</li>
+          <li><code>make_unique&lt;T&gt;(args…)</code> and <code>make_shared&lt;T&gt;(args…)</code> are always preferred over <code>new</code> —
+            they are exception-safe and, for <code>shared_ptr</code>, more efficient (single allocation).</li>
+          <li><code>weak_ptr</code> does not contribute to the reference count and therefore <strong>does not prevent
+            destruction</strong>. Always <code>.lock()</code> it before use.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="section">
       <h2>Notes</h2>
 
-      <h3>unique_ptr — Sole Ownership</h3>
-      <ul>
-        <li>One and only one <code>unique_ptr</code> can own an object at any time.</li>
-        <li>Cannot be copied; can be moved with <code>std::move</code>.</li>
-        <li>Destroyed when it goes out of scope or is explicitly reset.</li>
-        <li>Zero overhead over a raw pointer in release builds.</li>
-        <li>Create with <code>std::make_unique&lt;T&gt;(args…)</code> (C++14).</li>
-      </ul>
-
-      <h3>shared_ptr — Shared Ownership</h3>
-      <ul>
-        <li>Multiple <code>shared_ptr</code> instances can own the same object.</li>
-        <li>An internal <strong>reference count</strong> tracks how many owners exist.</li>
-        <li>The object is destroyed when the last <code>shared_ptr</code> owning it is destroyed or reset.</li>
-        <li>Create with <code>std::make_shared&lt;T&gt;(args…)</code> — preferred: single allocation for object + control block.</li>
-        <li>Slight overhead: atomic ref-count increment/decrement on copy/destroy.</li>
-      </ul>
-
-      <h3>weak_ptr — Non-Owning Observer</h3>
-      <ul>
-        <li>Does <em>not</em> contribute to the reference count.</li>
-        <li>Must be converted to a <code>shared_ptr</code> (via <code>.lock()</code>) before the resource can be accessed.</li>
-        <li><code>.lock()</code> returns an empty <code>shared_ptr</code> if the resource has already been destroyed.</li>
-        <li>Primary use: breaking <strong>reference cycles</strong> that would otherwise prevent objects from ever being freed.</li>
-      </ul>
-
-      <h3>Ownership vs Observation</h3>
+      <h3>The problem: raw new/delete leaks on every exit path</h3>
       <p>
-        Use raw pointers and raw references freely as <em>non-owning</em> handles — there is no need to wrap
-        everything in a smart pointer. The rule is about ownership, not about access:
+        Any function that allocates with <code>new</code> must call <code>delete</code> on <strong>every</strong> exit path — every
+        <code>return</code>, every thrown exception, every branch. Miss one and the memory leaks. In a function
+        with multiple early returns and a try/catch this becomes untenable.
+      </p>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BAD — leaks if validate() throws or the early return fires
+Widget* make_widget(bool fast) {
+    Widget* w = new Widget();
+    if (!validate(w)) {
+        return nullptr;   // LEAK: w is never deleted
+    }
+    if (fast) {
+        w-&gt;turbo = true;
+        return w;
+    }
+    w-&gt;init_heavy();
+    return w;
+}</code></pre>
+
+      <h3>unique_ptr — sole ownership</h3>
+      <p>
+        <code>std::unique_ptr&lt;T&gt;</code> enforces that <strong>one and only one</strong> smart pointer owns an object at any
+        time. Its destructor calls <code>delete</code> automatically — even if the function returns early or
+        throws.
       </p>
       <ul>
-        <li>Function parameter that just <em>uses</em> an object → <code>const T&amp;</code> or <code>T*</code></li>
-        <li>Function that takes <em>ownership</em> → <code>unique_ptr&lt;T&gt;</code> by value</li>
-        <li>Function that <em>shares</em> ownership → <code>shared_ptr&lt;T&gt;</code></li>
+        <li>Cannot be copied. Ownership transfers via <code>std::move</code>.</li>
+        <li>Zero overhead over a raw pointer in release builds.</li>
+        <li>Create with <code>std::make_unique&lt;T&gt;(args…)</code> (available since C++14).</li>
       </ul>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// GOOD — unique_ptr: destructor fires on every exit, no manual delete
+std::unique_ptr&lt;Widget&gt; make_widget(bool fast) {
+    auto w = std::make_unique&lt;Widget&gt;();
+    if (!validate(w.get())) {
+        return nullptr;   // w's destructor runs here — no leak
+    }
+    if (fast) {
+        w-&gt;turbo = true;
+        return w;         // ownership transferred to caller
+    }
+    w-&gt;init_heavy();
+    return w;
+}</code></pre>
+      <p>
+        <strong>Rule of Zero with unique_ptr.</strong> When a class owns a resource via <code>unique_ptr</code>, the
+        compiler auto-generates correct move operations and deletes copy — you need no
+        destructor, no copy constructor, and no copy-assignment operator:
+      </p>
+<pre><code class="language-cpp">class Car {
+    std::string              brand;
+    std::unique_ptr&lt;Engine&gt;  engine;   // owns Engine; copy is deleted automatically
+public:
+    Car(const std::string&amp; b)
+        : brand(b), engine(std::make_unique&lt;Engine&gt;()) {}
+
+    void drive() const { engine-&gt;run(); }
+    // ~Car() not needed — unique_ptr's destructor handles Engine
+};</code></pre>
+
+      <h3>shared_ptr — shared ownership</h3>
+      <p>
+        <code>std::shared_ptr&lt;T&gt;</code> allows multiple owners. An internal <strong>control block</strong> holds a reference
+        count. The object is destroyed when the last <code>shared_ptr</code> owning it is destroyed or reset.
+      </p>
+      <ul>
+        <li>Copyable — each copy increments the ref-count atomically.</li>
+        <li>Slight overhead: atomic increment/decrement on every copy and destroy.</li>
+        <li>Prefer <code>std::make_shared&lt;T&gt;(args…)</code>: single allocation for object + control block.</li>
+      </ul>
+<pre><code class="language-cpp">std::shared_ptr&lt;Node&gt; a = std::make_shared&lt;Node&gt;(42);
+// use_count == 1
+{
+    std::shared_ptr&lt;Node&gt; b = a;   // use_count == 2
+    std::shared_ptr&lt;Node&gt; c = a;   // use_count == 3
+} // b, c destroyed — use_count back to 1
+// a destroyed here — use_count → 0 → ~Node() called</code></pre>
+
+      <h3>The shared_ptr cycle leak — and how weak_ptr breaks it</h3>
+      <p>
+        Two objects can each hold a <code>shared_ptr</code> to the other. Each keeps the other's ref-count above
+        zero, so <strong>neither is ever destroyed</strong> — a classic reference cycle.
+      </p>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BROKEN — cycle: A and B keep each other alive forever
+struct A {
+    std::shared_ptr&lt;B&gt; b_ptr;
+    ~A() { std::cout &lt;&lt; "~A\n"; }
+};
+struct B {
+    std::shared_ptr&lt;A&gt; a_ptr;   // &lt;-- this creates the cycle
+    ~B() { std::cout &lt;&lt; "~B\n"; }
+};
+
+int main() {
+    auto a = std::make_shared&lt;A&gt;();
+    auto b = std::make_shared&lt;B&gt;();
+    a-&gt;b_ptr = b;   // a's count: 1→still 1 (b owns a from b-&gt;a_ptr)
+    b-&gt;a_ptr = a;   // b's count: 1→still 1
+    // main exits: local a and b destroyed, but each object's count drops only to 1
+    // ~A and ~B are NEVER printed — the heap objects leak forever
+}</code></pre>
+      <p>
+        <strong>Fix: make the back-pointer a <code>weak_ptr</code>.</strong> A <code>weak_ptr</code> does not increment the ref-count,
+        so it cannot create a cycle.
+      </p>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// FIXED — weak_ptr breaks the cycle
+struct B {
+    std::weak_ptr&lt;A&gt; a_ptr;   // non-owning; does NOT keep A alive
+    ~B() { std::cout &lt;&lt; "~B\n"; }
+};
+
+// When main exits:
+//   local a destroyed → A's strong_count → 0 → ~A → b_ptr (shared_ptr&lt;B&gt;) released
+//   → B's strong_count → 0 → ~B
+// Both destructors fire. No leak.</code></pre>
+
+      <h3>weak_ptr — non-owning observer</h3>
+      <p><code>std::weak_ptr&lt;T&gt;</code> observes a <code>shared_ptr</code>-managed resource without owning it:</p>
+      <ul>
+        <li>Does <strong>not</strong> increment the strong reference count.</li>
+        <li>Must be promoted to a <code>shared_ptr</code> via <code>.lock()</code> before the resource can be accessed.</li>
+        <li><code>.lock()</code> returns an empty <code>shared_ptr</code> if the resource has already been destroyed — safe
+          to test with <code>if (auto sp = wp.lock())</code>.</li>
+      </ul>
+<pre><code class="language-cpp">std::shared_ptr&lt;int&gt; sp = std::make_shared&lt;int&gt;(100);
+std::weak_ptr&lt;int&gt;   wp = sp;
+
+if (auto locked = wp.lock()) {
+    std::cout &lt;&lt; "value: " &lt;&lt; *locked &lt;&lt; "\n";  // 100
+}
+
+sp.reset();   // drop the last strong owner — object destroyed
+
+if (!wp.lock()) {
+    std::cout &lt;&lt; "resource is gone\n";
+}</code></pre>
+
+      <h3>Ownership vs observation — the passing rules</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Situation</th>
+            <th>Parameter type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Function only <em>uses</em> the object</td>
+            <td><code>const T&amp;</code> or <code>T*</code> (non-owning)</td>
+          </tr>
+          <tr>
+            <td>Function <em>takes</em> sole ownership</td>
+            <td><code>std::unique_ptr&lt;T&gt;</code> by value</td>
+          </tr>
+          <tr>
+            <td>Function <em>shares</em> ownership</td>
+            <td><code>std::shared_ptr&lt;T&gt;</code> by value</td>
+          </tr>
+          <tr>
+            <td>Function observes a shared resource</td>
+            <td><code>std::weak_ptr&lt;T&gt;</code> or raw <code>T*</code> (non-owning)</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="section">
       <h2>Code Examples</h2>
+      <p class="note">Full runnable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
 
-      <h3>unique_ptr Basics</h3>
+      <h3>unique_ptr basics — create, use, move</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;iostream&gt;
 
@@ -112,45 +282,45 @@ public:
 };
 
 int main() {
-    // Prefer make_unique over 'new'
+    // Prefer make_unique — never spell 'new' here
     auto eng = std::make_unique&lt;Engine&gt;();
     eng-&gt;run();
 
-    // Transfer ownership — eng is now empty
+    // Transfer ownership — eng is now null
     auto eng2 = std::move(eng);
-    if (!eng) std::cout &lt;&lt; "eng is empty\n";
+    if (!eng) std::cout &lt;&lt; "eng is empty after move\n";
     eng2-&gt;run();
 
-    // eng2 goes out of scope here → ~Engine() called automatically
+    // eng2 goes out of scope → ~Engine() fires automatically
 }</code></pre>
 
-      <h3>unique_ptr in a Class (Rule of Zero)</h3>
+      <h3>unique_ptr in a class — Rule of Zero</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;string&gt;
 #include &lt;iostream&gt;
 
 class Car {
-    std::string              brand;
-    std::unique_ptr&lt;Engine&gt; engine;   // Car owns its Engine
+    std::string             brand;
+    std::unique_ptr&lt;Engine&gt; engine;
 public:
     Car(const std::string&amp; b)
         : brand(b), engine(std::make_unique&lt;Engine&gt;()) {}
 
     void drive() const { engine-&gt;run(); }
 
-    // No destructor needed — unique_ptr destroys Engine automatically.
-    // Move is auto-generated. Copy is deleted (unique_ptr is move-only).
+    // No destructor, no copy constructor, no copy-assignment.
+    // unique_ptr handles cleanup; move is auto-generated.
 };
 
 int main() {
     Car c("Toyota");
     c.drive();
 
-    Car c2 = std::move(c);   // ownership of Engine transfers to c2
+    Car c2 = std::move(c);   // Engine ownership moves to c2
     c2.drive();
 }</code></pre>
 
-      <h3>shared_ptr and Reference Counting</h3>
+      <h3>shared_ptr and reference counting</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;iostream&gt;
 
@@ -161,50 +331,54 @@ struct Node {
 };
 
 int main() {
-    std::shared_ptr&lt;Node&gt; a = std::make_shared&lt;Node&gt;(42);
+    auto a = std::make_shared&lt;Node&gt;(42);
     std::cout &lt;&lt; "use_count: " &lt;&lt; a.use_count() &lt;&lt; "\n";  // 1
-
     {
-        std::shared_ptr&lt;Node&gt; b = a;   // both own the same Node
+        auto b = a;   // both own the same Node
         std::cout &lt;&lt; "use_count: " &lt;&lt; a.use_count() &lt;&lt; "\n";  // 2
-
-        std::shared_ptr&lt;Node&gt; c = a;
+        auto c = a;
         std::cout &lt;&lt; "use_count: " &lt;&lt; a.use_count() &lt;&lt; "\n";  // 3
     } // b and c destroyed — count drops to 1
-
     std::cout &lt;&lt; "use_count: " &lt;&lt; a.use_count() &lt;&lt; "\n";  // 1
-} // a destroyed — count hits 0 → Node(42) destroyed
-</code></pre>
+} // a destroyed → count → 0 → ~Node()</code></pre>
 
-      <h3>weak_ptr Breaking a Reference Cycle</h3>
+      <h3>shared_ptr cycle (broken) and weak_ptr fix</h3>
+      <p class="fail-badge">Broken</p>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;iostream&gt;
 
-struct B;  // forward declaration
+struct B;
 
+// --- BROKEN version (cycle, no output from destructors) ---
+struct A_broken {
+    std::shared_ptr&lt;B_broken&gt; b_ptr;
+    ~A_broken() { std::cout &lt;&lt; "~A_broken\n"; }
+};
+struct B_broken {
+    std::shared_ptr&lt;A_broken&gt; a_ptr;  // keeps A alive — cycle!
+    ~B_broken() { std::cout &lt;&lt; "~B_broken\n"; }
+};</code></pre>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// --- FIXED version ---
 struct A {
     std::shared_ptr&lt;B&gt; b_ptr;
     ~A() { std::cout &lt;&lt; "~A\n"; }
 };
-
 struct B {
-    std::weak_ptr&lt;A&gt; a_ptr;   // weak — does NOT keep A alive
+    std::weak_ptr&lt;A&gt; a_ptr;   // non-owning — no cycle
     ~B() { std::cout &lt;&lt; "~B\n"; }
 };
 
 int main() {
-    auto a = std::make_shared&lt;A&gt;();
-    auto b = std::make_shared&lt;B&gt;();
+    {
+        auto a = std::make_shared&lt;A&gt;();
+        auto b = std::make_shared&lt;B&gt;();
+        a-&gt;b_ptr = b;
+        b-&gt;a_ptr = a;
+    } // ~A then ~B both print — no leak
+}</code></pre>
 
-    a-&gt;b_ptr = b;          // A owns B
-    b-&gt;a_ptr = a;          // B observes A (weak — no cycle)
-
-    // If b_ptr were shared_ptr: a and b would form a cycle and never be freed.
-    // With weak_ptr: when main exits, a's count → 0 → ~A → b's count → 0 → ~B
-}
-</code></pre>
-
-      <h3>Accessing Through weak_ptr</h3>
+      <h3>Accessing a resource through weak_ptr</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;iostream&gt;
 
@@ -212,7 +386,7 @@ int main() {
     std::shared_ptr&lt;int&gt; sp = std::make_shared&lt;int&gt;(100);
     std::weak_ptr&lt;int&gt;   wp = sp;
 
-    // Must lock before use
+    // Must lock before accessing
     if (auto locked = wp.lock()) {
         std::cout &lt;&lt; "value: " &lt;&lt; *locked &lt;&lt; "\n";  // 100
     }
@@ -222,8 +396,7 @@ int main() {
     if (wp.lock() == nullptr) {
         std::cout &lt;&lt; "resource is gone\n";
     }
-}
-</code></pre>
+}</code></pre>
     </section>
 
     <section class="section">
@@ -244,33 +417,45 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Implement a <code>Zoo</code> class that owns a collection of <code>Animal</code> objects (use the
-          polymorphic hierarchy from Lecture 03). Store them as
-          <code>std::vector&lt;std::unique_ptr&lt;Animal&gt;&gt;</code>.
-          Add an <code>addAnimal</code> method that takes a <code>unique_ptr</code> by value.
-          Implement a <code>makeNoise()</code> that calls <code>speak()</code> on every animal via virtual dispatch.
-          Verify that all animals are destroyed automatically when the <code>Zoo</code> goes out of scope.
+          <strong>Zoo (unique_ptr + polymorphism).</strong> Implement a <code>Zoo</code> class that owns a collection of
+          <code>Animal</code> objects (use the polymorphic hierarchy from Lecture 03, or define a minimal one here:
+          <code>Animal</code> with a virtual <code>speak()</code>; <code>Dog</code> and <code>Cat</code> overriding it). Store them as
+          <code>std::vector&lt;std::unique_ptr&lt;Animal&gt;&gt;</code>. Add an <code>addAnimal</code> method that takes a <code>unique_ptr&lt;Animal&gt;</code>
+          by value. Implement <code>makeNoise()</code> that calls <code>speak()</code> on every animal via virtual dispatch.
+          Verify — using destructor messages — that all animals are freed automatically when the <code>Zoo</code>
+          goes out of scope with no explicit <code>delete</code>.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Create a shared <code>Config</code> object (key-value store implemented as
-          <code>std::unordered_map&lt;std::string, std::string&gt;</code>).
-          Two classes, <code>Server</code> and <code>Logger</code>, should each hold a
-          <code>shared_ptr&lt;Config&gt;</code>. Demonstrate that modifying the config through one class
-          is visible through the other, and that the config is destroyed only after both classes are destroyed.
+          <strong>Shared Config (shared_ptr).</strong> Create a <code>Config</code> object implemented as
+          <code>std::unordered_map&lt;std::string, std::string&gt;</code>. Two classes, <code>Server</code> and <code>Logger</code>, each hold
+          a <code>shared_ptr&lt;Config&gt;</code>. Demonstrate in <code>main()</code> that:
         </p>
+        <ul>
+          <li>modifying the config through <code>Server</code>'s handle is visible through <code>Logger</code>'s handle;</li>
+          <li>the config is destroyed only <strong>after both</strong> <code>Server</code> and <code>Logger</code> go out of scope (use a
+            destructor message in <code>Config</code> to verify).</li>
+        </ul>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Build a doubly-linked list node structure where each node holds a <code>shared_ptr</code> to the
-          next node and a <code>weak_ptr</code> to the previous node. Insert five integer nodes, then traverse
-          forward and backward. Verify (with destructor messages) that all nodes are freed correctly when the
-          head pointer is reset.
+          <strong>Doubly-linked list (shared_ptr + weak_ptr).</strong> Build a linked-list node:
+        </p>
+<pre><code class="language-cpp">struct ListNode {
+    int value;
+    std::shared_ptr&lt;ListNode&gt;  next;
+    std::weak_ptr&lt;ListNode&gt;    prev;   // back-pointer — must NOT be shared_ptr
+    ~ListNode() { std::cout &lt;&lt; "~ListNode(" &lt;&lt; value &lt;&lt; ")\n"; }
+};</code></pre>
+        <p>
+          Insert five integer nodes, traverse forward (via <code>next</code>) and backward (via <code>prev.lock()</code>).
+          Reset the head pointer and confirm — via destructor messages — that all five nodes are freed
+          in order. Explain in a comment why <code>prev</code> must be <code>weak_ptr</code> and not <code>shared_ptr</code>.
         </p>
       </div>
     </section>

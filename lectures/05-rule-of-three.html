@@ -30,30 +30,66 @@
       <p class="lecture-num">Lecture 05 · C++14</p>
       <h1>Rule of Three</h1>
       <div class="chips">
-        <span class="chip chip-blue">destructor</span>
-        <span class="chip chip-blue">copy constructor</span>
-        <span class="chip chip-orange">copy assignment</span>
-        <span class="chip chip-green">deep copy</span>
+        <span class="chip chip-blue">oop</span>
+        <span class="chip chip-blue">raii</span>
+        <span class="chip chip-blue">copy-semantics</span>
+        <span class="chip chip-green">deep-copy</span>
+        <span class="chip chip-green">rule-of-three</span>
+        <span class="chip chip-orange">copy-and-swap</span>
       </div>
     </header>
 
     <!-- ── Overview ─────────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Overview</h2>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>If a class has a custom destructor, the compiler-generated copies are almost certainly wrong.</li>
+          <li>A <strong>deep copy</strong> allocates new storage and copies the <em>content</em>, so each object owns its own resource.</li>
+          <li>Copy assignment has three responsibilities: <strong>guard against self-assignment</strong>, <strong>release the old resource</strong>, <strong>deep-copy the new one</strong>.</li>
+          <li>The <strong>copy-and-swap idiom</strong> provides strong exception safety and eliminates the self-assignment guard.</li>
+          <li>C++11 extended this to the Rule of Five (add move constructor + move assignment). Lecture 7 covers moves.</li>
+        </ul>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Special member function</th>
+            <th>Signature</th>
+            <th>When called</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Destructor</td>
+            <td><code>~T()</code></td>
+            <td>object goes out of scope / <code>delete</code></td>
+          </tr>
+          <tr>
+            <td>Copy constructor</td>
+            <td><code>T(const T&amp;)</code></td>
+            <td>initialisation from another <code>T</code></td>
+          </tr>
+          <tr>
+            <td>Copy assignment</td>
+            <td><code>T&amp; operator=(const T&amp;)</code></td>
+            <td>assignment to an already-constructed <code>T</code></td>
+          </tr>
+        </tbody>
+      </table>
+
       <p>
-        The <strong>Rule of Three</strong> is a C++ design guideline: if a class explicitly defines any one of the
-        following three special member functions, it almost certainly needs to define all three:
+        The <strong>Rule of Three</strong>: if your class explicitly defines <em>any one</em> of the three above,
+        it almost certainly needs all three.
       </p>
-      <ol>
-        <li>Destructor (<code>~T()</code>)</li>
-        <li>Copy constructor (<code>T(const T&amp;)</code>)</li>
-        <li>Copy assignment operator (<code>T&amp; operator=(const T&amp;)</code>)</li>
-      </ol>
       <p>
-        The reason is simple: if you needed a custom destructor, your class is probably managing a resource
-        (raw memory, a file handle, a network socket). The compiler-generated copy operations perform a
-        <em>shallow copy</em> — they copy the pointer, not what it points to — which leads to double-frees,
-        dangling pointers, and data corruption.
+        <strong>Why?</strong> A custom destructor is a signal that the class manages a resource (heap memory, a file
+        handle, a socket). The compiler-generated copy operations do a <em>shallow copy</em> — they copy the
+        pointer, not what it points to. The result is two objects sharing the same allocation: the first
+        destructor frees it, the second destructor frees it again — <strong>double-free, undefined behaviour</strong>.
       </p>
     </section>
 
@@ -61,50 +97,73 @@
     <section class="section">
       <h2>Notes</h2>
 
-      <h3>Shallow Copy vs Deep Copy</h3>
+      <h3>Why the Compiler-Generated Copies Are Wrong</h3>
       <p>
-        The compiler-generated copy constructor and copy assignment do a <strong>member-wise copy</strong>.
-        For pointer members, this means both the original and the copy point to the <em>same</em> heap allocation.
-        When either object is destroyed, the memory is freed — and the other object is left with a dangling pointer.
-        A <strong>deep copy</strong> allocates new storage and copies the pointed-to data, so each object owns its own copy.
+        The compiler synthesises a copy constructor and copy assignment operator for every class that
+        does not define them. For simple value types (all members are scalars or own objects) the
+        generated versions are correct. But for a class that holds a <strong>raw pointer to a heap
+        allocation</strong>, the generated copy does this:
+      </p>
+<pre><code class="language-cpp">original.data ──► [ heap block ]
+                        ▲
+copy.data    ───────────┘        ← same pointer, same block
+</code></pre>
+      <p>
+        When either object is destroyed, the block is freed. The other object now holds a <strong>dangling
+        pointer</strong>. When <em>it</em> is destroyed, the block is freed a second time: double-free.
       </p>
 
       <h3>The Destructor</h3>
       <p>
-        Responsible for releasing any resources the object acquired during its lifetime.
-        If a class manages raw heap memory (<code>new</code>/<code>delete</code>), the destructor must call <code>delete</code>
-        (or <code>delete[]</code> for arrays).
+        Releases any resource the object acquired during its lifetime. For raw heap arrays, that means
+        <code>delete[]</code>. For a single object, <code>delete</code>. The destructor is always the easiest of the three
+        to write correctly; it is also the breadcrumb that tells you the other two are needed.
       </p>
 
-      <h3>Copy Constructor</h3>
+      <h3>The Copy Constructor</h3>
       <p>
-        Called when an object is initialised from another object of the same type:
+        Called during initialisation from an existing object:
       </p>
-<pre><code class="language-cpp">T b = a;       // copy constructor
-T c(a);        // copy constructor
-void f(T x);   // copy constructor when passing by value
+<pre><code class="language-cpp">MyString b = a;     // copy constructor
+MyString c(a);      // copy constructor
+void f(MyString x); // copy constructor when passing by value
 </code></pre>
       <p>
-        A correct copy constructor performs a deep copy — allocating new resources and copying the content.
+        A correct copy constructor <strong>allocates fresh storage</strong> and copies the content — it does <em>not</em>
+        copy the pointer value.
       </p>
 
-      <h3>Copy Assignment Operator</h3>
+      <h3>The Copy Assignment Operator</h3>
       <p>
         Called when an already-constructed object is assigned from another:
       </p>
-<pre><code class="language-cpp">T a, b;
-a = b;         // copy assignment
+<pre><code class="language-cpp">MyString a, b;
+a = b;              // copy assignment (both already exist)
 </code></pre>
-      <p>Three responsibilities:</p>
+      <p>Three responsibilities, in order:</p>
       <ol>
-        <li><strong>Self-assignment guard</strong>: <code>if (this == &amp;rhs) return *this;</code></li>
-        <li><strong>Release</strong> the current resource before overwriting the pointer.</li>
-        <li><strong>Deep copy</strong> the new resource from <code>rhs</code>.</li>
+        <li><strong>Self-assignment guard</strong> — <code>if (this == &amp;rhs) return *this;</code><br>
+            Without this, step 2 would free the memory that step 3 then tries to read.</li>
+        <li><strong>Release the current resource</strong> — <code>delete[] data;</code><br>
+            If you skip this, the old allocation leaks.</li>
+        <li><strong>Deep-copy the new resource</strong> from <code>rhs</code>.</li>
       </ol>
-      <p class="note">
-        <strong>Copy-and-swap idiom:</strong> An elegant alternative — implement assignment by constructing
-        a temporary copy and swapping with it. Automatically handles self-assignment and provides strong
-        exception safety.
+
+      <h3>Copy-and-Swap Idiom</h3>
+      <p>
+        An elegant alternative that collapses the three responsibilities into a single, provably safe pattern:
+      </p>
+      <ol>
+        <li>Write a non-throwing <code>swap</code> that exchanges every member.</li>
+        <li>In <code>operator=</code>, take the parameter <strong>by value</strong> (invokes the copy constructor — the one hard
+            thing you have already written correctly).</li>
+        <li>Swap <code>*this</code> with the local copy.</li>
+        <li>The old resource is released when the local copy's destructor runs at end-of-scope.</li>
+      </ol>
+      <p>
+        This handles self-assignment for free (both sides become the same value regardless), and the
+        entire assignment is <strong>strongly exception-safe</strong>: if the copy constructor throws,
+        <code>*this</code> is unchanged.
       </p>
     </section>
 
@@ -112,10 +171,11 @@ a = b;         // copy assignment
     <section class="section">
       <h2>Code Examples</h2>
 
-      <h3>The Problem: Shallow Copy</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;cstring&gt;
+      <p>Full runnable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
 
+      <h3>The Problem: Shallow Copy and Double-Free</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// Deliberately broken — do NOT use this pattern in production.
 class BadString {
     char* data;
 public:
@@ -123,8 +183,8 @@ public:
         data = new char[std::strlen(s) + 1];
         std::strcpy(data, s);
     }
-    ~BadString() { delete[] data; }  // destructor defined...
-    // ...but no copy constructor or copy assignment!
+    ~BadString() { delete[] data; }   // destructor defined...
+    // ...but NO copy constructor or copy assignment!
     // The compiler generates shallow copies.
 
     void print() const { std::cout &lt;&lt; data &lt;&lt; "\n"; }
@@ -132,19 +192,23 @@ public:
 
 int main() {
     BadString a("hello");
-    BadString b = a;      // shallow copy: b.data == a.data (same pointer!)
-    b.print();            // "hello"
-    // When main exits: ~BadString() called for b, then for a
-    // → double delete[] on the same pointer → undefined behaviour
+    BadString b = a;      // shallow copy: b.data == a.data (SAME pointer!)
+    b.print();            // "hello" — looks fine...
+    // Scope ends: ~BadString() fires for b → frees the block
+    //             ~BadString() fires for a → frees the SAME block → CRASH
 }</code></pre>
+      <p>
+        Run with <code>-fsanitize=address</code> to see AddressSanitizer catch the double-free before it silently
+        corrupts the heap in production.
+      </p>
 
       <h3>The Fix: Rule of Three</h3>
+      <p class="fix-badge">Fixed</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;cstring&gt;
-#include &lt;stdexcept&gt;
 
 class MyString {
-    char* data;
+    char*       data;
     std::size_t len;
 
     void allocCopy(const char* s, std::size_t n) {
@@ -154,25 +218,21 @@ class MyString {
     }
 public:
     // Constructor
-    MyString(const char* s = "") {
-        allocCopy(s, std::strlen(s));
-    }
+    MyString(const char* s = "") { allocCopy(s, std::strlen(s)); }
 
-    // 1. Destructor
-    ~MyString() {
-        delete[] data;
-    }
+    // 1. Destructor — releases the heap buffer
+    ~MyString() { delete[] data; }
 
     // 2. Copy constructor — deep copy
-    MyString(const MyString& other) {
+    MyString(const MyString&amp; other) {
         allocCopy(other.data, other.len);
     }
 
-    // 3. Copy assignment — self-assignment guard + release + deep copy
-    MyString& operator=(const MyString& other) {
-        if (this == &amp;other) return *this;   // self-assignment guard
-        delete[] data;                       // release current resource
-        allocCopy(other.data, other.len);    // deep copy new resource
+    // 3. Copy assignment — guard + release + deep copy
+    MyString&amp; operator=(const MyString&amp; rhs) {
+        if (this == &amp;rhs) return *this;    // self-assignment guard
+        delete[] data;                     // release current resource
+        allocCopy(rhs.data, rhs.len);      // deep copy
         return *this;
     }
 
@@ -181,14 +241,14 @@ public:
 
 int main() {
     MyString a("hello");
-    MyString b = a;         // copy constructor — b gets its own allocation
-    b.print();              // hello (len=5)
+    MyString b = a;          // copy constructor — b gets its own allocation
+    b.print();               // hello (len=5)
 
     MyString c("world");
-    c = a;                  // copy assignment — c releases "world", copies "hello"
-    c.print();              // hello (len=5)
+    c = a;                   // copy assignment — c releases "world", copies "hello"
+    c.print();               // hello (len=5)
 
-    a.print();              // hello — a is unaffected
+    a.print();               // hello — a is unaffected
     // All three destructors run cleanly — no double-free
 }</code></pre>
 
@@ -196,27 +256,33 @@ int main() {
 <pre><code class="language-cpp">#include &lt;algorithm&gt;   // std::swap
 
 class MyString {
-    char* data;
+    char*       data;
     std::size_t len;
 public:
-    MyString(const char* s = "");
+    MyString(const char* s = "");   // same constructor as above
     ~MyString() { delete[] data; }
 
-    // Copy constructor (same as before)
-    MyString(const MyString& other);
+    // Copy constructor (same deep-copy logic as above)
+    MyString(const MyString&amp; other);
 
-    // Copy-and-swap assignment
-    MyString& operator=(MyString other) {  // other is a copy (by value)
-        std::swap(data, other.data);       // steal other's resource
+    // swap — exchange every member; must not throw
+    void swap(MyString&amp; other) noexcept {
+        std::swap(data, other.data);
         std::swap(len,  other.len);
+    }
+
+    // Copy-and-swap assignment: take by value → copy is already done
+    MyString&amp; operator=(MyString other) {   // other is a deep copy
+        swap(other);                        // steal other's resource
         return *this;
-        // old resource cleaned up by other's destructor
+        // other's destructor frees the OLD resource — automatically
     }
 };</code></pre>
       <p>
-        By taking <code>other</code> by value, the copy is made once (via the copy constructor), then swapped in.
-        The old resource is released when the temporary <code>other</code> is destroyed at the end of the function.
-        This also handles self-assignment correctly.
+        Taking <code>other</code> <strong>by value</strong> invokes the copy constructor (the one you already wrote and
+        tested). The swap is a cheap pointer exchange. When <code>other</code> goes out of scope it destructs the
+        old resource. Self-assignment is safe: you get a copy of yourself, swap with it, destroy the
+        copy — net effect: unchanged.
       </p>
     </section>
 
@@ -240,18 +306,20 @@ public:
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
+          <strong>DynArray (apply the Rule of Three).</strong>
           Implement a <code>DynArray</code> class that manages a dynamically allocated array of <code>int</code>.
-          It should store the array pointer and its size. Apply the Rule of Three: write a proper destructor,
-          copy constructor, and copy assignment operator (with self-assignment guard).
-          Test by copying a <code>DynArray</code>, modifying the copy, and verifying the original is unchanged.
+          Store the pointer and the size. Write a proper destructor, copy constructor, and copy assignment operator
+          (with self-assignment guard). In <code>main</code>, copy a <code>DynArray</code>, modify the copy, and verify
+          that the original is unchanged. Run under <code>-fsanitize=address</code> to confirm no double-free or leak.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          The following class is broken. Identify every memory issue, explain what goes wrong at runtime,
-          and fix it by applying the Rule of Three:
+          <strong>Fix the broken Buffer.</strong>
+          The following class has memory bugs. Identify every issue, explain what goes wrong at runtime
+          for each, and fix the class by applying the Rule of Three:
         </p>
 <pre><code class="language-cpp">class Buffer {
     int* buf;
@@ -265,21 +333,25 @@ public:
 void test() {
     Buffer a(5);
     a[0] = 10;
-    Buffer b(a);     // problem 1
+    Buffer b(a);    // problem 1: shallow copy
     b[0] = 99;
     Buffer c(3);
-    c = a;           // problem 2
+    c = a;          // problem 2: shallow assignment + old buf leaked
 }</code></pre>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Rewrite your <code>DynArray</code> copy assignment operator from Exercise 1 using the
-          <strong>copy-and-swap idiom</strong>. Add a <code>swap</code> member function (or free function)
-          and implement assignment by taking the parameter by value and swapping.
-          Explain in comments why this version is exception-safe.
+          <strong>Copy-and-swap (refactor + justify).</strong>
+          Rewrite your <code>DynArray</code> copy assignment operator from Exercise 1 using the copy-and-swap
+          idiom. Add a <code>swap</code> member function and implement assignment by taking the parameter by value
+          and swapping. Add comments explaining:
         </p>
+        <ul>
+          <li>Why the self-assignment guard is no longer needed.</li>
+          <li>Why this version is exception-safe (what happens if the copy constructor throws).</li>
+        </ul>
       </div>
     </section>
 

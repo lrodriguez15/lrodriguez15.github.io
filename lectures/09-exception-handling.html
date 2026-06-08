@@ -34,6 +34,8 @@
         <span class="chip chip-blue">throw</span>
         <span class="chip chip-green">std::exception</span>
         <span class="chip chip-orange">noexcept</span>
+        <span class="chip chip-orange">exception-safety</span>
+        <span class="chip chip-blue">stack-unwinding</span>
       </div>
     </header>
 
@@ -42,17 +44,52 @@
       <p>
         <strong>Exception handling</strong> separates error-detection code from error-recovery code.
         Instead of checking return codes at every call site, a function <em>throws</em> an exception object
-        when something goes wrong; the runtime unwinds the call stack until a matching <em>catch</em> block handles it.
+        when something goes wrong; the runtime unwinds the call stack until a matching <em>catch</em> block
+        handles it.
       </p>
-      <p>Key topics:</p>
-      <ul>
-        <li><code>try</code>, <code>throw</code>, <code>catch</code> mechanics</li>
-        <li>The standard exception hierarchy (<code>std::exception</code>)</li>
-        <li>Writing custom exception classes</li>
-        <li>Stack unwinding and RAII — why smart pointers matter here</li>
-        <li><code>noexcept</code> and when to use it</li>
-        <li>Exception safety guarantees</li>
-      </ul>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Safety guarantee</th>
+            <th>What it promises</th>
+            <th>Typical implementation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>No-throw</strong> (<code>noexcept</code>)</td>
+            <td>The operation <em>never</em> throws. <code>std::terminate</code> if it does.</td>
+            <td>Moves, swaps, destructors</td>
+          </tr>
+          <tr>
+            <td><strong>Strong</strong></td>
+            <td>If an operation throws, program state is <strong>unchanged</strong> — commit-or-rollback.</td>
+            <td>Copy-and-swap idiom</td>
+          </tr>
+          <tr>
+            <td><strong>Basic</strong></td>
+            <td>If an operation throws, no resources leak and objects remain in a <strong>valid</strong> (but possibly changed) state.</td>
+            <td>Smart pointers + invariant check</td>
+          </tr>
+          <tr>
+            <td><strong>None</strong></td>
+            <td>No promise — leaks and corrupt state are possible.</td>
+            <td>Raw <code>new</code>/<code>delete</code> without RAII</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li><code>throw</code> exits the current scope immediately; the runtime walks back up the call stack looking for a matching <code>catch</code>.</li>
+          <li>Always catch by <strong>const reference</strong> (<code>catch (const std::exception&amp; e)</code>) to avoid slicing and unnecessary copies.</li>
+          <li>Stack unwinding <strong>destroys all local objects</strong> in reverse-construction order — RAII turns this into automatic resource cleanup.</li>
+          <li><code>noexcept</code> is a contract: the compiler may generate better code, and the standard library uses it to prefer moves over copies in containers.</li>
+          <li>The leak-on-throw failure is the core motivator for RAII: a <code>delete</code> after a <code>throw</code> is <strong>dead code</strong>.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="section">
@@ -74,46 +111,78 @@
       <h3>Standard Exception Hierarchy</h3>
       <p>All standard exceptions inherit from <code>std::exception</code> (in <code>&lt;stdexcept&gt;</code>):</p>
       <ul>
-        <li><code>std::logic_error</code> — bugs detectable before runtime (invalid_argument, out_of_range, length_error)</li>
-        <li><code>std::runtime_error</code> — problems only detectable at runtime (overflow_error, underflow_error)</li>
+        <li><code>std::logic_error</code> — bugs detectable before runtime (<code>invalid_argument</code>, <code>out_of_range</code>, <code>length_error</code>)</li>
+        <li><code>std::runtime_error</code> — problems only detectable at runtime (<code>overflow_error</code>, <code>underflow_error</code>)</li>
         <li><code>std::bad_alloc</code> — thrown by <code>new</code> when memory is exhausted</li>
         <li><code>std::bad_cast</code> — thrown by a failing reference <code>dynamic_cast</code></li>
       </ul>
-      <p>Every standard exception exposes <code>.what()</code> returning a <code>const char*</code> description.</p>
+      <p>
+        Every standard exception exposes <code>.what()</code> returning a <code>const char*</code> description.
+      </p>
+      <p>
+        Catch order matters: list <strong>more-derived</strong> types before <strong>less-derived</strong> ones,
+        or a base-class handler will swallow every subtype.
+      </p>
 
       <h3>Custom Exception Classes</h3>
       <p>
         Derive from <code>std::runtime_error</code> or <code>std::logic_error</code> to create domain-specific
-        exceptions that carry extra context and can be caught specifically or generically.
+        exceptions that carry extra context and can be caught specifically or generically. Override <code>what()</code>
+        only when you need a dynamically built message; otherwise pass the message string to the base-class constructor.
       </p>
 
-      <h3>Stack Unwinding &amp; RAII</h3>
+      <h3>Stack Unwinding and RAII — The Leak Demo</h3>
+      <p>This is the failure that motivates everything:</p>
+<pre><code class="language-cpp">// BAD: raw new/delete — the delete is dead code if the throw fires first
+void riskyRaw() {
+    int* p = new int[1000];   // acquired
+    mayThrow();               // if this throws, the line below never runs
+    delete[] p;               // LEAKED
+}</code></pre>
       <p>
-        When an exception propagates, C++ <strong>destroys all local objects</strong> in scope in reverse
-        construction order. This is called <em>stack unwinding</em>. RAII-managed resources
-        (smart pointers, containers, file streams) are automatically cleaned up — no resource leak even when
-        exceptions bypass normal control flow.
+        When <code>mayThrow()</code> throws, C++ immediately starts unwinding. The <code>delete[] p</code> line is
+        <strong>never reached</strong>. The allocation leaks. AddressSanitizer will confirm it.
       </p>
-      <p class="note">
-        <strong>Never</strong> manage raw <code>new</code>/<code>delete</code> in exception-prone code without a RAII wrapper —
-        a <code>delete</code> after a <code>throw</code> will never execute.
+      <p>
+        The fix is to wrap <code>p</code> in a <code>std::unique_ptr</code> — its destructor runs automatically during
+        unwinding:
+      </p>
+<pre><code class="language-cpp">// GOOD: unique_ptr destructor fires during unwinding — no leak
+void riskyRAII() {
+    auto p = std::make_unique&lt;int[]&gt;(1000);
+    mayThrow();               // if this throws…
+    // …~unique_ptr() runs here automatically. Memory freed.
+}</code></pre>
+      <p>
+        <strong>No extra cleanup code. No try/catch required. The destructor is the cleanup.</strong>
       </p>
 
       <h3>noexcept</h3>
       <p>
-        Marking a function <code>noexcept</code> promises it will never throw.
-        The compiler may generate better code; the standard library uses this to prefer moves over copies in containers.
-        If a <code>noexcept</code> function <em>does</em> throw, <code>std::terminate()</code> is called immediately.
+        Marking a function <code>noexcept</code> promises it will never throw. The compiler may generate better
+        code; the standard library uses this to prefer moves over copies in containers. If a <code>noexcept</code>
+        function <em>does</em> throw, <code>std::terminate()</code> is called immediately — no handler gets a chance.
       </p>
-      <p>Always mark move constructors and move assignment operators <code>noexcept</code> when possible.</p>
+      <ul>
+        <li>Always mark <strong>move constructors</strong> and <strong>move assignment operators</strong> <code>noexcept</code> when possible.</li>
+        <li>Mark <strong>swap</strong> and <strong>destructors</strong> <code>noexcept</code> — the strong guarantee often depends on it.</li>
+        <li><code>noexcept(expr)</code> is the conditional form: <code>noexcept(noexcept(T::swap(...)))</code> propagates the guarantee from a dependent operation.</li>
+      </ul>
 
       <h3>Exception Safety Guarantees</h3>
-      <ul>
-        <li><strong>No-throw guarantee</strong> — the operation never throws (<code>noexcept</code>). Strongest.</li>
-        <li><strong>Strong guarantee</strong> — if an operation throws, the program state is unchanged (commit-or-rollback).</li>
-        <li><strong>Basic guarantee</strong> — if an operation throws, no resources are leaked and objects remain in a valid (but possibly changed) state.</li>
-        <li><strong>No guarantee</strong> — avoid; leads to resource leaks and corrupt state.</li>
-      </ul>
+      <p>
+        Providing a guarantee is a design decision, not an accident. Aim for the <strong>strong guarantee</strong>
+        for mutating operations on important state. The copy-and-swap idiom achieves it:
+      </p>
+      <ol>
+        <li>Make a copy of the object being modified.</li>
+        <li>Perform all potentially-throwing work on the copy.</li>
+        <li>Swap the copy into place — swap must be <code>noexcept</code>.</li>
+      </ol>
+      <p>
+        If any step before the swap throws, the original is untouched. After the swap succeeds, the
+        old state is destroyed in the copy's destructor — which also must not throw.
+      </p>
     </section>
 
     <section class="section">
@@ -138,8 +207,7 @@ int main() {
         std::cerr &lt;&lt; "Caught: " &lt;&lt; e.what() &lt;&lt; "\n";
     }
     std::cout &lt;&lt; "Program continues\n";
-}
-</code></pre>
+}</code></pre>
 
       <h3>Catching Multiple Exception Types</h3>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -149,7 +217,7 @@ int main() {
 int safeAt(const std::vector&lt;int&gt;&amp; v, int i) {
     if (i &lt; 0)
         throw std::invalid_argument("Negative index");
-    return v.at(i);   // throws std::out_of_range if i >= v.size()
+    return v.at(i);   // throws std::out_of_range if i &gt;= v.size()
 }
 
 int main() {
@@ -166,8 +234,7 @@ int main() {
             std::cerr &lt;&lt; "Out of range: " &lt;&lt; e.what() &lt;&lt; "\n";
         }
     }
-}
-</code></pre>
+}</code></pre>
 
       <h3>Custom Exception Classes</h3>
 <pre><code class="language-cpp">#include &lt;stdexcept&gt;
@@ -211,10 +278,60 @@ int main() {
                   &lt;&lt; " — have: " &lt;&lt; e.getAvailable()
                   &lt;&lt; ", need: "  &lt;&lt; e.getRequested() &lt;&lt; "\n";
     }
-}
-</code></pre>
+}</code></pre>
 
-      <h3>Stack Unwinding &amp; RAII</h3>
+      <h3>Failure First — Raw new/delete Leaks on Throw</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BAD — run with -fsanitize=address to watch the leak
+#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+void mayThrow() {
+    throw std::runtime_error("something went wrong");
+}
+
+void riskyRaw() {
+    int* buf = new int[1000];    // acquired
+    std::cout &lt;&lt; "Buffer acquired at " &lt;&lt; buf &lt;&lt; "\n";
+    mayThrow();                  // throws — the delete below is dead code
+    delete[] buf;                // NEVER REACHED
+}
+
+int main() {
+    try { riskyRaw(); }
+    catch (const std::exception&amp; e) {
+        std::cerr &lt;&lt; "Caught: " &lt;&lt; e.what() &lt;&lt; "\n";
+    }
+    // buf is leaked — AddressSanitizer will report it
+}</code></pre>
+
+      <h3>Fix — RAII Cleans Up During Stack Unwinding</h3>
+      <p class="fix-badge">Fixed</p>
+<pre><code class="language-cpp">// GOOD — unique_ptr destructor fires automatically; no leak
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;stdexcept&gt;
+
+void mayThrow() {
+    throw std::runtime_error("something went wrong");
+}
+
+void riskyRAII() {
+    auto buf = std::make_unique&lt;int[]&gt;(1000);
+    std::cout &lt;&lt; "Buffer acquired\n";
+    mayThrow();
+    // ~unique_ptr&lt;int[]&gt; runs here during unwinding — memory freed
+}
+
+int main() {
+    try { riskyRAII(); }
+    catch (const std::exception&amp; e) {
+        std::cerr &lt;&lt; "Caught: " &lt;&lt; e.what() &lt;&lt; "\n";
+    }
+    std::cout &lt;&lt; "Clean exit — no leak\n";
+}</code></pre>
+
+      <h3>Stack Unwinding with Multiple Resources</h3>
 <pre><code class="language-cpp">#include &lt;memory&gt;
 #include &lt;iostream&gt;
 #include &lt;stdexcept&gt;
@@ -243,14 +360,13 @@ int main() {
         std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
     }
     std::cout &lt;&lt; "Clean exit\n";
-}
-</code></pre>
+}</code></pre>
 
       <h3>noexcept and Re-throw</h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;stdexcept&gt;
 
-// Unconditionally does not throw — terminate() if it does
+// Unconditionally does not throw — std::terminate() if it does
 void swapInts(int&amp; a, int&amp; b) noexcept {
     int tmp = a; a = b; b = tmp;
 }
@@ -274,8 +390,7 @@ int main() {
     catch (const std::invalid_argument&amp; e) {
         std::cerr &lt;&lt; "[main] handled: " &lt;&lt; e.what() &lt;&lt; "\n";
     }
-}
-</code></pre>
+}</code></pre>
     </section>
 
     <section class="section">
@@ -296,7 +411,7 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Implement a <code>Stack&lt;T&gt;</code> class backed by a <code>std::vector</code> with:
+          <strong>Safe Stack.</strong> Implement a <code>Stack&lt;T&gt;</code> class backed by a <code>std::vector</code> with:
           <code>push()</code>, <code>pop()</code>, <code>top()</code>, and <code>isEmpty()</code>.
           <code>pop()</code> and <code>top()</code> should throw <code>std::underflow_error</code> on an empty stack.
           Write a test in <code>main</code> that catches this exception and prints a helpful message without crashing.
@@ -306,23 +421,30 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Create a hierarchy of custom exceptions for a university registration system:
-          <code>RegistrationError</code> (base) with two derived types: <code>CourseFull</code> and <code>PrerequisiteNotMet</code>.
-          Each should carry relevant data (e.g., course name, maximum capacity, or the missing prerequisite).
-          Write a <code>enroll()</code> function that throws the appropriate exception, and a <code>main</code>
-          that catches them both specifically and handles each with a different message.
+          <strong>Registration Exceptions.</strong> Create a hierarchy of custom exceptions for a university
+          registration system: <code>RegistrationError</code> (base, derives from <code>std::runtime_error</code>)
+          with two derived types: <code>CourseFull</code> and <code>PrerequisiteNotMet</code>.
+          Each should carry relevant data (e.g., course name, maximum capacity, or the missing prerequisite name).
+          Write an <code>enroll()</code> function that throws the appropriate exception, and a <code>main</code>
+          that catches them both specifically and prints a different message for each.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Demonstrate the difference between a <strong>memory leak</strong> and <strong>safe cleanup</strong> under exceptions.
-          Write two versions of a function that acquires two resources and then throws:
-          (a) using raw <code>new</code>/<code>delete</code> — show where the leak occurs;
-          (b) using <code>unique_ptr</code> — show that both resources are cleaned up automatically.
-          Add destructor messages to verify.
+          <strong>Leak vs. Safe (demonstrate with AddressSanitizer).</strong> Write two versions of a function
+          that acquires two resources with <code>new</code> and then throws:
         </p>
+        <p>
+          (a) Using raw <code>new</code>/<code>delete</code> — add destructor print statements and show where the
+          leak occurs. Build with <code>-fsanitize=address</code> and confirm ASan reports the leak.
+        </p>
+        <p>
+          (b) Using <code>std::unique_ptr</code> — show that both resources are cleaned up automatically even
+          when the throw fires. Confirm ASan reports nothing.
+        </p>
+        <p>Explain in a comment <em>why</em> (a) leaks but (b) does not.</p>
       </div>
     </section>
   </main>

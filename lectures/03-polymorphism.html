@@ -30,28 +30,72 @@
       <p class="lecture-num">Lecture 03 · C++14</p>
       <h1>Polymorphism</h1>
       <div class="chips">
+        <span class="chip chip-blue">oop</span>
         <span class="chip chip-blue">virtual</span>
         <span class="chip chip-blue">override</span>
         <span class="chip chip-orange">abstract</span>
         <span class="chip chip-green">dynamic_cast</span>
+        <span class="chip chip-green">vtable</span>
       </div>
     </header>
 
     <!-- ── Overview ─────────────────────────────────────────────────────────── -->
     <section class="section">
       <h2>Overview</h2>
+
       <p>
-        <strong>Polymorphism</strong> (from Greek: "many forms") allows a single interface to represent different underlying
-        types. In C++, polymorphism comes in two flavours:
+        The word "polymorphism" means many forms. In C++ it shows up in two completely different
+        mechanisms, and conflating them is the first mistake students make.
       </p>
-      <ul>
-        <li><strong>Compile-time (static) polymorphism</strong> — resolved by the compiler: function overloading, operator overloading, templates.</li>
-        <li><strong>Runtime (dynamic) polymorphism</strong> — resolved at execution via the virtual function mechanism and a hidden <em>vtable</em>.</li>
-      </ul>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Kind</th>
+            <th>When resolved</th>
+            <th>Mechanism</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Compile-time (static)</strong></td>
+            <td>At compilation</td>
+            <td>overloading, templates</td>
+            <td>zero</td>
+          </tr>
+          <tr>
+            <td><strong>Runtime (dynamic)</strong></td>
+            <td>At execution</td>
+            <td><code>virtual</code> + vtable + vptr</td>
+            <td>one pointer indirection per call</td>
+          </tr>
+        </tbody>
+      </table>
+
       <p>
-        Runtime polymorphism is the heart of OOP design: it lets you write code against an abstract interface and
-        swap in different implementations without changing callers.
+        <strong>This lecture is about runtime polymorphism.</strong> Compile-time polymorphism (overloading,
+        operator overloading) is covered briefly as contrast; templates are a later topic.
       </p>
+      <p>
+        The central promise of runtime polymorphism: write code that operates on a <strong>base-class
+        pointer or reference</strong>, and the right derived-class function executes automatically — today
+        and for every derived class written tomorrow, without touching the calling code.
+      </p>
+
+      <div class="keyideas">
+        <p class="keyideas-label">Key Ideas</p>
+        <ul>
+          <li>Mark a function <code>virtual</code> in the base class once; use <code>override</code> in every derived class
+            every time — the compiler then catches typos that would silently call the wrong function.</li>
+          <li>A class with at least one pure virtual function (<code>= 0</code>) is <strong>abstract</strong> and cannot be
+            instantiated — it expresses a contract, not an object.</li>
+          <li>A base class meant to be deleted through a base pointer <strong>must</strong> have a <code>virtual</code>
+            destructor; omitting it is undefined behaviour and a memory leak waiting to happen.</li>
+          <li><code>dynamic_cast</code> lets you safely recover a derived pointer at runtime, but frequent use is
+            a smell — it means the virtual interface is not doing enough work.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ── Notes ────────────────────────────────────────────────────────────── -->
@@ -60,49 +104,72 @@
 
       <h3>Compile-Time Polymorphism</h3>
       <p>
-        The compiler selects the correct function at compile time based on argument types or template parameters.
-        No runtime overhead. Examples:
+        The compiler selects the correct function at compile time based on the argument types (for
+        overloading) or the template parameters. No runtime overhead, no vptr, no vtable.
       </p>
       <ul>
-        <li><strong>Function overloading</strong>: multiple functions with the same name but different parameter lists</li>
-        <li><strong>Operator overloading</strong>: giving custom meaning to operators for user-defined types</li>
-        <li><strong>Templates</strong>: generic code parameterised by type (beyond this course's scope for now)</li>
+        <li><strong>Function overloading</strong>: same name, different parameter lists.</li>
+        <li><strong>Operator overloading</strong>: custom meaning for <code>+</code>, <code>&lt;&lt;</code>, <code>==</code>, etc. on user-defined types.</li>
+        <li><strong>Templates</strong>: generic code parameterised by type — introduced later in the course.</li>
       </ul>
 
-      <h3>Runtime Polymorphism &amp; <code>virtual</code></h3>
+      <h3>Runtime Polymorphism and <code>virtual</code></h3>
       <p>
-        When a base-class function is marked <code>virtual</code>, the compiler creates a <em>vtable</em> (virtual dispatch table)
-        for that class. Each object contains a hidden pointer (<em>vptr</em>) to its class's vtable. A call through a
-        base pointer/reference follows the vptr at runtime to find the correct override.
+        When a base-class function is marked <code>virtual</code>, the compiler builds a <strong>vtable</strong> (virtual
+        dispatch table) for that class: a static array of function pointers, one slot per virtual
+        function. Every object of a polymorphic class carries a hidden <strong>vptr</strong> pointing at its
+        class's vtable.
       </p>
+      <p>Calling <code>ptr-&gt;draw()</code> through a <code>Shape*</code> does three things at runtime:</p>
       <ul>
-        <li>Declare in base class: <code>virtual void draw() const;</code></li>
-        <li>Override in derived class: <code>void draw() const override;</code></li>
-        <li><code>override</code> is a C++11 keyword that asks the compiler to verify the function actually overrides something — use it always</li>
-        <li><code>final</code> prevents further overriding: <code>void draw() const final;</code></li>
+        <li>Follow the vptr to the vtable.</li>
+        <li>Read the function pointer in the <code>draw</code> slot.</li>
+        <li>Jump to it.</li>
       </ul>
+      <p>
+        That is one extra indirection per virtual call — negligible for most code, irrelevant for
+        all teaching code.
+      </p>
+      <p><strong>Rules for correct use:</strong></p>
+      <ul>
+        <li>Declare in the base: <code>virtual void draw() const;</code></li>
+        <li>Override in the derived: <code>void draw() const override;</code> — the <code>override</code> specifier tells
+          the compiler "this must match a virtual function in a base"; if it doesn't (typo, wrong
+          signature), you get a compile error, not a silent new function.</li>
+        <li>Use <code>final</code> to prevent further overriding: <code>void draw() const final;</code></li>
+        <li>Give the base class a <strong><code>virtual</code> destructor</strong> whenever it is possible that a derived
+          object will be deleted through a base pointer. Without it, only <code>~Base()</code> runs — the
+          derived destructor is skipped, and any resources the derived class owns leak.</li>
+      </ul>
+
+      <h3>Abstract Classes and Pure Virtual Functions</h3>
+      <p>
+        A <strong>pure virtual function</strong> is declared with <code>= 0</code> and has no definition in the base class
+        (though one may be supplied separately if needed). A class with at least one pure virtual
+        function is <strong>abstract</strong>: the compiler refuses to instantiate it directly.
+      </p>
+      <p>
+        Abstract classes define a <em>contract</em> — a set of operations every concrete subclass must
+        provide. They are C++'s closest equivalent to interfaces in Java or Go.
+      </p>
 
       <h3>The vtable in Practice</h3>
       <p>
-        Each class with at least one virtual function has its own vtable — a static array of function pointers.
-        Every instance holds a pointer to its class's vtable. When you call <code>ptr-&gt;draw()</code> through a
-        <code>Shape*</code>, the CPU dereferences the vptr, looks up <code>draw</code> in the table, and jumps to the
-        correct implementation. The cost is one extra indirection per virtual call.
-      </p>
-
-      <h3>Abstract Classes &amp; Pure Virtual Functions</h3>
-      <p>
-        A <strong>pure virtual function</strong> (declared with <code>= 0</code>) has no default implementation in the base class.
-        A class with at least one pure virtual function is <strong>abstract</strong> — it cannot be instantiated directly.
-        Abstract classes serve as interfaces: they define a contract that all concrete subclasses must fulfil.
+        Each polymorphic class has exactly one vtable, shared by all its instances. Every instance
+        has exactly one vptr (usually stored at offset 0, making <code>sizeof</code> slightly larger). The
+        vtable is populated at compile/link time; the vptr is set by the constructor.
       </p>
 
       <h3><code>dynamic_cast</code></h3>
       <p>
-        <code>dynamic_cast</code> performs a safe downcast at runtime using RTTI (Run-Time Type Information).
-        It returns <code>nullptr</code> (for pointer casts) or throws <code>std::bad_cast</code> (for reference casts)
-        if the cast is invalid. Use it only when you genuinely need to recover the derived type — frequent use
-        of <code>dynamic_cast</code> often signals a design that should rely more on virtual dispatch.
+        <code>dynamic_cast</code> performs a safe downcast at runtime using RTTI (Run-Time Type Information,
+        enabled by default). For pointer casts it returns <code>nullptr</code> on failure; for reference casts
+        it throws <code>std::bad_cast</code>.
+      </p>
+      <p>
+        Use it only when you genuinely need to recover the derived type — for example, when a
+        derived class has an operation that has no natural place in the base interface. Frequent
+        <code>dynamic_cast</code> in calling code often signals that the virtual interface is too narrow.
       </p>
     </section>
 
@@ -110,19 +177,58 @@
     <section class="section">
       <h2>Code Examples</h2>
 
-      <h3>Compile-Time Polymorphism: Overloading</h3>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+      <p class="note">Full runnable programs are in <code>examples/</code>. The snippets below are the teaching cut.</p>
 
-// Same name, different signatures — resolved at compile time
-void print(int x)         { std::cout &lt;&lt; "int: "    &lt;&lt; x   &lt;&lt; "\n"; }
-void print(double x)      { std::cout &lt;&lt; "double: " &lt;&lt; x   &lt;&lt; "\n"; }
-void print(const char* s) { std::cout &lt;&lt; "string: " &lt;&lt; s   &lt;&lt; "\n"; }
+      <h3>Failure 1 — Missing <code>virtual</code>: Silent Static Dispatch</h3>
+      <p>
+        This is the bug that bites everyone at least once. The code compiles cleanly, runs
+        without a crash, and does the wrong thing.
+      </p>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BAD — no virtual keyword
+struct Shape {
+    void draw() const { std::cout &lt;&lt; "Shape::draw\n"; }  // NOT virtual
+};
+
+struct Circle : Shape {
+    void draw() const { std::cout &lt;&lt; "Circle::draw\n"; } // shadows, does not override
+};
 
 int main() {
-    print(42);       // calls print(int)
-    print(3.14);     // calls print(double)
-    print("hello");  // calls print(const char*)
+    Circle c;
+    Shape* p = &amp;c;
+    p-&gt;draw();   // prints "Shape::draw" — static dispatch, always calls Shape::draw
 }</code></pre>
+      <p>
+        Adding <code>virtual</code> to <code>Shape::draw</code> and <code>override</code> to <code>Circle::draw</code> is the complete fix.
+        The <code>override</code> keyword then becomes the compile-time proof that dispatch is dynamic.
+      </p>
+
+      <h3>Failure 2 — Non-Virtual Destructor: Derived Resources Leak</h3>
+      <p class="fail-badge">Broken</p>
+<pre><code class="language-cpp">// BAD — virtual dispatch, but destructor is not virtual
+struct Base {
+    virtual void speak() const { std::cout &lt;&lt; "Base\n"; }
+    ~Base() {}            // NOT virtual — deleting through Base* is UB
+};
+
+struct Derived : Base {
+    int* data;
+    Derived() : data(new int[1000]) {}
+    ~Derived() { delete[] data; }   // never called when deleted through Base*
+    void speak() const override { std::cout &lt;&lt; "Derived\n"; }
+};
+
+int main() {
+    Base* p = new Derived();
+    p-&gt;speak();   // correct — "Derived" via vtable
+    delete p;     // UB: only ~Base() runs; ~Derived() and delete[] data are skipped
+}</code></pre>
+      <p>
+        The fix is one word: <code>virtual ~Base() {}</code> (or <code>= default</code>). This propagates to all
+        derived destructors automatically — no changes to <code>Derived</code> needed.
+      </p>
+      <p class="note">Run <code>examples/02_nonvirtual_dtor.cpp</code> with <code>-fsanitize=address</code> to watch ASan flag this.</p>
 
       <h3>Runtime Polymorphism with <code>virtual</code> and <code>override</code></h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
@@ -131,9 +237,9 @@ int main() {
 
 class Shape {
 public:
-    virtual double area() const = 0;       // pure virtual — Shape is abstract
+    virtual double area() const = 0;   // pure virtual — Shape is abstract
     virtual void   draw() const = 0;
-    virtual ~Shape() = default;
+    virtual ~Shape() = default;        // virtual destructor — always
 };
 
 class Circle : public Shape {
@@ -141,7 +247,7 @@ class Circle : public Shape {
 public:
     explicit Circle(double r) : r(r) {}
     double area() const override { return 3.14159 * r * r; }
-    void   draw() const override { std::cout &lt;&lt; "Drawing Circle, area=" &lt;&lt; area() &lt;&lt; "\n"; }
+    void   draw() const override { std::cout &lt;&lt; "Circle, area=" &lt;&lt; area() &lt;&lt; "\n"; }
 };
 
 class Rectangle : public Shape {
@@ -149,7 +255,7 @@ class Rectangle : public Shape {
 public:
     Rectangle(double w, double h) : w(w), h(h) {}
     double area() const override { return w * h; }
-    void   draw() const override { std::cout &lt;&lt; "Drawing Rectangle, area=" &lt;&lt; area() &lt;&lt; "\n"; }
+    void   draw() const override { std::cout &lt;&lt; "Rectangle, area=" &lt;&lt; area() &lt;&lt; "\n"; }
 };
 
 int main() {
@@ -162,27 +268,11 @@ int main() {
         s-&gt;draw();   // correct override called for each object at runtime
 }</code></pre>
 
-      <h3>Using <code>final</code></h3>
-<pre><code class="language-cpp">class Base {
-public:
-    virtual void foo() {}
-    virtual ~Base() = default;
-};
-
-class Sealed : public Base {
-public:
-    void foo() final {}  // no further override allowed
-};
-
-// class Attempt : public Sealed {
-//     void foo() override {}  // COMPILE ERROR: foo is final in Sealed
-// };</code></pre>
-
       <h3>Abstract Class as an Interface</h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
-class Logger {             // pure interface
+class Logger {             // pure interface — cannot be instantiated
 public:
     virtual void log(const std::string&amp; msg) const = 0;
     virtual ~Logger() = default;
@@ -200,11 +290,12 @@ class FileLogger : public Logger {
 public:
     explicit FileLogger(const std::string&amp; f) : filename(f) {}
     void log(const std::string&amp; msg) const override {
-        // In real code: open file and write. Simplified here:
+        // Real code would open the file; simplified for clarity.
         std::cout &lt;&lt; "[FILE:" &lt;&lt; filename &lt;&lt; "] " &lt;&lt; msg &lt;&lt; "\n";
     }
 };
 
+// Caller depends only on Logger — unaware of the concrete type
 void doWork(const Logger&amp; logger) {
     logger.log("Starting work");
     logger.log("Work complete");
@@ -216,6 +307,22 @@ int main() {
     doWork(cl);   // runtime dispatch to ConsoleLogger
     doWork(fl);   // runtime dispatch to FileLogger
 }</code></pre>
+
+      <h3>Using <code>final</code></h3>
+<pre><code class="language-cpp">class Base {
+public:
+    virtual void foo() {}
+    virtual ~Base() = default;
+};
+
+class Sealed : public Base {
+public:
+    void foo() final {}   // no further override allowed
+};
+
+// class Attempt : public Sealed {
+//     void foo() override {}  // COMPILE ERROR: foo is final in Sealed
+// };</code></pre>
 
       <h3><code>dynamic_cast</code></h3>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
@@ -229,28 +336,27 @@ public:
 
 class Dog : public Animal {
 public:
-    void speak()  const override { std::cout &lt;&lt; "Woof!\n"; }
-    void fetch()  const          { std::cout &lt;&lt; "Fetching!\n"; }
+    void speak() const override { std::cout &lt;&lt; "Woof!\n"; }
+    void fetch() const          { std::cout &lt;&lt; "Fetching!\n"; }
 };
 
 class Cat : public Animal {
 public:
-    void speak()  const override { std::cout &lt;&lt; "Meow!\n"; }
-    void purr()   const          { std::cout &lt;&lt; "Purring...\n"; }
+    void speak() const override { std::cout &lt;&lt; "Meow!\n"; }
+    void purr()  const          { std::cout &lt;&lt; "Purring...\n"; }
 };
 
 int main() {
     std::unique_ptr&lt;Animal&gt; a = std::make_unique&lt;Dog&gt;();
-
     a-&gt;speak();   // virtual dispatch — prints "Woof!"
 
-    // Try to treat 'a' as a Dog specifically
+    // Safe downcast: confirm the runtime type before using Dog-specific API
     Dog* dog = dynamic_cast&lt;Dog*&gt;(a.get());
     if (dog) {
-        dog-&gt;fetch();   // safe — we confirmed the runtime type
+        dog-&gt;fetch();   // safe — confirmed at runtime
     }
 
-    // Try an invalid cast
+    // Failed cast returns nullptr, not a crash
     Cat* cat = dynamic_cast&lt;Cat*&gt;(a.get());
     if (!cat) {
         std::cout &lt;&lt; "Not a Cat — cast failed safely\n";
@@ -278,34 +384,49 @@ int main() {
       <div class="exercise">
         <p class="exercise-label">Exercise 1</p>
         <p>
-          Design an abstract base class <code>Instrument</code> with a pure virtual method <code>play()</code>.
-          Derive at least three concrete instruments (e.g., <code>Guitar</code>, <code>Piano</code>, <code>Drums</code>).
-          Store them in a <code>std::vector&lt;std::unique_ptr&lt;Instrument&gt;&gt;</code> and call <code>play()</code>
-          on each element. Verify that the correct overridden method is invoked at runtime.
+          <strong>Instrument hierarchy.</strong> Design an abstract base class <code>Instrument</code> with a pure
+          virtual method <code>play()</code>. Derive at least three concrete instruments (<code>Guitar</code>, <code>Piano</code>,
+          <code>Drums</code>). Store them in a <code>std::vector&lt;std::unique_ptr&lt;Instrument&gt;&gt;</code> and call <code>play()</code> on
+          each element. Verify at runtime that the correct override is invoked for every element.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 2</p>
         <p>
-          Extend the <code>Shape</code> hierarchy from the code examples. Add a <code>Triangle</code> class.
-          Write a free function <code>double totalArea(const std::vector&lt;Shape*&gt;&amp; shapes)</code> that
-          accumulates and returns the sum of all areas using virtual dispatch. Test it with a mixed collection.
+          <strong>Shape totalArea.</strong> Extend the <code>Shape</code> hierarchy from the code examples: add a
+          <code>Triangle</code> class. Write a free function
+          <code>double totalArea(const std::vector&lt;Shape*&gt;&amp; shapes)</code> that accumulates and returns the sum
+          of all areas using virtual dispatch. Test it with a mixed collection and print the result.
         </p>
       </div>
 
       <div class="exercise">
         <p class="exercise-label">Exercise 3</p>
         <p>
-          Given the following hierarchy:
+          <strong>Payroll with <code>dynamic_cast</code>.</strong> Given the following hierarchy:
         </p>
-<pre><code class="language-cpp">class Employee { public: virtual double salary() const = 0; virtual ~Employee() = default; };
-class FullTime  : public Employee { double base; public: FullTime(double b) : base(b) {} double salary() const override { return base; } };
-class PartTime  : public Employee { double hourly; int hours; public: PartTime(double h, int hrs) : hourly(h), hours(hrs) {} double salary() const override { return hourly * hours; } };</code></pre>
+<pre><code class="language-cpp">class Employee {
+public:
+    virtual double salary() const = 0;
+    virtual ~Employee() = default;
+};
+class FullTime : public Employee {
+    double base;
+public:
+    FullTime(double b) : base(b) {}
+    double salary() const override { return base; }
+};
+class PartTime : public Employee {
+    double hourly; int hours;
+public:
+    PartTime(double h, int hrs) : hourly(h), hours(hrs) {}
+    double salary() const override { return hourly * hours; }
+};</code></pre>
         <p>
-          Write a <code>Payroll</code> class that stores a collection of <code>Employee*</code> pointers,
-          computes total payroll using virtual dispatch, and uses <code>dynamic_cast</code> to count how many
-          employees are <code>PartTime</code>. Print both the total payroll and the part-time headcount.
+          Write a <code>Payroll</code> class that stores a collection of <code>Employee*</code> pointers, computes total
+          payroll using virtual dispatch, and uses <code>dynamic_cast</code> to count how many employees are
+          <code>PartTime</code>. Print both the total payroll and the part-time headcount.
         </p>
       </div>
     </section>
