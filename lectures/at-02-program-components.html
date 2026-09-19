@@ -45,71 +45,58 @@
 
 <section class="section">
 <h2 id="overview">Overview</h2>
-<p>On Tuesday you wrote algorithms and I broke them by reading them
-literally. Today the machine takes over that job, and it is far less
-forgiving than I was: where I paused and raised an eyebrow, Python
-simply stops and prints a word you have never seen.</p>
-<p>So the shape of today is: your algorithm from Tuesday, typed in,
-<strong>crashing</strong>, and then fixed. Three failures, in order of
-how often they will happen to you this semester:</p>
+<p>On Tuesday you wrote algorithms and I broke them by reading them literally. Today the machine takes over that job, and it is far less forgiving than I was: where I paused and raised an eyebrow, Python simply stops and prints a word you have never seen.</p>
+<p>So the shape of today is: your algorithm from Tuesday, typed in, <strong>crashing</strong>, and then fixed. Three failures, in order of how often they will happen to you this semester:</p>
 <ol type="1">
-<li>Everything the user types is <strong>text</strong>, even when it
-looks like a number.</li>
-<li>Python has its own opinion about the order of operations, and it is
-not always yours.</li>
+<li>Everything the user types is <strong>text</strong>, even when it looks like a number.</li>
+<li>Python has its own opinion about the order of operations, and it is not always yours.</li>
 <li>A program that runs is not a program that is correct.</li>
 </ol>
 </section>
 <section class="section">
 <h2 id="notes">Notes</h2>
 <h3 id="the-anatomy-of-a-program">The anatomy of a program</h3>
-<p>Every Python program you write for the next ten weeks is made of
-these parts and nothing else:</p>
+<p>Every Python program you write for the next ten weeks is made of these parts and nothing else:</p>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Part</th>
 <th>What it does</th>
 <th>Example</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><strong>Comment</strong></td>
 <td>A note for humans. Ignored by Python.</td>
 <td><code># calculate the speed</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td><strong>Variable</strong></td>
 <td>A named box holding a value</td>
 <td><code>distance = 100</code></td>
 </tr>
-<tr>
+<tr class="odd">
 <td><strong>Assignment</strong></td>
 <td>Puts a value in the box</td>
 <td><code>speed = distance / hours</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td><strong>Expression</strong></td>
 <td>Something with a value</td>
 <td><code>distance / hours</code></td>
 </tr>
-<tr>
+<tr class="odd">
 <td><strong>Input</strong></td>
 <td>Gets a value from the user (as <strong>text</strong>)</td>
 <td><code>input("Distance: ")</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td><strong>Output</strong></td>
 <td>Shows a value</td>
 <td><code>print(speed)</code></td>
 </tr>
-<tr>
+<tr class="odd">
 <td><strong>Function call</strong></td>
 <td>Uses code someone else wrote</td>
 <td><code>float(...)</code>, <code>round(...)</code></td>
@@ -117,86 +104,66 @@ these parts and nothing else:</p>
 </tbody>
 </table>
 <blockquote>
-<p><strong>Gloss:</strong> <em>comentario</em> · <em>variable</em> ·
-<em>asignación</em> — assignment · <em>expresión</em> · <em>entrada /
-salida</em> — input / output · <em>llamada a función</em> — function
-call</p>
+<p><strong>Gloss:</strong> <em>comentario</em> · <em>variable</em> · <em>asignación</em> — assignment · <em>expresión</em> · <em>entrada / salida</em> — input / output · <em>llamada a función</em> — function call</p>
 </blockquote>
-<p>Compare against Tuesday’s pseudocode. <code>READ</code> became
-<code>input()</code>. <code>←</code> became <code>=</code>.
-<code>DISPLAY</code> became <code>print()</code>. <strong>The structure
-is identical.</strong> This is why we write the algorithm first: the
-translation is mechanical once the thinking is done.</p>
-<h3 id="failure-1-everything-the-user-types-is-text">Failure 1 —
-everything the user types is text</h3>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>distance <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>)   <span class="co"># &quot;100&quot;  &lt;- text, not 100</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>hours <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>)       <span class="co"># &quot;2&quot;    &lt;- text, not 2</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>speed <span class="op">=</span> distance <span class="op">/</span> hours               <span class="co"># TypeError</span></span></code></pre></div>
-<p><code>input()</code> returns a <code>str</code> — a string of
-characters — always, without exception, even when every character is a
-digit. <code>"100"</code> and <code>100</code> are different things: one
-is a piece of text that looks numeric, the other is a quantity.</p>
+<p>Compare against Tuesday’s pseudocode. <code>READ</code> became <code>input()</code>. <code>←</code> became <code>=</code>. <code>DISPLAY</code> became <code>print()</code>. <strong>The structure is identical.</strong> This is why we write the algorithm first: the translation is mechanical once the thinking is done.</p>
+<h3 id="failure-1-everything-the-user-types-is-text">Failure 1 — everything the user types is text</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>distance <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>)   <span class="co"># &quot;100&quot;  &lt;- text, not 100</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>hours <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>)       <span class="co"># &quot;2&quot;    &lt;- text, not 2</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>speed <span class="op">=</span> distance <span class="op">/</span> hours               <span class="co"># TypeError</span></span></code></pre></div>
+<p><code>input()</code> returns a <code>str</code> — a string of characters — always, without exception, even when every character is a digit. <code>"100"</code> and <code>100</code> are different things: one is a piece of text that looks numeric, the other is a quantity.</p>
 <p>The fix is to convert:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>distance_km <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hours <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>speed <span class="op">=</span> distance_km <span class="op">/</span> hours            <span class="co"># 50.0</span></span></code></pre></div>
-<p><code>float()</code> for anything that can have decimals,
-<code>int()</code> for whole numbers only.</p>
-<p><strong>The nastier version.</strong> Division crashes, so you find
-it immediately. <code>+</code> does not:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;First number: &quot;</span>)    <span class="co"># &quot;2&quot;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Second number: &quot;</span>)   <span class="co"># &quot;3&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a <span class="op">+</span> b)                   <span class="co"># 23    &lt;- not 5. No error. No warning.</span></span></code></pre></div>
-<p>On text, <code>+</code> means <em>join together</em>. This runs,
-produces a plausible-looking number, and is wrong. This is the failure
-mode you should actually fear: not the crash, but the silent wrong
-answer.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>distance_km <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>hours <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>speed <span class="op">=</span> distance_km <span class="op">/</span> hours            <span class="co"># 50.0</span></span></code></pre></div>
+<p><code>float()</code> for anything that can have decimals, <code>int()</code> for whole numbers only.</p>
+<p><strong>The nastier version.</strong> Division crashes, so you find it immediately. <code>+</code> does not:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>a <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;First number: &quot;</span>)    <span class="co"># &quot;2&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>b <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Second number: &quot;</span>)   <span class="co"># &quot;3&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="bu">print</span>(a <span class="op">+</span> b)                   <span class="co"># 23    &lt;- not 5. No error. No warning.</span></span></code></pre></div>
+<p>On text, <code>+</code> means <em>join together</em>. This runs, produces a plausible-looking number, and is wrong. This is the failure mode you should actually fear: not the crash, but the silent wrong answer.</p>
 <h3 id="failure-2-precedence">Failure 2 — precedence</h3>
 <p>Python evaluates in this order (highest first):</p>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th></th>
 <th>Operators</th>
 <th></th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>1</td>
 <td><code>()</code></td>
 <td>parentheses</td>
 </tr>
-<tr>
+<tr class="even">
 <td>2</td>
 <td><code>**</code></td>
 <td>exponent — <strong>right</strong> to left</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>3</td>
 <td><code>-x</code></td>
 <td>negation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>4</td>
 <td><code>*</code> <code>/</code> <code>//</code> <code>%</code></td>
 <td>left to right</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>5</td>
 <td><code>+</code> <code>-</code></td>
 <td>left to right</td>
 </tr>
-<tr>
+<tr class="even">
 <td>6</td>
-<td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code>
-<code>&gt;=</code> <code>==</code> <code>!=</code></td>
+<td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td>
 <td>comparison</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>7</td>
 <td><code>not</code>, <code>and</code>, <code>or</code></td>
 <td>logical</td>
@@ -205,59 +172,28 @@ answer.</p>
 </table>
 <p>Three that catch everybody:</p>
 <ul>
-<li><code>2 ** 3 ** 2</code> is <code>512</code>, not <code>64</code>.
-<code>**</code> groups right to left: <code>2 ** (3 ** 2)</code>.</li>
-<li><code>-2 ** 2</code> is <code>-4</code>, not <code>4</code>.
-Exponent binds tighter than the minus sign: <code>-(2 ** 2)</code>.</li>
-<li><code>10 / 3</code> is <code>3.333…</code> but <code>10 // 3</code>
-is <code>3</code> and <code>10 % 3</code> is <code>1</code>. Three
-different divisions. <code>//</code> is the quotient, <code>%</code> is
-the remainder — you will need <code>%</code> constantly from Week 3 for
-“is this number even?” and “is it divisible by?”</li>
+<li><code>2 ** 3 ** 2</code> is <code>512</code>, not <code>64</code>. <code>**</code> groups right to left: <code>2 ** (3 ** 2)</code>.</li>
+<li><code>-2 ** 2</code> is <code>-4</code>, not <code>4</code>. Exponent binds tighter than the minus sign: <code>-(2 ** 2)</code>.</li>
+<li><code>10 / 3</code> is <code>3.333…</code> but <code>10 // 3</code> is <code>3</code> and <code>10 % 3</code> is <code>1</code>. Three different divisions. <code>//</code> is the quotient, <code>%</code> is the remainder — you will need <code>%</code> constantly from Week 3 for “is this number even?” and “is it divisible by?”</li>
 </ul>
 <p>And the one that will actually cost somebody marks:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>average <span class="op">=</span> g1 <span class="op">+</span> g2 <span class="op">+</span> g3 <span class="op">/</span> <span class="dv">3</span>      <span class="co"># 193.33 for grades 90, 80, 70</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>average <span class="op">=</span> (g1 <span class="op">+</span> g2 <span class="op">+</span> g3) <span class="op">/</span> <span class="dv">3</span>    <span class="co"># 80.0   &lt;- correct</span></span></code></pre></div>
-<p>That program runs. It prints a number. The number is nonsense, and
-nothing warns you.</p>
-<h3 id="failure-3-the-program-runs-and-is-still-wrong">Failure 3 — the
-program runs and is still wrong</h3>
-<p>This is the lesson underneath the other two. <strong>Running is not a
-test.</strong> The average program ran. The <code>a + b</code> program
-ran. Both were wrong.</p>
-<p>The only defence available to you, today, is: <strong>know what you
-expect before you press run.</strong> If you predicted <code>80.0</code>
-and got <code>193.33</code>, you have found a bug. If you had no
-prediction, you have found a number, and you will write it down.</p>
-<p>This is also why we hand-check with known values. In
-<code>06_fuel_cost.py</code>, 200 km at 100 km/h must be 2 hours. You
-know that without a computer. That is your test.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>average <span class="op">=</span> g1 <span class="op">+</span> g2 <span class="op">+</span> g3 <span class="op">/</span> <span class="dv">3</span>      <span class="co"># 193.33 for grades 90, 80, 70</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>average <span class="op">=</span> (g1 <span class="op">+</span> g2 <span class="op">+</span> g3) <span class="op">/</span> <span class="dv">3</span>    <span class="co"># 80.0   &lt;- correct</span></span></code></pre></div>
+<p>That program runs. It prints a number. The number is nonsense, and nothing warns you.</p>
+<h3 id="failure-3-the-program-runs-and-is-still-wrong">Failure 3 — the program runs and is still wrong</h3>
+<p>This is the lesson underneath the other two. <strong>Running is not a test.</strong> The average program ran. The <code>a + b</code> program ran. Both were wrong.</p>
+<p>The only defence available to you, today, is: <strong>know what you expect before you press run.</strong> If you predicted <code>80.0</code> and got <code>193.33</code>, you have found a bug. If you had no prediction, you have found a number, and you will write it down.</p>
+<p>This is also why we hand-check with known values. In <code>06_fuel_cost.py</code>, 200 km at 100 km/h must be 2 hours. You know that without a computer. That is your test.</p>
 <h3 id="built-in-functions">Built-in functions</h3>
-<p>You do not have to write everything. Python ships with functions for
-the common operations:</p>
-<p><code>abs()</code> <code>round()</code> <code>max()</code>
-<code>min()</code> <code>len()</code> <code>int()</code>
-<code>float()</code> <code>str()</code> <code>type()</code></p>
-<p>and, after <code>import math</code>: <code>math.sqrt()</code>
-<code>math.pi</code> <code>math.floor()</code> <code>math.ceil()</code>
-<code>math.pow()</code></p>
-<p>See <code>examples/05_builtins.py</code>. Note one thing
-carefully:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(<span class="fl">3.7</span>)          <span class="co"># has a VALUE: 4. You can store it, add to it, pass it on.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="fl">3.7</span>)          <span class="co"># has no value. It has an EFFECT: characters appear.</span></span></code></pre></div>
-<p><code>x = round(3.7)</code> puts <code>4</code> in <code>x</code>.
-<code>x = print(3.7)</code> puts <em>nothing</em> in <code>x</code> — it
-prints <code>3.7</code> and stores <code>None</code>. Every semester
-several students write <code>total = print(a + b)</code> and cannot see
-why the next line fails. It is the same distinction as
-<code>return</code> versus <code>print</code>, which is next week’s hard
-idea, and this is where it starts.</p>
+<p>You do not have to write everything. Python ships with functions for the common operations:</p>
+<p><code>abs()</code> <code>round()</code> <code>max()</code> <code>min()</code> <code>len()</code> <code>int()</code> <code>float()</code> <code>str()</code> <code>type()</code></p>
+<p>and, after <code>import math</code>: <code>math.sqrt()</code> <code>math.pi</code> <code>math.floor()</code> <code>math.ceil()</code> <code>math.pow()</code></p>
+<p>See <code>examples/05_builtins.py</code>. Note one thing carefully:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">round</span>(<span class="fl">3.7</span>)          <span class="co"># has a VALUE: 4. You can store it, add to it, pass it on.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">print</span>(<span class="fl">3.7</span>)          <span class="co"># has no value. It has an EFFECT: characters appear.</span></span></code></pre></div>
+<p><code>x = round(3.7)</code> puts <code>4</code> in <code>x</code>. <code>x = print(3.7)</code> puts <em>nothing</em> in <code>x</code> — it prints <code>3.7</code> and stores <code>None</code>. Every semester several students write <code>total = print(a + b)</code> and cannot see why the next line fails. It is the same distinction as <code>return</code> versus <code>print</code>, which is next week’s hard idea, and this is where it starts.</p>
 <blockquote>
-<p><strong>Gloss:</strong> <em>función predefinida</em> — built-in
-function · <em>valor de retorno</em> — return value · <em>biblioteca /
-módulo</em> — library / module</p>
+<p><strong>Gloss:</strong> <em>función predefinida</em> — built-in function · <em>valor de retorno</em> — return value · <em>biblioteca / módulo</em> — library / module</p>
 </blockquote>
 
 </section>
@@ -391,64 +327,37 @@ print(&quot;Cost:  &quot;, round(cost, 2), &quot;MXN&quot;)
 <h2>Exercises</h2>
 <div class="exercise">
 <p class="exercise-label">Exercise 1</p>
-<p><strong>Exercise 1 — Predict, then run</strong> <em>(individual, 10
-min)</em></p>
-<p>Open <code>examples/03_precedence.py</code>. <strong>Do not run
-it.</strong> Write your prediction for all nine lines on paper first.
-Then run it and mark each one right or wrong.</p>
-<p>Hand in the paper with your predictions — including the wrong ones.
-The wrong ones are the useful part, and they are not penalised.</p>
+<p><strong>Exercise 1 — Predict, then run</strong> <em>(individual, 10 min)</em></p>
+<p>Open <code>examples/03_precedence.py</code>. <strong>Do not run it.</strong> Write your prediction for all nine lines on paper first. Then run it and mark each one right or wrong.</p>
+<p>Hand in the paper with your predictions — including the wrong ones. The wrong ones are the useful part, and they are not penalised.</p>
 
 </div>
 <div class="exercise">
 <p class="exercise-label">Exercise 2</p>
-<p><strong>Exercise 2 — Trip cost</strong> <em>(plenary, built together,
-20 min)</em></p>
-<p>Write a program that, given a distance in km, a speed in km/h, the
-car’s fuel economy in km/litre and the price per litre, displays the
-travel time, the litres required and the total cost in pesos.</p>
-<p><strong>Algorithm on paper first.</strong> <code>INPUT:</code> and
-<code>OUTPUT:</code> lines, numbered steps. I will look at the paper
-before anyone opens Thonny.</p>
-<p>Then code it, together, from your own algorithm. Reference:
-<code>examples/06_fuel_cost.py</code> — but that is <em>my</em>
-translation of <em>my</em> algorithm; yours should translate yours.</p>
-<p>Check with known values: 200 km at 100 km/h, 12 km/litre, 24.50
-MXN/litre → 2.0 h, 16.67 litres, 408.33 MXN. If your program disagrees,
-your program is wrong. Save as <code>A_matricula.py</code>.</p>
+<p><strong>Exercise 2 — Trip cost</strong> <em>(plenary, built together, 20 min)</em></p>
+<p>Write a program that, given a distance in km, a speed in km/h, the car’s fuel economy in km/litre and the price per litre, displays the travel time, the litres required and the total cost in pesos.</p>
+<p><strong>Algorithm on paper first.</strong> <code>INPUT:</code> and <code>OUTPUT:</code> lines, numbered steps. I will look at the paper before anyone opens Thonny.</p>
+<p>Then code it, together, from your own algorithm. Reference: <code>examples/06_fuel_cost.py</code> — but that is <em>my</em> translation of <em>my</em> algorithm; yours should translate yours.</p>
+<p>Check with known values: 200 km at 100 km/h, 12 km/litre, 24.50 MXN/litre → 2.0 h, 16.67 litres, 408.33 MXN. If your program disagrees, your program is wrong. Save as <code>A_matricula.py</code>.</p>
 
 </div>
 <div class="exercise">
 <p class="exercise-label">Exercise 3</p>
-<p><strong>Exercise 3 — Celsius to Fahrenheit</strong> <em>(individual,
-10 min)</em></p>
-<p>°F = °C × 9/5 + 32. Read a temperature in Celsius, display it in
-Fahrenheit.</p>
-<p>Two required checks before you submit: 0 °C must give 32.0, and 100
-°C must give 212.0. If you wrote <code>c * 9 / 5 + 32</code> without
-thinking about precedence, check whether you were lucky or right — and
-be able to say which.</p>
+<p><strong>Exercise 3 — Celsius to Fahrenheit</strong> <em>(individual, 10 min)</em></p>
+<p>°F = °C × 9/5 + 32. Read a temperature in Celsius, display it in Fahrenheit.</p>
+<p>Two required checks before you submit: 0 °C must give 32.0, and 100 °C must give 212.0. If you wrote <code>c * 9 / 5 + 32</code> without thinking about precedence, check whether you were lucky or right — and be able to say which.</p>
 
 </div>
 </section>
 <section class="section">
 <h2>After the session</h2>
-<p><strong>Homework — <code>assignments/hw-01-calculations.md</code>.
-Due Sunday 27 September, 23:59, on Canvas.</strong> Two programs. The
-handwritten algorithm is part of the submission; code without it is
-incomplete.</p>
+<p><strong>Homework — <code>assignments/hw-01-calculations.md</code>. Due Sunday 27 September, 23:59, on Canvas.</strong> Two programs. The handwritten algorithm is part of the submission; code without it is incomplete.</p>
 <p>Also before Tuesday:</p>
 <ol type="1">
-<li><strong>Respondus practice exam</strong> — deadline Monday 28
-September, 23:59.</li>
-<li><strong>Adaptive levelling module</strong> — units 3 (<em>Relational
-expressions</em>), 4 (<em>Logical expressions</em>), 5
-(<em>Algorithms</em>).</li>
-<li><strong>Autoestudio</strong> — relational and logical expressions,
-decision structures. We open Tuesday with your questions on it.</li>
-<li><strong>Quick exam 1 is Tuesday 29 September</strong>, first 20
-minutes: algorithms, operator precedence, built-in functions, and
-programs requiring calculations.</li>
+<li><strong>Respondus practice exam</strong> — deadline Monday 28 September, 23:59.</li>
+<li><strong>Adaptive levelling module</strong> — units 3 (<em>Relational expressions</em>), 4 (<em>Logical expressions</em>), 5 (<em>Algorithms</em>).</li>
+<li><strong>Autoestudio</strong> — relational and logical expressions, decision structures. We open Tuesday with your questions on it.</li>
+<li><strong>Quick exam 1 is Tuesday 29 September</strong>, first 20 minutes: algorithms, operator precedence, built-in functions, and programs requiring calculations.</li>
 </ol>
 
 </section>

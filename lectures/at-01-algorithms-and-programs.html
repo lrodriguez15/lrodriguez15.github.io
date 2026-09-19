@@ -43,33 +43,18 @@
 
 <section class="section">
 <h2 id="overview">Overview</h2>
-<p>Day one. Most of this room has never written a program. That is fine
-— and it is not what we start with anyway.</p>
-<p>We start with the one thing that separates a program that works from
-a program that nearly works: <strong>precision</strong>. A computer is
-not a collaborator who fills in what you meant. It is the most literal
-reader you will ever write for, and it executes exactly what you wrote,
-including the part you thought was obvious.</p>
-<p>So today there is no Python. Today we write instructions in Spanish
-or English, on paper, and then I execute them adversarially — exactly as
-written, not as intended — until they break. By the end you will know,
-physically, why an algorithm needs every step stated, in order, finite,
-and unambiguous.</p>
+<p>Day one. Most of this room has never written a program. That is fine — and it is not what we start with anyway.</p>
+<p>We start with the one thing that separates a program that works from a program that nearly works: <strong>precision</strong>. A computer is not a collaborator who fills in what you meant. It is the most literal reader you will ever write for, and it executes exactly what you wrote, including the part you thought was obvious.</p>
+<p>So today there is no Python. Today we write instructions in Spanish or English, on paper, and then I execute them adversarially — exactly as written, not as intended — until they break. By the end you will know, physically, why an algorithm needs every step stated, in order, finite, and unambiguous.</p>
 <p>That is the whole lesson. One idea.</p>
 </section>
 <section class="section">
 <h2 id="notes">Notes</h2>
-<h3 id="what-a-computer-actually-is-for-our-purposes">What a computer
-actually is, for our purposes</h3>
-<p>A machine that executes a sequence of instructions, one at a time, in
-order, without judgement. It has memory (somewhere to put values), it
-can do arithmetic, it can compare, and it can choose what to do next
-based on that comparison. That is the entire vocabulary.</p>
-<p>Everything you build this semester is made of those four things. Not
-more.</p>
+<h3 id="what-a-computer-actually-is-for-our-purposes">What a computer actually is, for our purposes</h3>
+<p>A machine that executes a sequence of instructions, one at a time, in order, without judgement. It has memory (somewhere to put values), it can do arithmetic, it can compare, and it can choose what to do next based on that comparison. That is the entire vocabulary.</p>
+<p>Everything you build this semester is made of those four things. Not more.</p>
 <blockquote>
-<p><strong>Gloss:</strong> <em>memoria</em> — memory · <em>instrucción /
-sentencia</em> — statement · <em>ejecutar</em> — to execute</p>
+<p><strong>Gloss:</strong> <em>memoria</em> — memory · <em>instrucción / sentencia</em> — statement · <em>ejecutar</em> — to execute</p>
 </blockquote>
 <h3 id="algorithm-vs.-program">Algorithm vs. program</h3>
 <table>
@@ -79,62 +64,46 @@ sentencia</em> — statement · <em>ejecutar</em> — to execute</p>
 <col style="width: 33%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th></th>
 <th>Algorithm</th>
 <th>Program</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>What it is</td>
 <td>The thinking</td>
 <td>The typing</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Written in</td>
 <td>Natural language, pseudocode, a flowchart</td>
 <td>Python</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Read by</td>
 <td>A human (and, adversarially, by you)</td>
 <td>A machine</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Can be wrong by</td>
 <td>Being ambiguous, unordered, unending</td>
 <td>…all of that, <strong>plus</strong> syntax</td>
 </tr>
 </tbody>
 </table>
-<p>Notice the last row. A program can fail for every reason an algorithm
-can fail, <strong>and</strong> for reasons of its own. If you skip the
-algorithm, you are debugging both layers simultaneously, without knowing
-which one is broken. That is why we separate them, and that separation
-is the single most useful habit in this course.</p>
+<p>Notice the last row. A program can fail for every reason an algorithm can fail, <strong>and</strong> for reasons of its own. If you skip the algorithm, you are debugging both layers simultaneously, without knowing which one is broken. That is why we separate them, and that separation is the single most useful habit in this course.</p>
 <h3 id="the-four-properties">The four properties</h3>
-<p><strong>Finite.</strong> It ends. “Keep adding numbers” is not an
-algorithm. “Keep adding numbers until the user types 0” is. The most
-common way first-semester code hangs forever is a step that has no
-stopping condition — we will meet this properly in Week 3, but it starts
-here.</p>
-<p><strong>Ordered.</strong> The sequence is part of the meaning.
-<em>Break the eggs, then heat the pan</em> and <em>heat the pan, then
-break the eggs</em> are different algorithms with different results.</p>
-<p><strong>Unambiguous.</strong> Exactly one reading. “Add the numbers”
-— which numbers? All of them? The last two? In what order? If two people
-following your algorithm can get different answers, it is ambiguous, and
-ambiguity is a bug you have not found yet.</p>
-<p><strong>Defined input and output.</strong> You know what you are
-given and what you must produce. This is the step students skip. Before
-writing a single step, write two lines:</p>
+<p><strong>Finite.</strong> It ends. “Keep adding numbers” is not an algorithm. “Keep adding numbers until the user types 0” is. The most common way first-semester code hangs forever is a step that has no stopping condition — we will meet this properly in Week 3, but it starts here.</p>
+<p><strong>Ordered.</strong> The sequence is part of the meaning. <em>Break the eggs, then heat the pan</em> and <em>heat the pan, then break the eggs</em> are different algorithms with different results.</p>
+<p><strong>Unambiguous.</strong> Exactly one reading. “Add the numbers” — which numbers? All of them? The last two? In what order? If two people following your algorithm can get different answers, it is ambiguous, and ambiguity is a bug you have not found yet.</p>
+<p><strong>Defined input and output.</strong> You know what you are given and what you must produce. This is the step students skip. Before writing a single step, write two lines:</p>
 <pre><code>INPUT:  the distance in kilometres, the time in hours
 OUTPUT: the average speed in km/h</code></pre>
 <p>Half the ambiguity dies right there.</p>
 <h3 id="pseudocode-our-notation">Pseudocode — our notation</h3>
-<p>Pseudocode is structured natural language. There is no official
-syntax; the convention for this course:</p>
+<p>Pseudocode is structured natural language. There is no official syntax; the convention for this course:</p>
 <pre><code>ALGORITHM  average_speed
 INPUT:     distance (km), time (hours)
 OUTPUT:    speed (km/h)
@@ -145,100 +114,63 @@ OUTPUT:    speed (km/h)
 4. DISPLAY speed
 END</code></pre>
 <ul>
-<li><code>←</code> is assignment — <em>“gets the value of”</em>. Not
-equality. <code>speed ← distance / time</code> is a command, not a
-claim.</li>
-<li><code>READ</code> gets a value from the user. <code>DISPLAY</code>
-shows one.</li>
-<li>Steps are numbered. Numbering is not decoration: it is what makes
-“ordered” checkable.</li>
+<li><code>←</code> is assignment — <em>“gets the value of”</em>. Not equality. <code>speed ← distance / time</code> is a command, not a claim.</li>
+<li><code>READ</code> gets a value from the user. <code>DISPLAY</code> shows one.</li>
+<li>Steps are numbered. Numbering is not decoration: it is what makes “ordered” checkable.</li>
 </ul>
 <blockquote>
-<p><strong>Gloss:</strong> <em>asignación</em> — assignment ·
-<em>pseudocódigo</em> — pseudocode · <em>entrada / salida</em> — input /
-output</p>
+<p><strong>Gloss:</strong> <em>asignación</em> — assignment · <em>pseudocódigo</em> — pseudocode · <em>entrada / salida</em> — input / output</p>
 </blockquote>
-<h3 id="writing-an-algorithm-that-survives-a-hostile-reader">Writing an
-algorithm that survives a hostile reader</h3>
-<p>The working method, which is also the exam method and also the method
-you will use in your final project:</p>
+<h3 id="writing-an-algorithm-that-survives-a-hostile-reader">Writing an algorithm that survives a hostile reader</h3>
+<p>The working method, which is also the exam method and also the method you will use in your final project:</p>
 <ol type="1">
-<li><strong>State input and output.</strong> Two lines, before anything
-else.</li>
-<li><strong>Write the steps, numbered.</strong> One action per step. If
-a step contains “and”, it is probably two steps.</li>
-<li><strong>Attack it.</strong> Read your own algorithm as literally as
-I read your square. Look specifically for: a step that assumes something
-unstated; two steps whose order you never decided; a quantity you named
-two different ways; a case where the input is empty, zero, or
-negative.</li>
+<li><strong>State input and output.</strong> Two lines, before anything else.</li>
+<li><strong>Write the steps, numbered.</strong> One action per step. If a step contains “and”, it is probably two steps.</li>
+<li><strong>Attack it.</strong> Read your own algorithm as literally as I read your square. Look specifically for: a step that assumes something unstated; two steps whose order you never decided; a quantity you named two different ways; a case where the input is empty, zero, or negative.</li>
 <li><strong>Fix and repeat.</strong></li>
 </ol>
-<p>Step 3 is the one that separates a passing grade from a good
-engineer. Everyone can do step 2.</p>
+<p>Step 3 is the one that separates a passing grade from a good engineer. Everyone can do step 2.</p>
 
 </section>
 <section class="section">
 <h2>Exercises</h2>
 <div class="exercise">
 <p class="exercise-label">Exercise 1</p>
-<p><strong>Exercise 1 — Price validation</strong> <em>(individual, on
-paper, 10 min)</em></p>
-<p>Write an algorithm that checks whether a price entered by the user is
-valid. A price is valid if it is a positive value.</p>
-<p>Then attack your own algorithm and answer, in writing, underneath
-it:</p>
+<p><strong>Exercise 1 — Price validation</strong> <em>(individual, on paper, 10 min)</em></p>
+<p>Write an algorithm that checks whether a price entered by the user is valid. A price is valid if it is a positive value.</p>
+<p>Then attack your own algorithm and answer, in writing, underneath it:</p>
 <ul>
 <li>What does yours do if the user enters exactly <code>0</code>?</li>
 <li>What does yours do if the user enters <code>hola</code>?</li>
-<li>Does your algorithm say what “valid” <em>looks like</em> as an
-output — a word, a symbol, nothing?</li>
+<li>Does your algorithm say what “valid” <em>looks like</em> as an output — a word, a symbol, nothing?</li>
 </ul>
-<p><em>Nobody’s first version answers all three. That is the point of
-the exercise.</em></p>
+<p><em>Nobody’s first version answers all three. That is the point of the exercise.</em></p>
 
 </div>
 <div class="exercise">
 <p class="exercise-label">Exercise 2</p>
-<p><strong>Exercise 2 — Metres to feet</strong> <em>(pairs, on paper, 15
-min)</em></p>
-<p>Write an algorithm that, given a length in metres, calculates and
-displays the equivalent in feet. You are given: 1 foot = 12 inches, 1
-inch = 2.54 cm, 1 m = 100 cm.</p>
+<p><strong>Exercise 2 — Metres to feet</strong> <em>(pairs, on paper, 15 min)</em></p>
+<p>Write an algorithm that, given a length in metres, calculates and displays the equivalent in feet. You are given: 1 foot = 12 inches, 1 inch = 2.54 cm, 1 m = 100 cm.</p>
 <p>Constraints, and these are the exercise:</p>
 <ul>
-<li>Your algorithm must have <strong>numbered steps</strong> and
-explicit <code>INPUT:</code> / <code>OUTPUT:</code> lines.</li>
-<li><strong>Swap with the other pair next to you.</strong> Execute their
-algorithm literally, on paper, for an input of <code>3.5</code> metres.
-Write down the number you get by following their steps exactly — not the
-number you know is right.</li>
-<li>If you got a different answer from theirs, find the step where the
-two of you diverged. That step is ambiguous. Write down which word
-caused it.</li>
+<li>Your algorithm must have <strong>numbered steps</strong> and explicit <code>INPUT:</code> / <code>OUTPUT:</code> lines.</li>
+<li><strong>Swap with the other pair next to you.</strong> Execute their algorithm literally, on paper, for an input of <code>3.5</code> metres. Write down the number you get by following their steps exactly — not the number you know is right.</li>
+<li>If you got a different answer from theirs, find the step where the two of you diverged. That step is ambiguous. Write down which word caused it.</li>
 </ul>
-<p>Hand in: your algorithm, your partner-pair’s execution of it, and the
-ambiguous word.</p>
+<p>Hand in: your algorithm, your partner-pair’s execution of it, and the ambiguous word.</p>
 
 </div>
 </section>
 <section class="section">
 <h2>After the session</h2>
+<p><strong>Friday is a long day: laboratory 16:30–17:30 in this room, then our session at 17:35.</strong></p>
+<p><strong>Bring your laptop, a notebook and a pencil on Friday.</strong> The lab opens with a 20-minute prior-knowledge diagnostic that needs the laptop; everything after it is on paper. Also bring today’s algorithm — you will be attacking each other’s.</p>
 <p>Before Friday:</p>
 <ol type="1">
-<li><strong>Install Thonny</strong> — see
-<code>informacion/instalacionThonny.html</code>. Bring a working
-installation on Friday; we write our first program then.</li>
-<li><strong>Install Respondus LockDown Browser</strong> — see
-<code>ComoUtilizarRespondusAlumnos.pdf</code>. Complete the practice
-exam by <strong>Monday 28 September, 23:59</strong>. <em>If you only
-have a Mac, tell me on Friday — Macs are not permitted for exams and we
-need to arrange something before your first quick exam.</em></li>
-<li><strong>Adaptive levelling module</strong> — complete units 1
-(<em>Computer memory</em>) and 2 (<em>Arithmetic expressions</em>).</li>
-<li><strong>Read</strong> the two handouts given out today: the course
-policies and <em>Using AI in this course</em>. Friday’s session opens
-with your questions on them.</li>
+<li><strong>Install Thonny</strong> — see <code>informacion/instalacionThonny.html</code>. Bring a working installation on Friday; we write our first program then.</li>
+<li><strong>Install Respondus LockDown Browser</strong> — see <code>ComoUtilizarRespondusAlumnos.pdf</code>. Complete the practice exam by <strong>Monday 28 September, 23:59</strong>. <em>If you only have a Mac, tell me on Friday — Macs are not permitted for exams and we need to arrange something before your first quick exam.</em></li>
+<li><strong>Adaptive levelling module</strong> — complete units 1 (<em>Computer memory</em>) and 2 (<em>Arithmetic expressions</em>).</li>
+<li><strong>Read</strong> the two handouts given out today: the course policies and <em>Using AI in this course</em>. Friday’s session opens with your questions on them.</li>
 </ol>
 
 </section>
