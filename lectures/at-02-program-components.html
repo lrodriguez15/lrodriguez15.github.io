@@ -58,6 +58,11 @@
 <h3 id="the-anatomy-of-a-program">The anatomy of a program</h3>
 <p>Every Python program you write for the next ten weeks is made of these parts and nothing else:</p>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Part</th>
@@ -72,31 +77,36 @@
 <td><code># calculate the speed</code></td>
 </tr>
 <tr class="even">
+<td><strong>Multi-line comment</strong></td>
+<td>Several lines for humans — where your algorithm lives</td>
+<td><code>"""INPUT: … OUTPUT: … 1. …"""</code></td>
+</tr>
+<tr class="odd">
 <td><strong>Variable</strong></td>
 <td>A named box holding a value</td>
 <td><code>distance = 100</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>Assignment</strong></td>
 <td>Puts a value in the box</td>
 <td><code>speed = distance / hours</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>Expression</strong></td>
 <td>Something with a value</td>
 <td><code>distance / hours</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>Input</strong></td>
 <td>Gets a value from the user (as <strong>text</strong>)</td>
 <td><code>input("Distance: ")</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>Output</strong></td>
 <td>Shows a value</td>
 <td><code>print(speed)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>Function call</strong></td>
 <td>Uses code someone else wrote</td>
 <td><code>float(...)</code>, <code>round(...)</code></td>
@@ -106,6 +116,7 @@
 <blockquote>
 <p><strong>Gloss:</strong> <em>comentario</em> · <em>variable</em> · <em>asignación</em> — assignment · <em>expresión</em> · <em>entrada / salida</em> — input / output · <em>llamada a función</em> — function call</p>
 </blockquote>
+<p><strong>Every program in this course starts the same way:</strong> line 1 is your name in a <code>#</code> comment, and lines 2 onwards are your algorithm inside a <code>"""</code> multi-line comment — <em>then</em> the code. The quick exams take two points off for each of the two that is missing, so make it a habit today, not on the 29th.</p>
 <p>Compare against Tuesday’s pseudocode. <code>READ</code> became <code>input()</code>. <code>←</code> became <code>=</code>. <code>DISPLAY</code> became <code>print()</code>. <strong>The structure is identical.</strong> This is why we write the algorithm first: the translation is mechanical once the thinking is done.</p>
 <h3 id="failure-1-everything-the-user-types-is-text">Failure 1 — everything the user types is text</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>distance <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>)   <span class="co"># &quot;100&quot;  &lt;- text, not 100</span></span>
@@ -343,8 +354,8 @@ print(&quot;Cost:  &quot;, round(cost, 2), &quot;MXN&quot;)
 </div>
 <div class="exercise">
 <p class="exercise-label">Exercise 3</p>
-<p><strong>Exercise 3 — Celsius to Fahrenheit</strong> <em>(individual, 10 min)</em></p>
-<p>°F = °C × 9/5 + 32. Read a temperature in Celsius, display it in Fahrenheit.</p>
+<p><strong>Exercise 3 — Celsius to Fahrenheit, in Trinket</strong> <em>(individual, 5 min in class, finish at home)</em></p>
+<p>°F = °C × 9/5 + 32. Read a temperature in Celsius, display it in Fahrenheit. <strong>Write this one in Trinket</strong> (<a href="https://trinket.strivemath.org/python3" class="uri">https://trinket.strivemath.org/python3</a>), not Thonny: it is the editor the quick exams use, and you should meet it before Tuesday, not during Tuesday.</p>
 <p>Two required checks before you submit: 0 °C must give 32.0, and 100 °C must give 212.0. If you wrote <code>c * 9 / 5 + 32</code> without thinking about precedence, check whether you were lucky or right — and be able to say which.</p>
 
 </div>
@@ -355,7 +366,7 @@ print(&quot;Cost:  &quot;, round(cost, 2), &quot;MXN&quot;)
 <p>Also before Tuesday:</p>
 <ol type="1">
 <li><strong>Respondus practice exam</strong> — deadline Monday 28 September, 23:59.</li>
-<li><strong>Adaptive levelling module</strong> — units 3 (<em>Relational expressions</em>), 4 (<em>Logical expressions</em>), 5 (<em>Algorithms</em>).</li>
+<li><strong>Adaptive levelling module</strong> — lessons 1–5 (<em>Computer memory</em>, <em>Arithmetic expressions</em>, <em>Relational expressions</em>, <em>Logical expressions</em>, <em>Algorithms</em>), or whichever of them today’s diagnostic assigned you. The whole module (4%) closes <strong>Thursday 8 October</strong>; the final diagnostic (1%) is in the lab on <strong>Friday 9 October</strong>.</li>
 <li><strong>Autoestudio</strong> — relational and logical expressions, decision structures. We open Tuesday with your questions on it.</li>
 <li><strong>Quick exam 1 is Tuesday 29 September</strong>, first 20 minutes: algorithms, operator precedence, built-in functions, and programs requiring calculations.</li>
 </ol>
