@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 1: Algorithms under attack — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lab 1: Algorithms under attack</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Laboratory 1 · Week 1</p>
+      <h1>Algorithms under attack</h1>
+      <div class="chips">
+        <span class="chip chip-blue">algorithms</span>
+        <span class="chip chip-orange">paper only</span>
+        <span class="chip chip-green">Fri 25 Sep · 16:30–17:30 · Room 4206</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Execute someone else's algorithm literally until it breaks, then write one that provably stops. Bring your laptop (20-minute diagnostic), a notebook, a pencil, and Tuesday's algorithm. Nothing is submitted to Canvas — hand your paper to Luis before you leave. <a href="../files/at/lab-01.pdf">PDF version</a>.</p>
+    </header>
+
+<section class="section" id="why-this-lab-is-paper-only" class="level2">
+<h2>Why this lab is paper-only</h2>
+<p>Our lab runs one hour <strong>before</strong> the Friday session that teaches Python, so nobody is asked to write Python today. This lab gives Tuesday’s idea a second, harder pass and hands you into the Friday lecture with a concrete failure fresh in mind. Coding starts in Lab 2 (Friday 2 October).</p>
+</section>
+<section class="section" id="running-order" class="level2">
+<h2>Running order</h2>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Minutes</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: right;">20</td>
+<td><strong>Initial prior-knowledge diagnostic</strong> — administered by the professor at 16:30. No built-in timer: the professor calls time at 20 minutes. You need your <strong>laptop</strong> for this part.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: right;">3</td>
+<td>Settle, hand out paper, collect Tuesday’s algorithms.</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td style="text-align: right;">32</td>
+<td>The two exercises below.</td>
+</tr>
+</tbody>
+</table>
+<p>Bring <strong>laptop, notebook and pencil</strong> — laptop for the diagnostic, paper for everything after it. Also bring your algorithm from Tuesday’s Exercise 1 (price validation); if you do not have it, you rewrite it, which takes four minutes and is not a penalty.</p>
+<hr />
+</section>
+<section class="section" id="exercise-1-break-someone-elses-algorithm" class="level2">
+<h2>Exercise 1 — Break someone else’s algorithm</h2>
+<p><em>Pairs. 15 minutes.</em></p>
+<ol type="1">
+<li><p>Swap your Tuesday price-validation algorithm with your partner.</p></li>
+<li><p><strong>Execute theirs literally</strong>, on paper, for each of these four inputs — writing down what their steps actually produce, not what you know is meant:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td><code>50</code></td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td>c</td>
+<td><code>-3</code></td>
+</tr>
+<tr class="even">
+<td>d</td>
+<td><code>hola</code></td>
+</tr>
+</tbody>
+</table></li>
+<li><p>For every input where their algorithm does something wrong, undefined, or unstated, write <strong>one line</strong> naming the step number and the problem.</p></li>
+</ol>
+<p>Hand back. You now have a bug report on your own algorithm, written by someone who was not trying to be kind to it.</p>
+<blockquote>
+<p>The point: nobody’s Tuesday version survives all four. Input <code>0</code> is the interesting one — “positive” either includes it or does not, and almost nobody said which.</p>
+</blockquote>
+<hr />
+</section>
+<section class="section" id="exercise-2-the-algorithm-that-must-terminate" class="level2">
+<h2>Exercise 2 — The algorithm that must terminate</h2>
+<p><em>Individual. 17 minutes.</em></p>
+<p>A vending machine holds a drink costing <strong>12 pesos</strong>. It accepts coins of 1, 2, 5 and 10 pesos, one at a time. It must keep accepting coins until the customer has paid enough, then release the drink and return any change.</p>
+<p>Write the algorithm. <code>INPUT:</code> / <code>OUTPUT:</code> lines, numbered steps.</p>
+<p>Then answer, in writing, underneath:</p>
+<ul>
+<li><strong>Where exactly does your algorithm stop?</strong> Point at the step number.</li>
+<li>What does it do if the customer pays 12 exactly?</li>
+<li>What does it do if the customer puts in a 10 and then walks away?</li>
+</ul>
+<blockquote>
+<p>You do not have the tools to write this as a program yet — that is fine. This is the algorithm you will be able to write as a program in Week 3, and I want it on paper first.</p>
+</blockquote>
+<hr />
+</section>
+<section class="section" id="submission" class="level2">
+<h2>Submission</h2>
+<p>Hand in, before you leave (to Luis, the TA):</p>
+<ul>
+<li>Your two handwritten algorithms.</li>
+<li>Your partner’s bug report on your Exercise 1 (with your name on it).</li>
+<li>Exercise 2’s three written answers.</li>
+</ul>
+<p><strong>Nothing is submitted to Canvas from this lab.</strong> Paper only, in the room.</p>
+<hr />
+</section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+</body>
+</html>
