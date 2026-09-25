@@ -60,6 +60,50 @@
 </ol>
 </section>
 <section class="section">
+<h2 id="opener-a-famous-algorithm-with-no-computer-in-it-10-min">Opener — a famous algorithm with no computer in it (10 min)</h2>
+<p><em>Algorithms to Live By</em> (Brian Christian &amp; Tom Griffiths, 2016), chapter 1: <strong>optimal stopping</strong>. The setting: you are looking for an apartment in Querétaro in September. Every one you visit is gone by tomorrow; you can see at most ten; you must say yes on the spot or lose it. <em>When do you stop looking?</em></p>
+<p>Take three answers from the room before showing anything. “Take the first decent one” and “see all ten and pick the best” both come up. Both are algorithms. The second cannot even be executed — by the time you have seen ten, nine are gone.</p>
+<p><strong>The 37 % rule.</strong> Look at the first 37 % of the options and say no to all of them — but remember the best. After that, take the <em>first one that beats everything you have seen</em>. If none does, you get the last one. With ten apartments: look at three or four, then leap.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Strategy, ten options</th>
+<th style="text-align: right;">P(you get the best)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Take the first one, no looking</td>
+<td style="text-align: right;">10 %</td>
+</tr>
+<tr class="even">
+<td>Look at 1, then leap</td>
+<td style="text-align: right;">28 %</td>
+</tr>
+<tr class="odd">
+<td><strong>Look at 3–4, then leap</strong></td>
+<td style="text-align: right;"><strong>40 %</strong></td>
+</tr>
+<tr class="even">
+<td>Look at 5, then leap</td>
+<td style="text-align: right;">37 %</td>
+</tr>
+<tr class="odd">
+<td>Look at 8, then leap</td>
+<td style="text-align: right;">19 %</td>
+</tr>
+<tr class="even">
+<td>See all ten, pick the best</td>
+<td style="text-align: right;">impossible</td>
+</tr>
+</tbody>
+</table>
+<p>With many options the best cut-off tends to 37 % (= 1/e) and so does the success rate. Two things to land: it is <em>provably the best possible strategy</em> — and it <strong>fails 63 % of the time</strong>. “Optimal” means <em>nothing does better</em>, not <em>always works</em>. That sentence returns in week 9, with data.</p>
+<p>Then the question that ties it to Tuesday: <em>is this an algorithm?</em> Finite (ten visits), ordered, unambiguous (“beats everything seen” is a comparison, not a feeling), defined input (a sequence you can rank) and output (one apartment). It passes all four.</p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> write the 37 % rule in Tuesday’s notation — <code>INPUT:</code>, <code>OUTPUT:</code>, numbered steps — for ten apartments seen one at a time. What exactly do you remember during the looking phase? What is the test that makes you say yes? Where does it stop — point at the step. <em>Keep the paper.</em> You cannot write this as a program yet: it needs the machine to <strong>choose</strong> (Tuesday) and to <strong>repeat</strong> (week 3). When you can, you will — this is the first program of week 3.</p>
+<p>The same shape appears in hiring (the “secretary problem”, 1950s–60s), parking, selling a house, and — Kepler’s eleven candidates for a second wife — dating. Say the pivot out loud: <em>everything you just wrote is a decision or a repetition; today Python can only calculate.</em></p>
+</section>
+<section class="section">
 <h2 id="notes">Notes</h2>
 <h3 id="the-anatomy-of-a-program">The anatomy of a program</h3>
 <p>Every Python program you write for the next ten weeks is made of these parts and nothing else:</p>
@@ -134,10 +178,20 @@
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>hours <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>speed <span class="op">=</span> distance_km <span class="op">/</span> hours            <span class="co"># 50.0</span></span></code></pre></div>
 <p><code>float()</code> for anything that can have decimals, <code>int()</code> for whole numbers only.</p>
+<p><strong>From one measurement to an average.</strong> Tuesday’s algorithm was called <em>average speed</em> and computed exactly one speed from one distance and one time — that is not an average of anything. A real trip is measured several times. With what we have today (no repetition yet) we can do it for a fixed number of measurements — three — by reading each pair, computing each speed, and averaging the speeds:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>d1 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance 1 (km): &quot;</span>))<span class="op">;</span>  t1 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time 1 (h): &quot;</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>d2 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance 2 (km): &quot;</span>))<span class="op">;</span>  t2 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time 2 (h): &quot;</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>d3 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance 3 (km): &quot;</span>))<span class="op">;</span>  t3 <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time 3 (h): &quot;</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>v1 <span class="op">=</span> d1 <span class="op">/</span> t1</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>v2 <span class="op">=</span> d2 <span class="op">/</span> t2</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>v3 <span class="op">=</span> d3 <span class="op">/</span> t3</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>average <span class="op">=</span> (v1 <span class="op">+</span> v2 <span class="op">+</span> v3) <span class="op">/</span> <span class="dv">3</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;Average speed:&quot;</span>, average, <span class="st">&quot;km/h&quot;</span>)</span></code></pre></div>
+<p><code>07_average_speed_3.py</code>. Test: (100, 2), (90, 1.5), (140, 2) → 50, 60, 70 → <strong>60.0</strong>. Six input lines for three measurements: the program is <em>longer</em> than the algorithm, and it is obvious that thirty measurements this way would be absurd. That is the itch week 3 scratches: <em>for N measurements — or a moving average over the last k — the program must repeat.</em> Note that it is not the same as <code>(d1 + d2 + d3) / (t1 + t2 + t3)</code> — that is the overall average speed of the trip, a different quantity; both are correct answers to different questions, and the algorithm must say which one it computes.</p>
 <p><strong>The nastier version.</strong> Division crashes, so you find it immediately. <code>+</code> does not:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>a <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;First number: &quot;</span>)    <span class="co"># &quot;2&quot;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>b <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Second number: &quot;</span>)   <span class="co"># &quot;3&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="bu">print</span>(a <span class="op">+</span> b)                   <span class="co"># 23    &lt;- not 5. No error. No warning.</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>a <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;First number: &quot;</span>)    <span class="co"># &quot;2&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>b <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Second number: &quot;</span>)   <span class="co"># &quot;3&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="bu">print</span>(a <span class="op">+</span> b)                   <span class="co"># 23    &lt;- not 5. No error. No warning.</span></span></code></pre></div>
 <p>On text, <code>+</code> means <em>join together</em>. This runs, produces a plausible-looking number, and is wrong. This is the failure mode you should actually fear: not the crash, but the silent wrong answer.</p>
 <h3 id="failure-2-precedence">Failure 2 — precedence</h3>
 <p>Python evaluates in this order (highest first):</p>
@@ -194,20 +248,20 @@
 <li><code>10 / 3</code> is <code>3.333…</code> but <code>10 // 3</code> is <code>3</code> and <code>10 % 3</code> is <code>1</code>. Three different divisions. <code>//</code> is the quotient, <code>%</code> is the remainder — you will need <code>%</code> constantly from Week 3 for “is this number even?” and “is it divisible by?”</li>
 </ul>
 <p>And the one that will actually cost somebody marks:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>average <span class="op">=</span> g1 <span class="op">+</span> g2 <span class="op">+</span> g3 <span class="op">/</span> <span class="dv">3</span>      <span class="co"># 193.33 for grades 90, 80, 70</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>average <span class="op">=</span> (g1 <span class="op">+</span> g2 <span class="op">+</span> g3) <span class="op">/</span> <span class="dv">3</span>    <span class="co"># 80.0   &lt;- correct</span></span></code></pre></div>
-<p>That program runs. It prints a number. The number is nonsense, and nothing warns you.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>average <span class="op">=</span> v1 <span class="op">+</span> v2 <span class="op">+</span> v3 <span class="op">/</span> <span class="dv">3</span>      <span class="co"># 133.33 for speeds 50, 60, 70</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>average <span class="op">=</span> (v1 <span class="op">+</span> v2 <span class="op">+</span> v3) <span class="op">/</span> <span class="dv">3</span>    <span class="co"># 60.0   &lt;- correct</span></span></code></pre></div>
+<p>That program runs. It prints a number. The number is nonsense, and nothing warns you. (The same trap with three grades 90, 80, 70 prints 193.33 instead of 80.0 — it is the single most common wrong line in this course’s history.)</p>
 <h3 id="failure-3-the-program-runs-and-is-still-wrong">Failure 3 — the program runs and is still wrong</h3>
 <p>This is the lesson underneath the other two. <strong>Running is not a test.</strong> The average program ran. The <code>a + b</code> program ran. Both were wrong.</p>
-<p>The only defence available to you, today, is: <strong>know what you expect before you press run.</strong> If you predicted <code>80.0</code> and got <code>193.33</code>, you have found a bug. If you had no prediction, you have found a number, and you will write it down.</p>
+<p>The only defence available to you, today, is: <strong>know what you expect before you press run.</strong> If you predicted <code>60.0</code> and got <code>133.33</code>, you have found a bug. If you had no prediction, you have found a number, and you will write it down.</p>
 <p>This is also why we hand-check with known values. In <code>06_fuel_cost.py</code>, 200 km at 100 km/h must be 2 hours. You know that without a computer. That is your test.</p>
 <h3 id="built-in-functions">Built-in functions</h3>
 <p>You do not have to write everything. Python ships with functions for the common operations:</p>
 <p><code>abs()</code> <code>round()</code> <code>max()</code> <code>min()</code> <code>len()</code> <code>int()</code> <code>float()</code> <code>str()</code> <code>type()</code></p>
 <p>and, after <code>import math</code>: <code>math.sqrt()</code> <code>math.pi</code> <code>math.floor()</code> <code>math.ceil()</code> <code>math.pow()</code></p>
 <p>See <code>examples/05_builtins.py</code>. Note one thing carefully:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="bu">round</span>(<span class="fl">3.7</span>)          <span class="co"># has a VALUE: 4. You can store it, add to it, pass it on.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="bu">print</span>(<span class="fl">3.7</span>)          <span class="co"># has no value. It has an EFFECT: characters appear.</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="language-python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="bu">round</span>(<span class="fl">3.7</span>)          <span class="co"># has a VALUE: 4. You can store it, add to it, pass it on.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="bu">print</span>(<span class="fl">3.7</span>)          <span class="co"># has no value. It has an EFFECT: characters appear.</span></span></code></pre></div>
 <p><code>x = round(3.7)</code> puts <code>4</code> in <code>x</code>. <code>x = print(3.7)</code> puts <em>nothing</em> in <code>x</code> — it prints <code>3.7</code> and stores <code>None</code>. Every semester several students write <code>total = print(a + b)</code> and cannot see why the next line fails. It is the same distinction as <code>return</code> versus <code>print</code>, which is next week’s hard idea, and this is where it starts.</p>
 <blockquote>
 <p><strong>Gloss:</strong> <em>función predefinida</em> — built-in function · <em>valor de retorno</em> — return value · <em>biblioteca / módulo</em> — library / module</p>
@@ -264,22 +318,23 @@ print(1 + 2 == 3)       # prediction: ____
 <h3>04_average_trap.py</h3>
 <pre><code class="language-python"># 04_average_trap.py — the classic.
 #
-# A student wants the average of three grades. This is what they write.
-# It runs. It prints a number. The number is wrong.
+# Three speed measurements, and the student wants their average.
+# This is what they write. It runs. It prints a number. The number is wrong.
 
-g1 = 90
-g2 = 80
-g3 = 70
+v1 = 50.0
+v2 = 60.0
+v3 = 70.0
 
-average = g1 + g2 + g3 / 3
+average = v1 + v2 + v3 / 3
 
-print(&quot;Average:&quot;, average)
+print(&quot;Average speed:&quot;, average)
 
-# Expected by the student: 80.0
+# Expected by the student: 60.0
 # Actually printed:        ____   &lt;- run it
 #
 # Fix it with one pair of parentheses. Then explain, in one sentence,
 # which rule of operator precedence you just defeated.
+# (The same trap, with grades 90, 80, 70, prints 193.33 instead of 80.0.)
 </code></pre>
 <h3>05_builtins.py</h3>
 <pre><code class="language-python"># 05_builtins.py — built-in functions: you do not have to write everything.
@@ -338,6 +393,34 @@ print(&quot;Cost:  &quot;, round(cost, 2), &quot;MXN&quot;)
 
 # Check it by hand: 200 km at 100 km/h, 12 km/l, 24.50 MXN/l
 #   -&gt; 2.0 h, 16.67 litres, 408.33 MXN
+</code></pre>
+<h3>07_average_speed_3.py</h3>
+<pre><code class="language-python"># 07_average_speed_3.py — from one measurement to an average.
+#
+# Tuesday&#x27;s algorithm gave ONE speed from ONE distance and ONE time. A real
+# trip is measured several times. Three measurements, no loops yet: read
+# each pair, compute each speed, average the three speeds.
+#
+# Test: (100 km, 2 h), (90 km, 1.5 h), (140 km, 2 h) -&gt; 50, 60, 70 -&gt; 60.0
+
+d1 = float(input(&quot;Distance 1 (km): &quot;))
+t1 = float(input(&quot;Time 1 (h): &quot;))
+d2 = float(input(&quot;Distance 2 (km): &quot;))
+t2 = float(input(&quot;Time 2 (h): &quot;))
+d3 = float(input(&quot;Distance 3 (km): &quot;))
+t3 = float(input(&quot;Time 3 (h): &quot;))
+
+v1 = d1 / t1
+v2 = d2 / t2
+v3 = d3 / t3
+
+average = (v1 + v2 + v3) / 3        # the parentheses are the whole point — see 04
+
+print(&quot;Speeds:&quot;, v1, v2, v3, &quot;km/h&quot;)
+print(&quot;Average speed:&quot;, average, &quot;km/h&quot;)
+
+# Six input lines for three measurements. For N measurements, or a moving
+# average over the last k of them, you need the program to REPEAT — week 3.
 </code></pre>
 </section>
 <section class="section">
