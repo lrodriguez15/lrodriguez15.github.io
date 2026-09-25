@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab 1: Algorithms and coding — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lab 1: Algorithms and coding</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Laboratory 1 · Week 1</p>
+      <h1>Algorithms and coding: three programs</h1>
+      <div class="chips">
+        <span class="chip chip-blue">algorithms</span>
+        <span class="chip chip-green">first python</span>
+        <span class="chip chip-orange">Fri 25 Sep · 16:30–17:30 · Room 4206</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> For three small problems — triangle area, dollars to pesos, Fahrenheit to Celsius — write the algorithm on paper, then the program in Thonny, then test it. Bring your laptop (20-minute diagnostic first), a notebook and a pencil. Algorithms are handed in on paper; the files go to Canvas by 23:59. <a href="../files/at/lab-01.pdf">PDF version</a>.</p>
+    </header>
+
+<section class="section" id="why-this-lab-looks-like-this" class="level2">
+<h2>Why this lab looks like this</h2>
+<p>From next week every one of the 13 groups runs <strong>one</strong> version of each lab (department decision, 22 Sep), so the TAs prepare one lab instead of six. This week we adopt the national exercises already: for each problem, <strong>first the algorithm, then the program, then tests</strong> — which is the method of this course anyway.</p>
+</section>
+<section class="section" id="running-order" class="level2">
+<h2>Running order</h2>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Minutes</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: right;">20</td>
+<td><strong>Initial prior-knowledge diagnostic</strong> — administered by the professor at 16:30. No built-in timer: the professor calls time at 20 minutes. You need your <strong>laptop</strong> for this part.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: right;">3</td>
+<td>Settle. Everyone opens <strong>Thonny</strong>; whoever does not have it pairs with a neighbour and installs during exercise 2. The professor opens the first levelling lesson on the projector for one minute.</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td style="text-align: right;">15</td>
+<td><strong>Exercise 1 — together.</strong> Algorithm on paper (3 min, everyone), then Luis types the program on the projector line by line and students type along.</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td style="text-align: right;">19</td>
+<td><strong>Exercises 2 and 3 — individual.</strong> Algorithm on paper first, then the program, then the tests.</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td style="text-align: right;">3</td>
+<td>Hand in / submit.</td>
+</tr>
+</tbody>
+</table>
+<p>Bring <strong>laptop, notebook and pencil</strong> and the <code>A_Matricula.docx</code> algorithm template (printed Tuesday; blank paper is fine).</p>
+<hr />
+</section>
+<section class="section" id="the-rule-for-all-three-exercises" class="level2">
+<h2>The rule for all three exercises</h2>
+<p>For each problem, in this order:</p>
+<ol type="1">
+<li><strong>The algorithm</strong> — on paper. <code>INPUT:</code> line, <code>OUTPUT:</code> line, numbered steps. Written <em>before</em> any code. This is the part that is graded as the work; the program is its transcription.</li>
+<li><strong>The program</strong> — in Thonny. Start every file the same way: <strong>line 1, your name in a <code>#</code> comment; then the algorithm inside a <code>"""</code> multi-line comment; then the code.</strong></li>
+<li><strong>The tests</strong> — run it with the values given and write, under the algorithm, the values you used and what the program printed. A program that runs is not a program that is correct.</li>
+</ol>
+<hr />
+</section>
+<section class="section" id="exercise-1-area-of-a-triangle-together-15-min" class="level2">
+<h2>Exercise 1 — Area of a triangle <em>(together, 15 min)</em></h2>
+<p>Read the base and the height of a triangle from the user; display its area.</p>
+<pre><code>Area = base × height / 2</code></pre>
+<p><strong>Tests:</strong> base <code>10</code>, height <code>5</code> → <code>25.0</code>. Base <code>3</code>, height <code>4</code> → <code>6.0</code>. Save as <code>A_Matricula_1.py</code>.</p>
+</section>
+<section class="section" id="exercise-2-dollars-to-pesos-individual" class="level2">
+<h2>Exercise 2 — Dollars to pesos <em>(individual)</em></h2>
+<p>Read an amount in US dollars and today’s exchange rate (pesos per dollar); display the equivalent in pesos.</p>
+<p><strong>Tests:</strong> <code>100</code> dollars at <code>18.50</code> → <code>1850.0</code>. <code>20</code> at <code>17.80</code> → <code>356.0</code>. Save as <code>A_Matricula_2.py</code>.</p>
+</section>
+<section class="section" id="exercise-3-fahrenheit-to-celsius-individual" class="level2">
+<h2>Exercise 3 — Fahrenheit to Celsius <em>(individual)</em></h2>
+<p>Read a temperature in degrees Fahrenheit; display it in degrees Celsius.</p>
+<pre><code>C = 5 / 9 × (F − 32)</code></pre>
+<p><strong>Tests:</strong> <code>212</code> → <code>100.0</code>. <code>32</code> → <code>0.0</code>. <code>98.6</code> → <code>37.0</code>. If you wrote <code>5 / 9 * F - 32</code>, check whether you were lucky or right — and be able to say which. Save as <code>A_Matricula_3.py</code>.</p>
+<p><strong>Finished all three?</strong> Swap your Exercise 2 algorithm with a neighbour and execute theirs literally for <code>0</code>, <code>-3</code> and <code>hola</code>. Write down, in one line per input, what their steps actually produce. Hand that back with your name on it.</p>
+<hr />
+</section>
+<section class="section" id="submission" class="level2">
+<h2>Submission</h2>
+<p>Two parts:</p>
+<ul>
+<li><strong>In the room, before you leave:</strong> your three handwritten algorithms (with the test values and results written underneath) — to Luis. He records attendance and completion.</li>
+<li><strong>On Canvas, by 23:59 tonight</strong> — <em>Laboratory 1</em>: one PDF or photo of the three algorithms, and the <code>.py</code> files you finished (<code>A_Matricula_1.py</code>, <code>_2.py</code>, <code>_3.py</code>). If you did not finish a program in the lab, finish it after tonight’s session — the lecture at 17:35 covers exactly what these programs use — and upload it then.</li>
+</ul>
+<p>An upload with code but no algorithm is <strong>incomplete</strong> and is graded as such. Programs are individual work: the triangle one was typed together, the other two are yours. See <em>Using AI in this course</em>.</p>
+<hr />
+</section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+</body>
+</html>
