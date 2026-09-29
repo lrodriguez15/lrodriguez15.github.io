@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Situación problema — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+  <main>
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Situación problema</span>
+    </nav>
+    <header class="lecture-header">
+      <p class="lecture-num">Project · 15 % of the course</p>
+      <h1>Situación problema</h1>
+      <div class="chips">
+        <span class="chip chip-blue">teams of 2</span>
+        <span class="chip chip-green">Nov 6 · 13 · 20</span>
+        <span class="chip chip-orange">final Nov 27, individual</span>
+      </div>
+      <p class="lecture-objective"><strong>In one sentence.</strong> Pick a business problem and a real dataset; by the end of November, have a Python program that loads it, describes it, plots the answers to your own questions — and explain your code out loud.</p>
+    </header>
+<p><strong>15 % of the course. Teams of two for three deliverables; the final delivery is individual.</strong> Formal release: Friday 16 October. This page is published early so nobody is surprised.</p>
+<section class="section" id="what-it-is" class="level2">
+<h2>What it is</h2>
+<p>You pick a business problem and a real dataset, and by the end of November you have a Python program that loads the data, describes it statistically, and plots the answers to questions you wrote yourself — plus a short report that says what the numbers mean and what the business should do about it. Everything taught between now and then is a piece of that program: conditionals (week 2), functions (week 2), loops (weeks 3–4), lists and plots (weeks 7–8), data frames (week 9).</p>
+</section>
+<section class="section" id="the-method-the-academias-five-steps" class="level2">
+<h2>The method (the academia’s five steps)</h2>
+<ol type="1">
+<li><strong>Define the problem.</strong> Pick an area you actually care about — the point is a program that processes a lot of data quickly, so pick data you want answers from.</li>
+<li><strong>Collect the data.</strong> A table with quantitative <em>and</em> qualitative columns, from a real, current source.</li>
+<li><strong>Clean it.</strong> Uniform dates and numbers, no duplicates, no useless rows.</li>
+<li><strong>Analyse.</strong> Descriptive statistics and plots in Python.</li>
+<li><strong>Conclude.</strong> What the results mean, and what you recommend.</li>
+</ol>
+</section>
+<section class="section" id="the-four-deliveries" class="level2">
+<h2>The four deliveries</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Date</th>
+<th>Team</th>
+<th>What</th>
+<th>File</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1 — Dataset</strong></td>
+<td>Fri <strong>6 Nov</strong></td>
+<td>2</td>
+<td>An Excel table from a real source: <strong>30–50 rows</strong>, <strong>up to 10 columns — 5 text, 5 numeric</strong>. Sources: <a href="https://www.kaggle.com/datasets">Kaggle</a>, <a href="https://www.datos.gob.mx/dataset/">datos.gob.mx</a>, the <a href="https://datacatalog.worldbank.org">World Bank</a>, or a company that lets you use its data — a family business counts.</td>
+<td><code>entrega1.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>2 — Driving questions</strong></td>
+<td>Fri <strong>13 Nov</strong></td>
+<td>2</td>
+<td>Four to six <em>preguntas detonadoras</em> about your data (<em>which branch sells most? which product? who are the best clients?</em>). Each team member takes two or three of them.</td>
+<td><code>entrega2.docx</code></td>
+</tr>
+<tr class="odd">
+<td><strong>3 — Data in Python</strong></td>
+<td>Fri <strong>20 Nov</strong></td>
+<td>2</td>
+<td>The Excel file loaded into a DataFrame and printed.</td>
+<td><code>entrega3.py</code> + <code>entrega1.xlsx</code></td>
+</tr>
+<tr class="even">
+<td><strong>Final</strong></td>
+<td>Fri <strong>27 Nov</strong></td>
+<td><strong>individual</strong></td>
+<td>The program + the report (below). <strong>And a two-minute oral explanation of your own code</strong>, per the AI policy.</td>
+<td><code>entregaF_matricula.py</code> + report</td>
+</tr>
+</tbody>
+</table>
+<p>All four go to Canvas → Modules → <em>Situación problema</em>. <strong>Each missed or late stage costs 5 points off the project grade.</strong> No email submissions.</p>
+</section>
+<section class="section" id="the-final-program-what-it-must-contain" class="level2">
+<h2>The final program — what it must contain</h2>
+<p>Written as functions plus a <code>main()</code>, the way every program in this course is written from week 2:</p>
+<ul>
+<li><code>estadistica_descriptiva(tablero)</code> — takes the DataFrame; computes at least <strong>five</strong> descriptive statistics related to your driving questions.</li>
+<li><code>grafica1(tablero)</code> — a simple bar or line chart.</li>
+<li><code>grafica2(tablero)</code> — a figure with two sub-plots, <em>or</em> one x against two y’s, <em>or</em> a <code>groupby</code> chart. Every chart with title, axis labels and legend.</li>
+<li><code>menu()</code> — displays: 1 Descriptive statistics · 2 Chart 1 · 3 Chart 2 · 4 Exit.</li>
+<li><code>main()</code> — loads the Excel into a DataFrame, shows the menu, runs the chosen function with <code>if</code> / <code>elif</code> / <code>else</code>, repeats with a <code>while</code> until Exit. All <code>input()</code> lives here.</li>
+<li>A last line that calls <code>main()</code>. Comments before every function saying what it does.</li>
+</ul>
+</section>
+<section class="section" id="the-report-what-it-must-contain" class="level2">
+<h2>The report — what it must contain</h2>
+<ol type="1">
+<li>Cover with your data and the project’s.</li>
+<li>The business and what it does.</li>
+<li>What each column means.</li>
+<li>The driving questions, answered.</li>
+<li>Screenshots: the statistics output, the two charts.</li>
+<li>Conclusion: what the analysis shows, and a <strong>strategic proposal</strong> — concrete actions the business should take, grounded in the data.</li>
+</ol>
+</section>
+<section class="section" id="how-it-is-graded" class="level2">
+<h2>How it is graded</h2>
+<p>Rubric published before deliverable 1 (Friday 16 October, with the formal release). The shape: each deliverable has its own small rubric; the final weighs the program (functions that work and are <em>yours</em>), the report, and the oral explanation. A program you cannot explain is not yours.</p>
+</section>
+<section class="section" id="what-to-do-now" class="level2">
+<h2>What to do now</h2>
+<p>Nothing formal until 16 October. Informally: <strong>start noticing data.</strong> The best projects come from a dataset a student already cared about — a family business, a sport, a city problem. If you find one before October, bring it to asesorías.</p>
+</section>
+
+  </main>
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+</body>
+</html>

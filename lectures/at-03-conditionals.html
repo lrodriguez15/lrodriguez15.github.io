@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 03: Conditionals — the program that chooses — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 03: Conditionals — the program that chooses</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 03 · Python 3</p>
+      <h1>Conditionals — the program that chooses</h1>
+      <div class="chips">
+        <span class="chip chip-blue">python</span>
+        <span class="chip chip-green">conditionals</span>
+        <span class="chip chip-orange">relational</span>
+        <span class="chip chip-blue">logical</span>
+        <span class="chip chip-green">if</span>
+        <span class="chip chip-orange">week-02</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Write a program whose output depends on a condition, and predict which branch runs before running it.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Slides</h2>
+<p>The deck projected in class — <a href="../files/at/at-03-slides.pdf">open / download the PDF</a>. The notes below are the full version; the slides are the subset shown on screen. <a href="../files/at/at-03-notes.pdf">Download these notes as PDF</a>.</p>
+<object data="../files/at/at-03-slides.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/at/at-03-slides.pdf">Open the slides (PDF)</a></p></object>
+</section>
+
+
+<section class="section">
+<h2 id="overview">Overview</h2>
+<p>Quick exam 1 takes the first twenty minutes. Then, for the first time, the machine gets to <strong>choose</strong>.</p>
+<p>Everything so far ran top to bottom: read, compute, display. That is why the <code>time = 0</code> note has been sitting in the margin since Tuesday of week 1 — a program that cannot choose cannot refuse a bad input; it can only crash on it. Today it stops crashing.</p>
+<p>One idea: <strong>a condition is an expression whose value is <code>True</code> or <code>False</code>, and <code>if</code> runs a block only when it is <code>True</code>.</strong> Everything else — <code>elif</code>, <code>else</code>, <code>and</code>, <code>or</code>, <code>not</code>, nesting — is that idea, applied carefully.</p>
+</section>
+<section class="section">
+<h2 id="opener-explore-or-exploit-10-min">Opener — Explore or exploit? (10 min)</h2>
+<p><em>Algorithms to Live By</em>, chapter 2. Friday night in Querétaro: the restaurant you love, or the new one that opened last month? Every time you choose the known one you are <strong>exploiting</strong>; every time you try a new one you are <strong>exploring</strong>. Exploring costs a possibly-bad dinner; exploiting costs never finding something better.</p>
+<p>Take three answers before showing anything. Someone will say “depends how long I’m staying in Querétaro” — that person has found the whole chapter: <strong>the value of exploring depends on how much time you have left to use what you find.</strong> New in town: explore. Last week before you leave: exploit. That is also why a hospital trial and a casino look different, and why Netflix’s front page is a compromise.</p>
+<p>The oldest simple strategy — Robbins, 1952 — fits on one line:</p>
+<blockquote>
+<p><strong>Win-stay, lose-shift.</strong> If the last choice was good, repeat it. If it was bad, switch.</p>
+</blockquote>
+<p>It is an algorithm. Finite (one decision per night), ordered, unambiguous once you define “good”, input (last outcome) and output (tonight’s choice). Better strategies exist — the Gittins index, “upper confidence bound”, <em>optimism in the face of uncertainty</em> — but every one of them has the same skeleton: <strong>a condition, and two branches.</strong></p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> write win-stay-lose-shift in our notation. <code>INPUT:</code> (what do you need to remember from last time?), <code>OUTPUT:</code>, numbered steps. Circle the step that is a <em>decision</em>. Then the pivot, out loud: <em>that circled step is what Python learns today.</em></p>
+</section>
+<section class="section">
+<h2 id="situación-problema-five-minutes-today-so-it-is-not-a-surprise-5-min">Situación problema — five minutes, today, so it is not a surprise (5 min)</h2>
+<p>The <strong>situación problema</strong> is 15 % of the grade and it is the one piece of the course that is <em>yours</em>: you pick a business problem and a real dataset, and by the end of November you have a Python program that loads it, describes it statistically, and plots the answers to questions you wrote yourself.</p>
+<ul>
+<li><strong>Teams of two</strong> for the three deliverables; the <strong>final delivery is individual</strong>.</li>
+<li><strong>Deliverable 1 — Friday 6 November:</strong> the dataset, as an Excel table: 30–50 rows, up to 10 columns, 5 text and 5 numeric, from a real source (Kaggle, datos.gob.mx, the World Bank, or a company that lets you use its data — a family business counts).</li>
+<li><strong>Deliverable 2 — Friday 13 November:</strong> four to six <em>driving questions</em> about your data.</li>
+<li><strong>Deliverable 3 — Friday 20 November:</strong> the data loaded into Python and printed.</li>
+<li><strong>Final — Friday 27 November, individual:</strong> the program (functions for descriptive statistics, two plots, a menu, a <code>main</code>) and a short report — and <strong>you explain your own code out loud</strong>.</li>
+<li>Each missed or late stage costs 5 points off the project grade.</li>
+</ul>
+<p>Nothing to do yet except one thing: <strong>start noticing data.</strong> The formal brief comes out on Friday 16 October; the full text is already on the course site under <em>Situación problema</em>. Everything we do between now and then — conditionals today, functions Friday, loops in weeks 3–4, lists in week 7 — is a piece of that program.</p>
+</section>
+<section class="section">
+<h2 id="notes">Notes</h2>
+<h3 id="the-bug-we-could-not-fix">The bug we could not fix</h3>
+<p>Week 1, Tuesday, on the board:</p>
+<pre><code>-- what if time = 0? --</code></pre>
+<p>Friday’s program made it concrete:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>distance_km <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Distance in km: &quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>hours <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>speed <span class="op">=</span> distance_km <span class="op">/</span> hours          <span class="co"># ZeroDivisionError when hours is 0</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;Average speed:&quot;</span>, speed, <span class="st">&quot;km/h&quot;</span>)</span></code></pre></div>
+<p>Type <code>0</code> for the time and Python stops: <code>ZeroDivisionError: float division by zero</code>. It is the third kind of error you have met. <code>TypeError</code> was text where a number was needed; <code>133.33</code> was a program that ran and lied; this one is a <strong>correct program given an input it was never told how to handle.</strong> The algorithm never said what to do when time is zero, so the program does not know either. <code>01_time_zero.py</code>.</p>
+<h3 id="a-condition-has-a-value">A condition has a value</h3>
+<p>Before <code>if</code>, the thing <code>if</code> looks at. Type these in the Thonny shell, one at a time:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">5</span> <span class="op">&gt;</span> <span class="dv">3</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="va">True</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">3</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="va">False</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> hours <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> hours <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="va">True</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> hours <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="va">False</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">type</span>(<span class="dv">5</span> <span class="op">&gt;</span> <span class="dv">3</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="op">&lt;</span><span class="kw">class</span> <span class="st">&#39;bool&#39;</span><span class="op">&gt;</span></span></code></pre></div>
+<p><code>True</code> and <code>False</code> are values, of type <code>bool</code> — as much a value as <code>5</code> or <code>"hola"</code>. A <strong>relational expression</strong> produces one:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Meaning</th>
+<th><code>5 ? 3</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&lt;</code></td>
+<td>less than</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><code>&lt;=</code></td>
+<td>less than or equal</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><code>&gt;</code></td>
+<td>greater than</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td><code>&gt;=</code></td>
+<td>greater than or equal</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td><code>==</code></td>
+<td>equal — <strong>two</strong> signs</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><code>!=</code></td>
+<td>not equal</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Gloss:</strong> <em>expresión relacional</em> · <em>booleano</em> — boolean · <em>condición</em> — condition · <em>rama</em> — branch · <em>sangría</em> — indentation · <em>anidado</em> — nested</p>
+</blockquote>
+<p><strong><code>=</code> is a command; <code>==</code> is a question.</strong> <code>x = 5</code> puts 5 in the box. <code>x == 5</code> asks whether the box holds 5, and the answer is <code>True</code> or <code>False</code>. Python catches <code>if x = 5:</code> as a syntax error, but not <code>x == 5</code> on its own line, which does nothing and says nothing. <code>02_relational.py</code>.</p>
+<h3 id="if-a-block-that-runs-only-when-the-condition-is-true"><code>if</code> — a block that runs only when the condition is <code>True</code></h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>hours <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Time in hours: &quot;</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="cf">if</span> hours <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    speed <span class="op">=</span> distance_km <span class="op">/</span> hours</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Average speed:&quot;</span>, speed, <span class="st">&quot;km/h&quot;</span>)</span></code></pre></div>
+<p>Three things on the line <code>if hours &gt; 0:</code> — the keyword, a condition, and a <strong>colon</strong>. Then the block: every line indented <strong>four spaces</strong> under it belongs to it. Un-indent, and you are back in the main program, which runs regardless. <code>03_if_block.py</code> shows the difference: move <code>print</code> one level left and it runs even when there was no speed to print — <code>NameError</code>.</p>
+<h3 id="else-the-other-branch-and-the-end-of-the-margin-note"><code>else</code> — the other branch, and the end of the margin note</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="cf">if</span> hours <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    speed <span class="op">=</span> distance_km <span class="op">/</span> hours</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Average speed:&quot;</span>, speed, <span class="st">&quot;km/h&quot;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="cf">else</span>:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Time must be greater than zero.&quot;</span>)</span></code></pre></div>
+<p>Exactly one of the two blocks runs. That is the <code>time = 0</code> note, closed: the algorithm now <em>says</em> what happens on a bad input, and the program says it too. <code>04_speed_checked.py</code>.</p>
+<p>Write the algorithm for it before the code — it is one line longer than week 1’s:</p>
+<pre><code>1. READ distance, time
+2. IF time &gt; 0:
+3.     speed &lt;- distance / time
+4.     DISPLAY speed
+5. ELSE:
+6.     DISPLAY &quot;time must be greater than zero&quot;</code></pre>
+<h3 id="elif-more-than-two-branches-in-order"><code>elif</code> — more than two branches, in order</h3>
+<p>A grade message: 0–69 fails, 70–79 good, 80–89 very good, 90–100 excellent, anything else is an error.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="language-python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>grade <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Grade: &quot;</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="cf">if</span> grade <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> grade <span class="op">&gt;</span> <span class="dv">100</span>:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;ERROR&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="cf">elif</span> grade <span class="op">&lt;</span> <span class="dv">70</span>:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Reprobado&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="cf">elif</span> grade <span class="op">&lt;</span> <span class="dv">80</span>:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Bueno&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="cf">elif</span> grade <span class="op">&lt;</span> <span class="dv">90</span>:</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Muy bueno&quot;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="cf">else</span>:</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Excelente&quot;</span>)</span></code></pre></div>
+<p>Read it the way Python does: top to bottom, <strong>the first <code>True</code> condition wins and the rest are skipped</strong>. That is why <code>elif grade &lt; 80</code> does not need to say <code>grade &gt;= 70</code> — if we got there, the previous test already failed. And it is why <strong>order matters</strong>: swap the <code>&lt; 70</code> and <code>&lt; 80</code> lines and a 65 prints <code>Bueno</code>. <code>05_grade_message.py</code> has the working version and the swapped one; predict both for 65, 79, 80, 100, 101 before running.</p>
+<h3 id="and-or-not"><code>and</code>, <code>or</code>, <code>not</code></h3>
+<p>A year is a leap year when it is divisible by 4 and not by 100, or when it is divisible by 400. That sentence is already the condition:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="language-python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>year <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;Year: &quot;</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="cf">if</span> (year <span class="op">%</span> <span class="dv">4</span> <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> year <span class="op">%</span> <span class="dv">100</span> <span class="op">!=</span> <span class="dv">0</span>) <span class="kw">or</span> year <span class="op">%</span> <span class="dv">400</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>    <span class="bu">print</span>(year, <span class="st">&quot;is a leap year&quot;</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="cf">else</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>    <span class="bu">print</span>(year, <span class="st">&quot;is not a leap year&quot;</span>)</span></code></pre></div>
+<p><code>%</code> is the remainder — <code>year % 4 == 0</code> means <em>divisible by 4</em> — and here is the first time it earns its place. Precedence: <code>not</code> first, then <code>and</code>, then <code>or</code>; the parentheses above are not required, but they make the sentence readable, which is the point. Tests: 1984 yes, 1800 no, 2000 yes, 2026 no. <code>06_leap_year.py</code>.</p>
+<h3 id="nested-if-a-choice-inside-a-choice">Nested <code>if</code> — a choice inside a choice</h3>
+<p>Sometimes the second question only makes sense after the first has been answered:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="language-python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>n <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;Integer: &quot;</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="cf">if</span> n <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>    <span class="cf">if</span> n <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;positive even&quot;</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;positive odd&quot;</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="cf">else</span>:</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>    <span class="cf">if</span> n <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;negative even&quot;</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;negative odd&quot;</span>)</span></code></pre></div>
+<p>Eight lines of indentation doing the work of four sentences. It is correct — and it is worth seeing next to the flat version with <code>and</code>, which says the same thing in four <code>elif</code> rungs. Neither is “right”; the nested one mirrors <em>the order you would ask a person</em>, the flat one is easier to test. What matters is that <code>0</code> goes somewhere on purpose — in this version it is “negative even”, which is a bug the algorithm should have caught. <code>07_nested.py</code>.</p>
+<h3 id="two-more-shapes-the-conditional-expression-and-match">Two more shapes: the conditional expression, and <code>match</code></h3>
+<p>Both say something you can already say with <code>if</code>. Neither is required; both are worth recognising, because you will read them in other people’s code.</p>
+<p><strong>The conditional expression</strong> (other languages call it the <em>ternary operator</em>) — an <code>if</code> that <em>is a value</em>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="language-python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>label <span class="op">=</span> <span class="st">&quot;leap year&quot;</span> <span class="cf">if</span> is_leap <span class="cf">else</span> <span class="st">&quot;not a leap year&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="bu">print</span>(year, <span class="st">&quot;is a&quot;</span>, label)</span></code></pre></div>
+<p>Read it left to right as English: <em>label is “leap year” if <code>is_leap</code>, else “not a leap year”</em>. Use it when the two branches are two <strong>values</strong> for the same variable and nothing else happens. The moment a branch needs two lines, go back to <code>if</code>. <code>08_ternary.py</code>.</p>
+<p><strong><code>match</code> / <code>case</code></strong> (Python 3.10 and later) — the <code>switch</code> of other languages, for the case where one value is compared against several <strong>specific</strong> alternatives:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="language-python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>option <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;1 stats · 2 chart 1 · 3 chart 2 · 4 exit: &quot;</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>match option:</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a>    case <span class="dv">1</span>:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Descriptive statistics&quot;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>    case <span class="dv">2</span>:</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Chart 1&quot;</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>    case <span class="dv">3</span>:</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Chart 2&quot;</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a>    case <span class="dv">4</span>:</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Exit&quot;</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>    case _:</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Not an option&quot;</span>)</span></code></pre></div>
+<p><code>case _:</code> is the <em>else</em>. This is the menu of the situación problema’s final program, and it reads better than four <code>elif option ==</code> rungs. It does <strong>not</strong> replace the ladder for <em>ranges</em> (<code>grade &lt; 70</code>): <code>match</code> compares against values, not conditions (it can, with <code>case x if x &lt; 70:</code>, but at that point the ladder is clearer). <code>09_match.py</code>.</p>
+<blockquote>
+<p><strong>Exam note.</strong> Trinket’s Python may be older than 3.10 — <code>match</code> may not exist in the quick-exam editor. The <code>if</code> / <code>elif</code> ladder always works. Know <code>match</code>; do not depend on it.</p>
+</blockquote>
+<h3 id="failure-first-three-bugs-that-do-not-crash">Failure-first: three bugs that do not crash</h3>
+<ol type="1">
+<li><strong><code>=</code> for <code>==</code></strong> inside an expression is a syntax error — fine, Python helps. But <code>if hours = 0:</code> written as two lines <code>hours == 0</code> then <code>if hours:</code> silently tests <em>whether hours is non-zero</em>. Bugs that run are the ones to fear.</li>
+<li><strong>A boundary on the wrong side.</strong> <code>grade &lt; 70</code> vs <code>grade &lt;= 70</code>: a 70 fails or passes depending on one character. <strong>Test the boundaries</strong> — 69, 70, 71 — not the middle.</li>
+<li><strong>The unreachable branch.</strong> <code>if x &gt; 10: … elif x &gt; 20: …</code> — the second can never run. No error, no warning; the branch is simply dead. Order the conditions from most to least specific, or from smallest to largest, and <em>say which</em> in the algorithm.</li>
+</ol>
+</section>
+<section class="section">
+<h2 id="stretch-if-the-session-was-easy">Stretch — if the session was easy</h2>
+<p>Optional, ungraded, and harder than they look. Bring them to asesorías or leave them in the week’s evidence box.</p>
+<ol type="1">
+<li><strong>No <code>if</code>.</strong> Write <code>speed_label(speed)</code> (slow / normal / fast / too fast, same thresholds as the in-class activity) <strong>without</strong> <code>if</code>, <code>elif</code>, <code>else</code> or the conditional expression. Hint: <code>True + True</code> is <code>2</code>. Then say, in one sentence, why the <code>if</code> version is still the one you should hand in.</li>
+<li><strong>The specification hunt.</strong> Take the client-status table from Friday’s lab (<em>más de $1,000,000 → Excelente</em>, …). List every input the table does <strong>not</strong> decide: the exact limits, negatives, decimals, text. That list is the algorithm’s missing lines; write them.</li>
+<li><strong>Prove the leap year.</strong> Write the condition as one boolean expression <em>and</em> as nested <code>if</code>s, and show they agree for every year from 1 to 2400. You may use anything you already know; the point is the word <em>every</em>.</li>
+</ol>
+
+</section>
+<section class="section">
+<h2>Code Examples</h2>
+<h3>01_time_zero.py</h3>
+<pre><code class="language-python"># 01_time_zero.py — the bug from week 1, finally in the open.
+#
+# Type 0 for the time. The program is CORRECT and still stops:
+#   ZeroDivisionError: float division by zero
+# The algorithm never said what to do when time is zero, so neither does this.
+
+distance_km = float(input(&quot;Distance in km: &quot;))
+hours = float(input(&quot;Time in hours: &quot;))
+
+speed = distance_km / hours
+
+print(&quot;Average speed:&quot;, speed, &quot;km/h&quot;)
+</code></pre>
+<h3>02_relational.py</h3>
+<pre><code class="language-python"># 02_relational.py — a condition is a VALUE. Predict every line, then run.
+
+print(5 &gt; 3)          # True
+print(5 == 3)         # False
+print(5 != 3)         # True
+print(3 &gt;= 3)         # True
+print(&quot;a&quot; == &quot;a&quot;)     # True  — text compares too
+print(&quot;10&quot; == 10)     # False — text is not a number, even when it looks like one
+print(type(5 &gt; 3))    # &lt;class &#x27;bool&#x27;&gt;
+
+hours = 0
+print(hours == 0)     # True   &lt;- a question
+hours = 5             #        &lt;- a command. One sign. Different thing.
+print(hours == 0)     # False
+</code></pre>
+<h3>03_if_block.py</h3>
+<pre><code class="language-python"># 03_if_block.py — the indented block belongs to the if. The rest does not.
+#
+# Run with 100 and 0. Then move the print one level LEFT and run again with 0:
+#   NameError: name &#x27;speed&#x27; is not defined   &lt;- it ran, and there was no speed.
+
+distance_km = float(input(&quot;Distance in km: &quot;))
+hours = float(input(&quot;Time in hours: &quot;))
+
+if hours &gt; 0:
+    speed = distance_km / hours
+    print(&quot;Average speed:&quot;, speed, &quot;km/h&quot;)
+</code></pre>
+<h3>04_speed_checked.py</h3>
+<pre><code class="language-python"># 04_speed_checked.py — the margin note, closed.
+&quot;&quot;&quot;
+INPUT:  distance (km), time (h)
+OUTPUT: the average speed, or an error message
+1. READ distance, time
+2. IF time &gt; 0:
+3.     speed &lt;- distance / time
+4.     DISPLAY speed
+5. ELSE:
+6.     DISPLAY &quot;Time must be greater than zero.&quot;
+&quot;&quot;&quot;
+
+distance_km = float(input(&quot;Distance in km: &quot;))
+hours = float(input(&quot;Time in hours: &quot;))
+
+if hours &gt; 0:
+    speed = distance_km / hours
+    print(&quot;Average speed:&quot;, speed, &quot;km/h&quot;)
+else:
+    print(&quot;Time must be greater than zero.&quot;)
+</code></pre>
+<h3>05_grade_message.py</h3>
+<pre><code class="language-python"># 05_grade_message.py — the elif ladder. The first True condition wins; the rest are skipped.
+#
+# Predict for 65, 79, 80, 100, 101 BEFORE running. Then read the swapped version below.
+
+grade = float(input(&quot;Grade: &quot;))
+
+if grade &lt; 0 or grade &gt; 100:
+    print(&quot;ERROR&quot;)
+elif grade &lt; 70:
+    print(&quot;Reprobado&quot;)
+elif grade &lt; 80:
+    print(&quot;Bueno&quot;)
+elif grade &lt; 90:
+    print(&quot;Muy bueno&quot;)
+else:
+    print(&quot;Excelente&quot;)
+
+# --- Same rungs, two of them swapped. What does 65 print now? -------------
+# if grade &lt; 0 or grade &gt; 100:
+#     print(&quot;ERROR&quot;)
+# elif grade &lt; 80:
+#     print(&quot;Bueno&quot;)          # 65 lands here. No error. No warning.
+# elif grade &lt; 70:
+#     print(&quot;Reprobado&quot;)      # can never run: dead branch
+# elif grade &lt; 90:
+#     print(&quot;Muy bueno&quot;)
+# else:
+#     print(&quot;Excelente&quot;)
+</code></pre>
+<h3>06_leap_year.py</h3>
+<pre><code class="language-python"># 06_leap_year.py — and / or / not, and the first honest use of %.
+#
+# A year is a leap year when it is divisible by 4 and not by 100,
+# or when it is divisible by 400.   Tests: 1984 yes, 1800 no, 2000 yes, 2026 no.
+
+year = int(input(&quot;Year: &quot;))
+
+if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+    print(year, &quot;is a leap year&quot;)
+else:
+    print(year, &quot;is not a leap year&quot;)
+</code></pre>
+<h3>07_nested.py</h3>
+<pre><code class="language-python"># 07_nested.py — a choice inside a choice, and the same thing flat.
+#
+# Both versions agree on every input except one. Which? (Try 0.)
+
+n = int(input(&quot;Integer: &quot;))
+
+# nested — mirrors the order you would ask a person
+if n &gt; 0:
+    if n % 2 == 0:
+        print(&quot;positive even&quot;)
+    else:
+        print(&quot;positive odd&quot;)
+else:
+    if n % 2 == 0:
+        print(&quot;negative even&quot;)     # 0 lands here. Is that what the algorithm said?
+    else:
+        print(&quot;negative odd&quot;)
+
+# flat — easier to test, one rung per case
+if n &gt; 0 and n % 2 == 0:
+    print(&quot;positive even&quot;)
+elif n &gt; 0:
+    print(&quot;positive odd&quot;)
+elif n &lt; 0 and n % 2 == 0:
+    print(&quot;negative even&quot;)
+elif n &lt; 0:
+    print(&quot;negative odd&quot;)
+else:
+    print(&quot;zero&quot;)                   # the flat version was forced to decide about 0
+</code></pre>
+<h3>08_ternary.py</h3>
+<pre><code class="language-python"># 08_ternary.py — the conditional expression: an if that IS a value.
+
+year = int(input(&quot;Year: &quot;))
+is_leap = (year % 4 == 0 and year % 100 != 0) or year % 400 == 0
+
+label = &quot;a leap year&quot; if is_leap else &quot;not a leap year&quot;
+print(year, &quot;is&quot;, label)
+
+# The same thing with if / else — four lines instead of one:
+# if is_leap:
+#     label = &quot;a leap year&quot;
+# else:
+#     label = &quot;not a leap year&quot;
+#
+# Use the one-line form only when both branches are VALUES for the same variable.
+</code></pre>
+<h3>09_match.py</h3>
+<pre><code class="language-python"># 09_match.py — match / case (Python 3.10+): one value against specific alternatives.
+#
+# This is the menu of the situación problema&#x27;s final program.
+# Trinket may not have match — the if/elif ladder always works.
+
+option = int(input(&quot;1 stats · 2 chart 1 · 3 chart 2 · 4 exit: &quot;))
+
+match option:
+    case 1:
+        print(&quot;Descriptive statistics&quot;)
+    case 2:
+        print(&quot;Chart 1&quot;)
+    case 3:
+        print(&quot;Chart 2&quot;)
+    case 4:
+        print(&quot;Exit&quot;)
+    case _:
+        print(&quot;Not an option&quot;)
+
+# For RANGES (grade &lt; 70) match is the wrong tool — use the elif ladder.
+</code></pre>
+</section>
+<section class="section">
+<h2>Exercises</h2>
+<p><strong>In-class activity — Speed, checked and classified</strong> <em>(individual, 20 min, graded — the first of the four in-class activities, 4 % of the course)</em></p>
+<p>Finish the week-1 program properly.</p>
+<ol type="1">
+<li>Read distance (km) and time (hours) from the user.</li>
+<li>If the time is not greater than zero, display <code>Time must be greater than zero.</code> and nothing else.</li>
+<li>Otherwise compute the average speed and display it, then classify it:
+<ul>
+<li>below 40 km/h → <code>slow</code></li>
+<li>40 to below 90 km/h → <code>normal</code></li>
+<li>90 to 120 km/h → <code>fast</code></li>
+<li>above 120 km/h → <code>too fast — this is a road, not a runway</code></li>
+</ul></li>
+</ol>
+<p><strong>Algorithm first, on paper</strong> — <code>INPUT:</code>, <code>OUTPUT:</code>, numbered steps with the <code>IF</code> lines. Then the program, in the exam format (name in a <code>#</code> comment on line 1, algorithm in <code>"""</code>). Then the tests — write them under the algorithm:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">distance</th>
+<th style="text-align: right;">time</th>
+<th>expected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">0</td>
+<td>Time must be greater than zero.</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">2</td>
+<td>50.0 → normal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">1</td>
+<td>100.0 → fast</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">1</td>
+<td>120.0 → fast</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">121</td>
+<td style="text-align: right;">1</td>
+<td>121.0 → too fast</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">1</td>
+<td>30.0 → slow</td>
+</tr>
+</tbody>
+</table>
+<p>The two 120/121 rows are there on purpose: the boundary is where the marks are.</p>
+<p><strong>Submit:</strong> photo of the algorithm + <code>A_Matricula_ic1.py</code> → Canvas → <em>In-class activity: Conditional structure (if)</em> — by Sunday 23:59, but the work happens now, in the room.</p>
+<blockquote>
+<p>Rubric: algorithm with input/output and every branch stated 40 % · program runs and passes all six tests 40 % · boundaries right (120 → fast, 121 → too fast, 0 → error) 20 %.</p>
+</blockquote>
+
+</div>
+</section>
+<section class="section">
+<h2>After the session</h2>
+<p><strong>Homework 2 — <code>assignments/hw-02-conditionals.md</code>. Due Sunday 4 October, 23:59, on Canvas.</strong> Two programs: leap year (<code>and</code>/<code>or</code>/<code>%</code>) and three numbers in descending order (nested comparisons). Algorithm on paper, exam file format, tests written under the algorithm.</p>
+<p>Also before Friday:</p>
+<ol type="1">
+<li><strong>Levelling module</strong> — lessons 6–8 (flowcharts) by Friday; all ten by Thursday 8 October.</li>
+<li><strong>Lab 2 — Friday 16:30</strong>, with Luis: conditionals, the same lab as every group (<em>Laboratorio: Estructura condicional if</em>). Bring the laptop.</li>
+<li><strong>Friday’s session: functions.</strong> Read <em>Self-study: Python functions</em> in Canvas — ten minutes — so that <code>def</code> is not the first time you see the word.</li>
+<li><strong>Quick exam 2 is Tuesday 6 October</strong>, first 20 minutes: conditionals and functions.</li>
+</ol>
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

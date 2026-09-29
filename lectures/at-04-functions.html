@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 04: Functions — a named promise — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 04: Functions — a named promise</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 04 · Python 3</p>
+      <h1>Functions — a named promise</h1>
+      <div class="chips">
+        <span class="chip chip-blue">python</span>
+        <span class="chip chip-green">functions</span>
+        <span class="chip chip-orange">parameters</span>
+        <span class="chip chip-blue">return</span>
+        <span class="chip chip-green">scope</span>
+        <span class="chip chip-orange">main</span>
+        <span class="chip chip-blue">week-02</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Write a function with parameters and a return value, call it from a main program, and explain the difference between returning a value and printing one.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Slides</h2>
+<p>The deck projected in class — <a href="../files/at/at-04-slides.pdf">open / download the PDF</a>. The notes below are the full version; the slides are the subset shown on screen. <a href="../files/at/at-04-notes.pdf">Download these notes as PDF</a>.</p>
+<object data="../files/at/at-04-slides.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/at/at-04-slides.pdf">Open the slides (PDF)</a></p></object>
+</section>
+
+
+<section class="section">
+<h2 id="overview">Overview</h2>
+<p>You have called functions since your second program: <code>float()</code>, <code>print()</code>, <code>round()</code>, <code>math.sqrt()</code>. Someone wrote each of them once, gave it a name, and you have been using the name ever since without reading a line of what is inside. Today you write your own.</p>
+<p>One idea: <strong>a function is a named promise — inputs in, value out.</strong> <code>def</code> makes the promise, <code>return</code> keeps it, and calling the function by name is how the rest of the program collects. The hard part is not the syntax. It is the difference between <strong>returning</strong> a value and <strong>printing</strong> one — the single most confusing idea of the first month, and the one on which every program from week 3 onwards depends.</p>
+</section>
+<section class="section">
+<h2 id="opener-sorting-and-the-function-you-never-wrote-10-min">Opener — Sorting, and the function you never wrote (10 min)</h2>
+<p><em>Algorithms to Live By</em>, chapter 3. Hand out five playing cards, face down, to a pair in the front row. “Sort them, smallest to largest — and tell me <em>exactly</em> what you are doing, step by step, so that the person next to you could do it with their eyes closed.”</p>
+<p>What they describe is almost always <strong>insertion sort</strong>: take the next card, slide it left until it is in place. It is a fine algorithm for five cards. For a million it is a disaster: the work grows with the <em>square</em> of the number of cards. <strong>Merge sort</strong> — split, sort the halves, merge — grows with <em>n log n</em>, and that difference is why your phone can sort a million contacts before you lift your finger. It is also why sports tournaments are brackets, why a library is shelved alphabetically only where people will search, and why the book’s advice is: <em>sorting something you will never search is a waste; searching something you never sorted is merely inefficient.</em></p>
+<p>Now the point for today. In Python:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">sorted</span>([<span class="dv">9</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">2</span>])</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">9</span>]</span></code></pre></div>
+<p>Somebody wrote that — Tim Peters, 2002, an algorithm called Timsort — <strong>once</strong>. Gave it a name. Since then every Python programmer on earth has <em>called</em> it, by name, with an input, and received an output, without knowing or caring what is inside. <strong>That is a function.</strong> Today you make your own: something you would otherwise write three times.</p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> write your card-sorting procedure as an algorithm. <code>INPUT:</code> five cards. <code>OUTPUT:</code> the same cards, in order. Numbered steps. Then draw a box around the whole thing and give it a <strong>name</strong>. You have just written <code>sort_cards</code>.</p>
+</section>
+<section class="section">
+<h2 id="notes">Notes</h2>
+<h3 id="the-smell-the-same-lines-three-times">The smell: the same lines three times</h3>
+<p>Lab 1’s triangle program, then Homework 1, then today’s lab: every one of them read a number, converted it, checked it, computed something. Look at <code>01_repeated_code.py</code>: three areas of three triangles, and the formula typed three times. Change the formula — say the base is now in centimetres and you want metres — and you change it in three places, and you will miss one. That is not a style problem. It is a <em>correctness</em> problem: <strong>code that exists twice will one day be right in one place and wrong in the other.</strong></p>
+<h3 id="def-make-the-promise"><code>def</code> — make the promise</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">def</span> triangle_area(base, height):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    area <span class="op">=</span> base <span class="op">*</span> height <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="cf">return</span> area</span></code></pre></div>
+<p>Line by line: <code>def</code>, a <strong>name</strong> (same rules as variables), <strong>parameters</strong> in parentheses — the names this function will use for its inputs — and a colon. Then the body, indented, like an <code>if</code> block. And <code>return</code>, which hands <code>area</code> back to whoever called and ends the function.</p>
+<p><strong>Nothing has happened yet.</strong> Defining a function is like writing a recipe: no food is cooked until someone follows it. <code>02_first_function.py</code> — run it as written and it prints nothing.</p>
+<h3 id="calling-it-collect-on-the-promise">Calling it — collect on the promise</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>a <span class="op">=</span> triangle_area(<span class="dv">10</span>, <span class="dv">5</span>)      <span class="co"># 25.0 goes into a</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="bu">print</span>(a)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="bu">print</span>(triangle_area(<span class="dv">3</span>, <span class="dv">4</span>))    <span class="co"># 6.0 — the call IS a value; use it anywhere a value fits</span></span></code></pre></div>
+<p><code>10</code> and <code>5</code> are <strong>arguments</strong>; they land in <code>base</code> and <code>height</code> <strong>in order</strong>. The call <code>triangle_area(10, 5)</code> is an expression with a value, exactly like <code>5 &gt; 3</code> or <code>d / t</code> — you can store it, print it, add it, compare it, pass it to another function.</p>
+<blockquote>
+<p><strong>Gloss:</strong> <em>función</em> · <em>definir</em> — define · <em>parámetro</em> — parameter · <em>argumento</em> — argument · <em>llamar</em> — to call · <em>devolver / regresar</em> — return · <em>alcance</em> — scope</p>
+</blockquote>
+<h3 id="return-versus-print-the-whole-idea"><code>return</code> versus <code>print</code> — the whole idea</h3>
+<p>Two functions that look the same and are not:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">def</span> area_returns(base, height):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="cf">return</span> base <span class="op">*</span> height <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">def</span> area_prints(base, height):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="bu">print</span>(base <span class="op">*</span> height <span class="op">/</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> x <span class="op">=</span> area_returns(<span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> x</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="fl">25.0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> y <span class="op">=</span> area_prints(<span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="fl">25.0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> y</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(y)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="va">None</span></span></code></pre></div>
+<p><code>area_prints</code> <strong>showed</strong> 25.0 to you and gave the program <strong>nothing</strong> — <code>y</code> holds <code>None</code>. Try <code>area_prints(10, 5) + 1</code> and you get <code>TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'</code>. The function did its job for a human and is useless to the rest of the program. <code>03_return_vs_print.py</code>.</p>
+<p>The rule, from today until December: <strong>functions return; <code>main</code> prints.</strong> A function that computes something <em>returns</em> it. Displaying is a separate job, done in one place.</p>
+<h3 id="scope-what-happens-in-the-function-stays-in-the-function">Scope — what happens in the function stays in the function</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="language-python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">def</span> triangle_area(base, height):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    area <span class="op">=</span> base <span class="op">*</span> height <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="cf">return</span> area</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>result <span class="op">=</span> triangle_area(<span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="bu">print</span>(area)        <span class="co"># NameError: name &#39;area&#39; is not defined</span></span></code></pre></div>
+<p><code>area</code> was created inside the function and ceased to exist when the function returned. The only things that cross the boundary are the arguments going in and the returned value coming out. That is a feature: it means you can read <code>triangle_area</code> on its own and know everything about it. <code>04_scope.py</code>. (Python does let a function <em>read</em> outside names; we will not use that — it is exactly the habit that makes programs impossible to test.)</p>
+<h3 id="main-the-shape-of-every-program-from-now-on"><code>main()</code> — the shape of every program from now on</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="language-python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">def</span> triangle_area(base, height):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>    <span class="cf">return</span> base <span class="op">*</span> height <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="kw">def</span> main():</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>    base <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Base: &quot;</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>    height <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Height: &quot;</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>    area <span class="op">=</span> triangle_area(base, height)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Area:&quot;</span>, area)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>main()</span></code></pre></div>
+<p>Three parts: the functions (each one a promise, each one returning), a <code>main()</code> that talks to the user and calls them, and the last line that starts it. Reading, printing and <code>input()</code> live in <code>main</code>; arithmetic and decisions live in functions. <code>05_main.py</code>.</p>
+<p>Why bother, for twelve lines? Because in week 3 <code>main</code> grows a loop, in week 7 it grows a list, in November it grows a menu — and the functions underneath do not change. The situación problema’s final program is <em>specified</em> this way: <code>estadistica_descriptiva(...)</code>, <code>grafica1(...)</code>, <code>menu()</code>, <code>main()</code>. You are writing its skeleton today.</p>
+<h3 id="functions-that-decide">Functions that decide</h3>
+<p>Yesterday’s conditional, inside a function, becomes reusable:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="language-python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">def</span> speed_label(speed):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    <span class="cf">if</span> speed <span class="op">&lt;</span> <span class="dv">40</span>:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>        <span class="cf">return</span> <span class="st">&quot;slow&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>    <span class="cf">elif</span> speed <span class="op">&lt;</span> <span class="dv">90</span>:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>        <span class="cf">return</span> <span class="st">&quot;normal&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>    <span class="cf">elif</span> speed <span class="op">&lt;=</span> <span class="dv">120</span>:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>        <span class="cf">return</span> <span class="st">&quot;fast&quot;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>        <span class="cf">return</span> <span class="st">&quot;too fast&quot;</span></span></code></pre></div>
+<p>Four <code>return</code>s, one per branch — and each one ends the function, so no <code>elif</code> is ever reached after a <code>return</code>. Test it in the shell without any <code>input()</code> at all: <code>speed_label(39.9)</code>, <code>speed_label(40)</code>, <code>speed_label(120)</code>, <code>speed_label(120.1)</code>. <strong>That is the second reason functions exist: you can test the logic without typing inputs every time.</strong> <code>06_speed_label.py</code>.</p>
+<h3 id="failure-first-the-four-ways-this-goes-wrong-on-tuesdays-quick-exam">Failure-first: the four ways this goes wrong on Tuesday’s quick exam</h3>
+<ol type="1">
+<li><strong>Forgetting to call.</strong> <code>def</code> and nothing else — the program prints nothing, and the student says “it doesn’t work”. It works; nobody asked it to.</li>
+<li><strong><code>print</code> where <code>return</code> was needed.</strong> Then <code>total = f(x) + 1</code> crashes with <code>NoneType</code>.</li>
+<li><strong>Using a parameter name outside the function</strong> — <code>NameError</code>. What goes in goes in through the parentheses.</li>
+<li><strong><code>input()</code> inside the function.</strong> It runs, and it cannot be tested or reused — every call stops to ask. Inputs belong in <code>main</code>; values belong in parameters.</li>
+</ol>
+</section>
+<section class="section">
+<h2 id="stretch-if-the-session-was-easy">Stretch — if the session was easy</h2>
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Count the comparisons.</strong> <code>descending(a, b, c)</code> — what is the <em>minimum</em> number of comparisons that always suffices to order three numbers? Write a version that never uses more than that, and argue (on paper) why fewer is impossible.</li>
+<li><strong>Exhaustive.</strong> Write <code>check()</code> that calls <code>classify_triangle(a, b, c)</code> for every integer triple with sides 0–10 and counts how many land in each label. What fraction are “not a triangle”? Is there any triple where your function and a friend’s disagree?</li>
+<li><strong>A function that takes a function.</strong> <code>apply_twice(f, x)</code> returns <code>f(f(x))</code>. Try it with <code>fahrenheit_to_celsius</code>. What does the result <em>mean</em>, and why is that a warning about what a function’s parameters promise?</li>
+</ol>
+
+</section>
+<section class="section">
+<h2>Code Examples</h2>
+<h3>01_repeated_code.py</h3>
+<pre><code class="language-python"># 01_repeated_code.py — the smell. Three triangles, the formula three times.
+#
+# Now the base is in centimetres and the area must be in m². Change the formula.
+# In all three places. You will miss one. That is why functions exist.
+
+b1 = float(input(&quot;Base 1: &quot;));   h1 = float(input(&quot;Height 1: &quot;))
+b2 = float(input(&quot;Base 2: &quot;));   h2 = float(input(&quot;Height 2: &quot;))
+b3 = float(input(&quot;Base 3: &quot;));   h3 = float(input(&quot;Height 3: &quot;))
+
+area1 = b1 * h1 / 2
+area2 = b2 * h2 / 2
+area3 = b3 * h3 / 2
+
+print(&quot;Areas:&quot;, area1, area2, area3)
+</code></pre>
+<h3>02_first_function.py</h3>
+<pre><code class="language-python"># 02_first_function.py — def makes the promise. Nothing runs until someone calls.
+#
+# Run this file as written: it prints NOTHING. Then, in the shell:
+#   &gt;&gt;&gt; triangle_area(10, 5)
+#   25.0
+#   &gt;&gt;&gt; a = triangle_area(3, 4)
+#   &gt;&gt;&gt; a
+#   6.0
+
+def triangle_area(base, height):
+    area = base * height / 2
+    return area
+</code></pre>
+<h3>03_return_vs_print.py</h3>
+<pre><code class="language-python"># 03_return_vs_print.py — the whole idea of the session.
+
+def area_returns(base, height):
+    return base * height / 2
+
+def area_prints(base, height):
+    print(base * height / 2)
+
+x = area_returns(10, 5)
+print(&quot;x is&quot;, x)              # x is 25.0   &lt;- the program HAS the value
+
+y = area_prints(10, 5)        # 25.0 appears on screen...
+print(&quot;y is&quot;, y)              # y is None   &lt;- ...and the program has NOTHING
+
+# Uncomment the next line to see the crash:
+# print(area_prints(10, 5) + 1)   # TypeError: unsupported operand type(s) for +: &#x27;NoneType&#x27; and &#x27;int&#x27;
+</code></pre>
+<h3>04_scope.py</h3>
+<pre><code class="language-python"># 04_scope.py — what is created inside the function dies when it returns.
+
+def triangle_area(base, height):
+    area = base * height / 2
+    return area
+
+result = triangle_area(10, 5)
+print(&quot;result:&quot;, result)      # 25.0 — it came out through return
+
+print(area)                   # NameError: name &#x27;area&#x27; is not defined
+</code></pre>
+<h3>05_main.py</h3>
+<pre><code class="language-python"># 05_main.py — the shape of every program from today on.
+#
+#   functions  : compute, return, never input(), never print
+#   main()     : reads, calls, prints
+#   last line  : main()
+
+def triangle_area(base, height):
+    return base * height / 2
+
+def main():
+    base = float(input(&quot;Base: &quot;))
+    height = float(input(&quot;Height: &quot;))
+    area = triangle_area(base, height)
+    print(&quot;Area:&quot;, area)
+
+main()
+</code></pre>
+<h3>06_speed_label.py</h3>
+<pre><code class="language-python"># 06_speed_label.py — a function that decides. One return per branch.
+#
+# Test it from the shell, no input() needed:
+#   &gt;&gt;&gt; speed_label(39.9)   &#x27;slow&#x27;
+#   &gt;&gt;&gt; speed_label(40)     &#x27;normal&#x27;
+#   &gt;&gt;&gt; speed_label(120)    &#x27;fast&#x27;
+#   &gt;&gt;&gt; speed_label(120.1)  &#x27;too fast&#x27;
+
+def speed_label(speed):
+    if speed &lt; 40:
+        return &quot;slow&quot;
+    elif speed &lt; 90:
+        return &quot;normal&quot;
+    elif speed &lt;= 120:
+        return &quot;fast&quot;
+    else:
+        return &quot;too fast&quot;
+
+def main():
+    distance_km = float(input(&quot;Distance in km: &quot;))
+    hours = float(input(&quot;Time in hours: &quot;))
+    if hours &gt; 0:
+        speed = distance_km / hours
+        print(&quot;Average speed:&quot;, speed, &quot;km/h -&gt;&quot;, speed_label(speed))
+    else:
+        print(&quot;Time must be greater than zero.&quot;)
+
+main()
+</code></pre>
+</section>
+<section class="section">
+<h2>Exercises</h2>
+<p><strong>Exercise 1 — Three functions, one <code>main</code></strong> <em>(individual, 15 min)</em></p>
+<p>Take Lab 1’s three programs and turn them into three functions in <strong>one</strong> file:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">def</span> triangle_area(base, height): ...</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">def</span> dollars_to_pesos(dollars, rate): ...</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">def</span> fahrenheit_to_celsius(f): ...</span></code></pre></div>
+<p>Each returns; none prints; none calls <code>input()</code>. Then a <code>main()</code> that reads the values for all three, calls them, and prints the three results. Tests are the same as Lab 1: <code>25.0</code>, <code>1850.0</code>, <code>100.0</code>. Save as <code>A_Matricula_f1.py</code>.</p>
+<p>Before you write <code>main</code>, test each function <strong>from the Thonny shell</strong> — run the file, then type <code>triangle_area(3, 4)</code> in the shell. If it prints <code>6.0</code>, the promise holds.</p>
+
+</div>
+<div class="exercise">
+<p class="exercise-label">Exercise 2</p>
+<p><strong>Exercise 2 — A function that decides</strong> <em>(pairs, 15 min)</em></p>
+<p>Write <code>classify_triangle(a, b, c)</code> that <strong>returns</strong> one of <code>"not a triangle"</code>, <code>"equilateral"</code>, <code>"isosceles"</code>, <code>"scalene"</code>. Three sides make a triangle only when all are positive and each pair sums to more than the third. Algorithm on paper first — the order of the checks is the algorithm.</p>
+<p>Tests, from the shell before any <code>main</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>call</th>
+<th>expected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>classify_triangle(3, 3, 3)</code></td>
+<td>equilateral</td>
+</tr>
+<tr class="even">
+<td><code>classify_triangle(3, 3, 5)</code></td>
+<td>isosceles</td>
+</tr>
+<tr class="odd">
+<td><code>classify_triangle(3, 4, 5)</code></td>
+<td>scalene</td>
+</tr>
+<tr class="even">
+<td><code>classify_triangle(1, 2, 3)</code></td>
+<td>not a triangle</td>
+</tr>
+<tr class="odd">
+<td><code>classify_triangle(0, 4, 4)</code></td>
+<td>not a triangle</td>
+</tr>
+</tbody>
+</table>
+<p>Then a <code>main()</code> that reads three sides and prints the label. Save as <code>A_Matricula_f2.py</code>.</p>
+<blockquote>
+<p>The <code>1, 2, 3</code> row is the one that catches people: 1 + 2 is not <em>greater</em> than 3. Strict inequality, and the algorithm has to say so.</p>
+</blockquote>
+
+</div>
+</section>
+<section class="section">
+<h2>After the session</h2>
+<p><strong>Homework 3 — <code>assignments/hw-03-functions.md</code>. Due Sunday 4 October, 23:59, on Canvas</strong>, together with Homework 2. It is short by design: rewrite your two Homework 2 programs as functions with a <code>main()</code>, and add one new function. The point is the refactor.</p>
+<p>Also before Tuesday:</p>
+<ol type="1">
+<li><strong>Levelling module</strong> — all ten lessons by <strong>Thursday 8 October</strong>; the final diagnostic is Friday 9 October in the lab (1 %).</li>
+<li><strong>Quick exam 2 — Tuesday 6 October, first 20 minutes:</strong> conditionals and functions. Read / predict / fix, plus one function to write. Rubric on the site.</li>
+<li><strong>Self-study: repetition statements</strong> (Canvas) — ten minutes, so <code>while</code> is not new on Tuesday.</li>
+</ol>
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
