@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stretch problems — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+  <main>
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Stretch problems</span>
+    </nav>
+    <header class="lecture-header">
+      <p class="lecture-num">Optional · ungraded · one set per lecture</p>
+      <h1>Stretch problems</h1>
+      <div class="chips">
+        <span class="chip chip-blue">if the session was easy</span>
+        <span class="chip chip-green">no grade</span>
+        <span class="chip chip-orange">bring them to asesorías</span>
+      </div>
+      <p class="lecture-objective"><strong>What these are.</strong> Every lecture ends with three problems written so that already knowing Python does not help much: proofs about the minimum number of steps, specifications with holes in them, exhaustive checks, instructions executed by a literal friend. They are not graded — the course weights are fixed by the academia — and they are not homework. The reward is the conversation: bring your answer to asesorías (Tue / Thu / Fri 16:30–17:30) or drop a photo in the week's evidence box on Canvas.</p>
+    </header>
+<p>The same problems also live at the end of each lecture page, under <em>Stretch — if the session was easy</em>. This page just collects them. New set every session.</p>
+<section class="section" id="lecture-01">
+<h2>Lecture 01 — Algorithms and Programs <span class="chip chip-blue">Week 1 · Tue 22 Sep</span></h2>
+<p><a href="lectures/at-01-algorithms-and-programs.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, and harder than they look. Bring them to asesorías or leave them in the week’s evidence box. No Python needed — none of these is a programming problem.</p>
+<ol type="1">
+<li><strong>Seven questions.</strong> I think of a whole number from 1 to 100; you may only ask questions I answer <em>yes</em> or <em>no</em>. Write the algorithm — numbered steps, no gaps — that always finds the number in <strong>seven questions or fewer</strong>. Then argue, on paper, why six can never be enough. (Count what six yes/no answers can distinguish.)</li>
+<li><strong>Euclid, executed.</strong> The oldest algorithm still in daily use: <em>to find the largest number that divides both a and b, replace the larger by the difference until both are equal.</em> Write it as INPUT / OUTPUT / steps. Execute it by hand for (48, 18) and for (1071, 462), counting the steps. Then answer the only question that matters for an algorithm: <em>why must it stop?</em></li>
+<li><strong>The literal friend.</strong> Write instructions for drawing a five-pointed star with one continuous line. Give them to someone who follows them <strong>literally</strong> and says nothing. Every point where they hesitate or draw something else is a missing line in your algorithm — write those lines. How many did you need?</li>
+</ol>
+
+</section><section class="section" id="lecture-02">
+<h2>Lecture 02 — From Algorithm to Program <span class="chip chip-blue">Week 1 · Fri 25 Sep</span></h2>
+<p><a href="lectures/at-02-program-components.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look. Bring them to asesorías or leave them in the week’s evidence box.</p>
+<ol type="1">
+<li><strong>Average without a memory.</strong> Today’s program stored three speeds and averaged them. Suppose you could only keep <em>two</em> numbers: the average so far and how many measurements went into it. Show that <code>new_avg = old_avg + (x - old_avg) / n</code> gives the same result as adding everything up, then write the three-measurement program that way and test it with the same inputs. Which version would you trust with a million measurements, and why?</li>
+<li><strong>Two averages that disagree.</strong> <code>(v1 + v2 + v3) / 3</code> and <code>(d1 + d2 + d3) / (t1 + t2 + t3)</code> are both called “average speed”. Find distances and times where they differ by a factor of more than two. Then say, in one sentence each, which one a traffic officer wants and which one the driver wants.</li>
+<li><strong>Predict, then run.</strong> Write down, <em>before</em> running anything, what Python prints for <code>7 // 2</code>, <code>-7 // 2</code>, <code>7 % -2</code>, <code>2 ** 3 ** 2</code>, <code>0.1 + 0.2 == 0.3</code>, and <code>"3" * 3</code>. Run them. For every miss, write the rule you were missing — that rule is a line in someone’s quick exam.</li>
+</ol>
+
+</section><section class="section" id="lecture-03">
+<h2>Lecture 03 — Conditionals <span class="chip chip-blue">Week 2 · Tue 29 Sep</span></h2>
+<p><a href="lectures/at-03-conditionals.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, and harder than they look. Bring them to asesorías or leave them in the week’s evidence box.</p>
+<ol type="1">
+<li><strong>No <code>if</code>.</strong> Write <code>speed_label(speed)</code> (slow / normal / fast / too fast, same thresholds as the in-class activity) <strong>without</strong> <code>if</code>, <code>elif</code>, <code>else</code> or the conditional expression. Hint: <code>True + True</code> is <code>2</code>. Then say, in one sentence, why the <code>if</code> version is still the one you should hand in.</li>
+<li><strong>The specification hunt.</strong> Take the client-status table from Friday’s lab (<em>más de $1,000,000 → Excelente</em>, …). List every input the table does <strong>not</strong> decide: the exact limits, negatives, decimals, text. That list is the algorithm’s missing lines; write them.</li>
+<li><strong>Prove the leap year.</strong> Write the condition as one boolean expression <em>and</em> as nested <code>if</code>s, and show they agree for every year from 1 to 2400. You may use anything you already know; the point is the word <em>every</em>.</li>
+</ol>
+
+</section><section class="section" id="lecture-04">
+<h2>Lecture 04 — Functions <span class="chip chip-blue">Week 2 · Fri 2 Oct</span></h2>
+<p><a href="lectures/at-04-functions.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Count the comparisons.</strong> <code>descending(a, b, c)</code> — what is the <em>minimum</em> number of comparisons that always suffices to order three numbers? Write a version that never uses more than that, and argue (on paper) why fewer is impossible.</li>
+<li><strong>Exhaustive.</strong> Write <code>check()</code> that calls <code>classify_triangle(a, b, c)</code> for every integer triple with sides 0–10 and counts how many land in each label. What fraction are “not a triangle”? Is there any triple where your function and a friend’s disagree?</li>
+<li><strong>A function that takes a function.</strong> <code>apply_twice(f, x)</code> returns <code>f(f(x))</code>. Try it with <code>fahrenheit_to_celsius</code>. What does the result <em>mean</em>, and why is that a warning about what a function’s parameters promise?</li>
+</ol>
+
+</section>
+  </main>
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+</body>
+</html>
