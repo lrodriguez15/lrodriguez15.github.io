@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 06: The while loop, in practice — one step too many, one too few — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 06: The while loop, in practice — one step too many, one too few</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 06 · Python 3</p>
+      <h1>The while loop, in practice — one step too many, one too few</h1>
+      <div class="chips">
+        <span class="chip chip-blue">python</span>
+        <span class="chip chip-green">while</span>
+        <span class="chip chip-orange">loops</span>
+        <span class="chip chip-blue">functions</span>
+        <span class="chip chip-green">off-by-one</span>
+        <span class="chip chip-orange">euclid</span>
+        <span class="chip chip-blue">random</span>
+        <span class="chip chip-green">week-03</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Write four loops inside functions, each tested from the shell at its boundary, and name the off-by-one before running.</p>
+    </header>
+
+
+
+<section class="section">
+<h2 id="overview">Overview</h2>
+<p>Tuesday gave you the loop. Today you write four of them, and every one is built around the same trap: <strong>the loop that runs once too often, or once too few.</strong> <code>6, not 5</code>. <code>55</code> becoming <code>65</code>. <code>digits(0)</code>. The spec says <em>down to 1</em> and the program prints <code>0</code>.</p>
+<p>Off-by-one is not a beginner’s bug. It is <em>the</em> bug — the one professionals still write. The cure is not care; it is a habit: <strong>before you run the loop, write down what the first turn and the last turn do.</strong> Today’s exercises are chosen so that the boundary is always where the marks are, and the shell is where you check it in four seconds.</p>
+<p>Everything is a function with a <code>main</code>. That is no longer a topic; it is the format.</p>
+</section>
+<section class="section">
+<h2 id="opener-the-shortest-job-first-10-min">Opener — The shortest job first (10 min)</h2>
+<p><em>Algorithms to Live By</em>, chapter 5, <em>Scheduling</em>. You have five things to do tonight and one evening. Which order?</p>
+<p>Put them on the slide with their durations: <em>reply to an email (5 min), HW4 (90 min), buy groceries (30 min), call home (15 min), read for Tuesday (40 min)</em>. Ask the room for an order and a reason. Someone will say “the urgent one first”; someone will say “the big one first, get it out of the way”.</p>
+<p>Then the result from 1954 (W. E. Smith): if the goal is that <strong>the sum of everyone’s waiting time is as small as possible</strong>, there is exactly one right order — <strong>Shortest Processing Time first</strong>. Do the 5, then the 15, then the 30, then the 40, then the 90. Every other order makes the total wait larger. The intuition: a long task at the front makes <em>everything behind it</em> wait; a short task at the front makes everything wait only a little.</p>
+<p>Compute it with them: SPT order gives completion times 5, 20, 50, 90, 180 — total <strong>345</strong>. Longest first: 90, 130, 160, 175, 180 — total <strong>735</strong>. Same five tasks, same evening, twice the waiting.</p>
+<p>Now look at how you <em>did</em> it: <strong>while there are tasks left: pick the shortest remaining one, do it, cross it off.</strong> A loop. With a quantity that moves toward the exit — the list gets shorter every turn. (The book’s caveat: if the tasks have <em>deadlines</em>, the rule changes to Earliest Due Date first. Different goal, different algorithm — the goal comes first.)</p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> write SPT as an algorithm. <code>INPUT:</code> a list of tasks with durations. <code>OUTPUT:</code> the order. The loop, the exit, and the one step that chooses. Keep it: in week 7 you will write it in Python, with a list.</p>
+</section>
+<section class="section">
+<h2 id="notes">Notes</h2>
+<h3 id="the-smell-revisited-what-broke-in-the-lab">The smell, revisited — what broke in the lab</h3>
+<p>Two answers from the room, no more. The ones you want: “it never stopped” (missing step, or step outside the block) and “it asked one time too many” (the test). Both are today.</p>
+<h3 id="exercise-1-countdownn-the-test">Exercise 1 — <code>countdown(n)</code> <em>(the test)</em></h3>
+<p>Open <code>01_countdown.py</code>. Spec: <em>display <code>n</code>, <code>n−1</code>, …, <code>1</code>, one per line, then <code>Liftoff!</code></em></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">def</span> countdown(n):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    <span class="cf">while</span> n <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>        <span class="bu">print</span>(n)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        n <span class="op">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Liftoff!&quot;</span>)</span></code></pre></div>
+<p>Shell: <code>countdown(3)</code> → <code>3 2 1 Liftoff!</code>. <code>countdown(1)</code> → <code>1 Liftoff!</code>. <strong><code>countdown(0)</code></strong> → just <code>Liftoff!</code> — the block ran zero times, and that is what the spec implies. Change the test to <code>n &gt;= 0</code> and <code>0</code> appears; the spec said <em>down to 1</em>. One character, one extra turn.</p>
+<p>Notice we are changing the <strong>parameter</strong> <code>n</code> inside the function. That is allowed — it is the function’s own copy (A4 on Tuesday’s exam). The caller’s variable is untouched.</p>
+<h3 id="exercise-2-digitsn-the-start">Exercise 2 — <code>digits(n)</code> <em>(the start)</em></h3>
+<p>Open <code>02_digits.py</code>. Spec: <em>return how many digits a non-negative whole number has.</em></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">def</span> digits(n):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    count <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="cf">while</span> n <span class="op">&gt;=</span> <span class="dv">10</span>:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>        n <span class="op">=</span> n <span class="op">//</span> <span class="dv">10</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        count <span class="op">=</span> count <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="cf">return</span> count</span></code></pre></div>
+<p>The step is <code>n // 10</code> — integer division drops the last digit: <code>1234 // 10</code> is <code>123</code>. Shell: <code>digits(1000)</code> → <code>4</code>, <code>digits(999)</code> → <code>3</code>, <code>digits(10)</code> → <code>2</code>, <code>digits(7)</code> → <code>1</code>.</p>
+<p>Now the start. The obvious version starts <code>count = 0</code> with <code>while n &gt; 0</code>. It gives <code>digits(0)</code> → <strong><code>0</code></strong>. Does zero have no digits? The spec says <em>non-negative</em>, so <code>0</code> is a legal input and the answer must be <code>1</code>. Starting <code>count</code> at <code>1</code> and testing <code>n &gt;= 10</code> fixes it — every number has at least one digit, and the loop counts the <em>extra</em> ones. <strong>Where the counter starts is a decision about the smallest input.</strong></p>
+<h3 id="exercise-3-playsecret-the-step-order-and-random">Exercise 3 — <code>play(secret)</code> <em>(the step order, and <code>random</code>)</em></h3>
+<p>Open <code>03_guess.py</code>. The computer picks a number 1–100; the user guesses; the program says <em>Higher</em> or <em>Lower</em>; at the end, the number of attempts.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="im">import</span> random</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">def</span> play(secret):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    attempts <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    guess <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;Guess: &quot;</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    attempts <span class="op">=</span> attempts <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="cf">while</span> guess <span class="op">!=</span> secret:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>        <span class="cf">if</span> guess <span class="op">&lt;</span> secret:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>            <span class="bu">print</span>(<span class="st">&quot;Higher.&quot;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>            <span class="bu">print</span>(<span class="st">&quot;Lower.&quot;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>        guess <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;Guess: &quot;</span>))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>        attempts <span class="op">=</span> attempts <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="cf">return</span> attempts</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="kw">def</span> main():</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    secret <span class="op">=</span> random.randint(<span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Found it in&quot;</span>, play(secret), <span class="st">&quot;attempts.&quot;</span>)</span></code></pre></div>
+<p>Three things. The <strong>sentinel idiom</strong> from Tuesday, with the “sentinel” now being <em>the right answer</em>: first <code>input()</code> before the loop, the next one last inside it. The <strong>counter</strong> goes up right after each <code>input()</code> — put it anywhere else and you are off by one (try: move <code>attempts = attempts + 1</code> above the first <code>input()</code>… and the count still works; move it <em>out</em> of the loop and it never passes 1). And <strong><code>random.randint(1, 100)</code></strong> — includes both ends. The <code>random</code> module is imported at the top; this is the self-study page’s first appearance in anger.</p>
+<p>Shell test with a <em>known</em> secret — that is why <code>play</code> takes <code>secret</code> as a parameter instead of picking it: <code>play(50)</code>, type <code>50</code> → <code>1</code>. <code>play(50)</code>, type <code>25</code>, <code>75</code>, <code>50</code> → <code>3</code>. A function you can test is a function whose randomness lives in <code>main</code>.</p>
+<p>Stretch 01 asked for an algorithm that always finds the number in seven questions. Play it that way: 50, then 25 or 75… How many did you need?</p>
+<h3 id="exercise-4-gcda-b-termination">Exercise 4 — <code>gcd(a, b)</code> <em>(termination)</em></h3>
+<p>Open <code>04_gcd.py</code>. Euclid, 300 BC — from the stretch problems of lecture 01, now as code:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">def</span> gcd(a, b):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="cf">while</span> a <span class="op">!=</span> b:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>        <span class="cf">if</span> a <span class="op">&gt;</span> b:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>            a <span class="op">=</span> a <span class="op">-</span> b</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>            b <span class="op">=</span> b <span class="op">-</span> a</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>    <span class="cf">return</span> a</span></code></pre></div>
+<p><code>gcd(48, 18)</code> → <code>6</code>: 48−18 = 30, 30−18 = 12, 18−12 = 6, 12−6 = 6, equal — stop. <code>gcd(1071, 462)</code> → <code>21</code>. <code>gcd(7, 7)</code> → <code>7</code> without entering the loop.</p>
+<p>Why does it stop? <strong>Every turn makes one of the two numbers strictly smaller, and neither can go below 1</strong> (they are positive, and we always subtract the smaller from the larger). So the sum <code>a + b</code> goes down every turn and cannot go below 2. Name the quantity, name the floor — that is a termination proof, and it is the only kind of argument that ever convinces anyone a loop ends.</p>
+<p>Now break the promise: <code>gcd(5, 0)</code>. <code>a &gt; b</code>, <code>a = 5 − 0 = 5</code>, forever. Ctrl+C. The docstring said <em>positive integers</em>; the caller lied. Whose bug is it? <strong>The caller’s</strong> — and yet in <code>main</code> <em>you</em> are the caller, so <code>main</code> must check before it calls. That is the division of labour we have had since week 2: functions compute, <code>main</code> reads, checks and prints.</p>
+<h3 id="the-gallery">The gallery</h3>
+<p>Open <code>05_off_by_one_gallery.py</code>. Four loops, each exactly one step from right. Predict all four on paper before running: (a) prints 1–4, the spec said 1–5. (b) prints <code>b</code> four times for <code>n = 3</code>. (c) gives <code>14</code> for <code>n = 4</code> — the sum should be <code>10</code>. (d) counts the <code>-1</code> and misses the first reading. For each, say which of the three places the bug is in: <strong>test, start, or step order.</strong></p>
+</section>
+<section class="section">
+<h2 id="stretch-if-the-session-was-easy">Stretch — if the session was easy</h2>
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Euclid, faster.</strong> Replace subtraction with <code>%</code>: <code>while b != 0: a, b = b, a % b</code>. Trace <code>gcd(1071, 462)</code> both ways and count the turns. Then argue why the <code>%</code> version also stops — the quantity is different. Which version would you trust with <code>gcd(10**9, 1)</code>?</li>
+<li><strong>The binary search guesser.</strong> Write <code>robot_play(secret)</code> that plays <code>play</code>’s game <em>without a human</em>: it keeps <code>low</code> and <code>high</code>, always guesses the middle, and counts attempts. Run it for every secret from 1 to 100 (a loop around a loop) and report the maximum attempts. Is it 7? Then make the range 1–1000 and predict the maximum before running.</li>
+<li><strong>Reverse, not count.</strong> <code>reverse_digits(n)</code> returns the number with its digits reversed — <code>1234 → 4321</code>, <code>1200 → 21</code>. Same loop as <code>digits</code>, with <code>% 10</code> to pull the last digit and an accumulator built with `* 10 +<code>. Then the question: for which inputs does</code>reverse_digits(reverse_digits(n)) != n`, and is that a bug or the spec?</li>
+</ol>
+
+</section>
+<section class="section">
+<h2>Code Examples</h2>
+<h3>01_countdown.py</h3>
+<pre><code class="language-python"># 01_countdown.py — &quot;display n, n-1, ..., 1, then Liftoff!&quot; Where is the off-by-one hiding?
+
+def countdown(n):
+    &quot;&quot;&quot;Display n down to 1, one per line, then Liftoff!&quot;&quot;&quot;
+    while n &gt; 0:
+        print(n)
+        n = n - 1
+    print(&quot;Liftoff!&quot;)
+
+
+def main():
+    n = int(input(&quot;Count down from: &quot;))
+    countdown(n)
+
+
+main()
+# countdown(3) -&gt; 3 2 1 Liftoff!      countdown(0) -&gt; Liftoff!      countdown(1) -&gt; 1 Liftoff!
+# Change the test to n &gt;= 0 and watch the 0 appear. The spec said &quot;down to 1&quot;.
+</code></pre>
+<h3>02_digits.py</h3>
+<pre><code class="language-python"># 02_digits.py — how many digits does a whole number have? // is the step.
+
+def digits(n):
+    &quot;&quot;&quot;Return the number of digits of a non-negative integer n.&quot;&quot;&quot;
+    count = 1                # every number has at least one digit — including 0
+    while n &gt;= 10:
+        n = n // 10          # chop off the last digit
+        count = count + 1
+    return count
+
+
+def main():
+    n = int(input(&quot;A whole number: &quot;))
+    print(&quot;Digits:&quot;, digits(n))
+
+
+main()
+# digits(0) -&gt; 1   digits(7) -&gt; 1   digits(10) -&gt; 2   digits(999) -&gt; 3   digits(1000) -&gt; 4
+# The boundary is 10: count = 0 with &quot;while n &gt; 0&quot; gives digits(0) -&gt; 0. Is 0 a number with no digits?
+</code></pre>
+<h3>03_guess.py</h3>
+<pre><code class="language-python"># 03_guess.py — the computer picks 1..100; you guess; it says higher/lower; count the attempts.
+import random
+
+
+def play(secret):
+    &quot;&quot;&quot;Ask until the user finds secret. Return the number of attempts.&quot;&quot;&quot;
+    attempts = 0
+    guess = int(input(&quot;Guess: &quot;))
+    attempts = attempts + 1
+    while guess != secret:
+        if guess &lt; secret:
+            print(&quot;Higher.&quot;)
+        else:
+            print(&quot;Lower.&quot;)
+        guess = int(input(&quot;Guess: &quot;))
+        attempts = attempts + 1
+    return attempts
+
+
+def main():
+    secret = random.randint(1, 100)
+    attempts = play(secret)
+    print(&quot;Found it in&quot;, attempts, &quot;attempts.&quot;)
+
+
+main()
+# Shell test with a known secret: play(50) and type 50 -&gt; 1.  play(50), type 25, 75, 50 -&gt; 3.
+# Stretch 01 said seven questions always suffice. How many did you need?
+</code></pre>
+<h3>04_gcd.py</h3>
+<pre><code class="language-python"># 04_gcd.py — Euclid, the oldest algorithm in daily use (stretch problem, lecture 01), as a loop.
+
+def gcd(a, b):
+    &quot;&quot;&quot;Greatest common divisor of two positive integers, by repeated subtraction.&quot;&quot;&quot;
+    while a != b:
+        if a &gt; b:
+            a = a - b
+        else:
+            b = b - a
+    return a
+
+
+def main():
+    a = int(input(&quot;First number: &quot;))
+    b = int(input(&quot;Second number: &quot;))
+    print(&quot;GCD:&quot;, gcd(a, b))
+
+
+main()
+# gcd(48, 18) -&gt; 6     gcd(1071, 462) -&gt; 21     gcd(7, 7) -&gt; 7     gcd(1, 100) -&gt; 1
+# Why must it stop? Every turn makes one of the two numbers smaller, and neither can go below 1.
+# Try gcd(5, 0) ... and keep Ctrl+C ready. The spec said POSITIVE integers.
+</code></pre>
+<h3>05_off_by_one_gallery.py</h3>
+<pre><code class="language-python"># 05_off_by_one_gallery.py — four loops that are each one step away from right. Predict first.
+
+# (a) &quot;the numbers from 1 to n&quot;            (b) &quot;n times&quot;
+i = 1                                     # k = 0
+while i &lt; 5:                              # while k &lt;= 3:
+    print(&quot;a&quot;, i)                         #     print(&quot;b&quot;)
+    i = i + 1                             #     k = k + 1
+                                          # how many b&#x27;s?  the spec said n = 3 times
+
+# (c) &quot;the sum of 1..n&quot;, step before add  (d) &quot;read until -1, count the readings&quot;
+n = 4                                     # count = 0
+total = 0                                 # x = int(input())
+j = 1                                     # while x != -1:
+while j &lt;= n:                             #     x = int(input())
+    j = j + 1                             #     count = count + 1
+    total = total + j                     # print(count)      -- counts the -1, misses the first
+print(&quot;c&quot;, total)                         #
+</code></pre>
+</section>
+<section class="section">
+<h2>Exercises</h2>
+<p><strong>In class — the four, as files</strong> <em>(individual, from 18:05; whatever is not finished becomes homework for your own benefit, not for Canvas)</em></p>
+<p>Each exercise is <strong>one function and a <code>main</code></strong>, in the exam format, algorithm on paper first. Shell tests written under the algorithm before you run <code>main()</code>.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Function</th>
+<th>Shell tests you must write down</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>A_Matricula_w1.py</code></td>
+<td><code>countdown(n)</code></td>
+<td><code>countdown(3)</code>, <code>countdown(1)</code>, <code>countdown(0)</code></td>
+</tr>
+<tr class="even">
+<td><code>A_Matricula_w2.py</code></td>
+<td><code>digits(n)</code> → number of digits</td>
+<td><code>digits(0)</code> → 1 · <code>digits(7)</code> → 1 · <code>digits(10)</code> → 2 · <code>digits(1000)</code> → 4</td>
+</tr>
+<tr class="odd">
+<td><code>A_Matricula_w3.py</code></td>
+<td><code>play(secret)</code> → attempts; <code>main</code> picks the secret with <code>random.randint(1, 100)</code></td>
+<td><code>play(50)</code> typing <code>50</code> → 1; typing <code>25 75 50</code> → 3</td>
+</tr>
+<tr class="even">
+<td><code>A_Matricula_w4.py</code></td>
+<td><code>gcd(a, b)</code> by subtraction; <code>main</code> refuses non-positive input with <code>Both numbers must be positive.</code></td>
+<td><code>gcd(48, 18)</code> → 6 · <code>gcd(1071, 462)</code> → 21 · <code>gcd(7, 7)</code> → 7; <code>main</code> with <code>5 0</code> → the message</td>
+</tr>
+</tbody>
+</table>
+<p>Photograph the algorithms and upload them with the four <code>.py</code> files to the <strong>Week 3 evidence box</strong> (not graded, but it is your record, and I read it). Finished all four? Make <code>play</code> tell the user how far from seven they were.</p>
+
+</div>
+</section>
+<section class="section">
+<h2>After the session</h2>
+<p><strong>Homework 4 — <code>assignments/hw-04-while.md</code>. Due Sunday 11 October, 23:59, on Canvas.</strong> One file, <code>A_Matricula_hw4.py</code>: <code>collatz_steps(n)</code> and <code>reverse_digits(n)</code> plus a <code>main</code> menu, shell tests written down, algorithm on paper. Both loops need a termination sentence.</p>
+<p>Also before Tuesday:</p>
+<ol type="1">
+<li><strong>Lab 3 files</strong> — <code>C1_matricula.py</code>, <code>C2_matricula.py</code> + the photo of your algorithms → Canvas → <em>Laboratory 3</em>, <strong>Sunday 11 October, 23:59</strong>.</li>
+<li><strong>Quick exam 3 — Tuesday 13 October, first 20 minutes:</strong> the <code>while</code> loop. Read / predict / fix on today’s gallery, and one loop to write as a function. Rubric on the site.</li>
+<li><strong>Self-study: counter-controlled repetition</strong> (Canvas, Week 4) — ten minutes, so <code>for</code> on Tuesday is a word you have seen.</li>
+<li>The levelling module is closed. If you did not finish, the final diagnostic today was your last word on it; the course moves on.</li>
+</ol>
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

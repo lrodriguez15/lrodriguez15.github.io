@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 05: The while loop — the program that insists — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 05: The while loop — the program that insists</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 05 · Python 3</p>
+      <h1>The while loop — the program that insists</h1>
+      <div class="chips">
+        <span class="chip chip-blue">python</span>
+        <span class="chip chip-green">while</span>
+        <span class="chip chip-orange">loops</span>
+        <span class="chip chip-blue">sentinel</span>
+        <span class="chip chip-green">accumulator</span>
+        <span class="chip chip-orange">termination</span>
+        <span class="chip chip-blue">week-03</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Write a loop that repeats while a condition holds, name the line that makes it stop, and prove it does.</p>
+    </header>
+
+
+
+<section class="section">
+<h2 id="overview">Overview</h2>
+<p>Quick exam 2 takes the first twenty minutes. Then the program learns to <strong>insist</strong>.</p>
+<p>Part C of the exam you just sat said: <em>if the consumption is negative, display a message and stop.</em> Stop? A real program does not stop. It says “try again” — and keeps saying it until the answer is acceptable. That is one line of Python we did not have until today, and it is the whole lecture.</p>
+<p>One idea: <strong><code>while</code> runs a block again and again, for as long as its condition is <code>True</code>.</strong> Everything else — counting, adding up, reading until a sentinel, the loop that never ends — is that idea with a different condition. The skill is not writing the loop. The skill is knowing, before you run it, <strong>which line makes it stop</strong>.</p>
+</section>
+<section class="section">
+<h2 id="opener-why-the-internet-does-not-collapse-10-min">Opener — Why the internet does not collapse (10 min)</h2>
+<p><em>Algorithms to Live By</em>, chapter 10, <em>Networking</em>. Thirty laptops in this room share one Wi-Fi channel. Two of them send at the same instant — the signals collide and both messages are garbage. What should a laptop do when its message collides?</p>
+<p>Take three answers. “Send it again immediately” — both laptops do that, they collide again, forever. “Wait a bit” — how long? If everyone waits the same fixed time they collide again on schedule. The answer that has run every Ethernet and Wi-Fi network since 1973 is <strong>exponential backoff</strong>:</p>
+<blockquote>
+<p>After the first collision, wait a random time between 0 and 1 slot. After the second, between 0 and 3. Then 0 to 7, 0 to 15 — <strong>doubling the range every time</strong>. Give up after 16 tries.</p>
+</blockquote>
+<p>Three things make it an algorithm worth stealing. It <strong>repeats while</strong> a condition holds (the message is not through yet). It has a <strong>step</strong> that changes every repetition (the waiting range doubles). And it has an <strong>exit you can prove</strong>: either the message gets through or the counter reaches 16 — nothing can keep it running forever. The book’s point is that the same shape is how you should treat a friend who cancels: don’t cut them off at the first miss, don’t tolerate forever — double the gap each time.</p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> write <em>send with backoff</em> in our notation. <code>INPUT:</code> (the message), <code>OUTPUT:</code> (sent, or gave up), numbered steps. You will need a counter for the attempts and a variable for the waiting range. <strong>Circle the step that decides whether to go round again.</strong> Then the pivot, out loud: <em>that circled step is the only new word Python learns today.</em></p>
+</section>
+<section class="section">
+<h2 id="notes">Notes</h2>
+<h3 id="the-line-we-could-not-write">The line we could not write</h3>
+<p>Open <code>01_ask_again.py</code>. On the exam, a negative consumption got a message and the program ended. Now:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>cubic_meters <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Consumption (m3): &quot;</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="cf">while</span> cubic_meters <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Consumption cannot be negative. Try again.&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    cubic_meters <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Consumption (m3): &quot;</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;Thank you. Billing&quot;</span>, cubic_meters, <span class="st">&quot;m3.&quot;</span>)</span></code></pre></div>
+<p>Run it; type <code>-3</code>, <code>-1</code>, <code>12</code>. Read the new word out loud: <strong>while</strong> the consumption is negative, do this block. Not <em>if</em> — <em>while</em>. The difference between the two keywords is one arrow: after the block, <code>while</code> <strong>goes back to the test</strong>. <code>if</code> goes on.</p>
+<p>Everything you know about conditions from last week transfers unchanged: it is an expression with a <code>True</code>/<code>False</code> value, <code>==</code> compares, the block is what is indented.</p>
+<h3 id="start-test-step">Start, test, step</h3>
+<p>Open <code>02_count_to_five.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>count <span class="op">=</span> <span class="dv">1</span>                 <span class="co"># start</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="cf">while</span> count <span class="op">&lt;=</span> <span class="dv">5</span>:         <span class="co"># test</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="bu">print</span>(count)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    count <span class="op">=</span> count <span class="op">+</span> <span class="dv">1</span>     <span class="co"># step</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;Done. count is now&quot;</span>, count)</span></code></pre></div>
+<p>Predict the last line before running. Most of the room says <code>5</code>. It prints <strong><code>6</code></strong>: the loop ends when the test <em>fails</em>, and the test fails when <code>count</code> has already become 6. The variable you count with is always one step past the last thing you printed. Remember this on Friday — it is where half of all off-by-one bugs come from.</p>
+<p>Three parts, always: <strong>start</strong> (the variable exists and has a value <em>before</em> the <code>while</code>), <strong>test</strong> (the condition on the <code>while</code> line), <strong>step</strong> (the line inside the block that changes the variable the test looks at). Find all three in <code>01_ask_again.py</code>. The step is the <code>input()</code> — the user supplies the change.</p>
+<h3 id="reading-until-a-sentinel">Reading until a sentinel</h3>
+<p>Open <code>03_sentinel_average.py</code>. Week 1’s problem — the average speed — with the number of measurements unknown:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>speed <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Speed (0 to finish): &quot;</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="cf">while</span> speed <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    total <span class="op">=</span> total <span class="op">+</span> speed</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    count <span class="op">=</span> count <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    speed <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Speed (0 to finish): &quot;</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="cf">if</span> count <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Measurements:&quot;</span>, count, <span class="st">&quot;Average:&quot;</span>, total <span class="op">/</span> count)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="cf">else</span>:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;No measurements.&quot;</span>)</span></code></pre></div>
+<p>Run with <code>100</code>, <code>90</code>, <code>140</code>, <code>0</code> → <code>3</code> measurements, average <code>110.0</code>. The <code>0</code> is the <strong>sentinel</strong>: a value the user types to say <em>I am done</em>, and which therefore cannot be a real measurement. Notice the shape — the first <code>input()</code> is <em>before</em> the loop, the next one is the <em>last line inside</em> it. That is the sentinel idiom; copy it exactly until it is a reflex.</p>
+<p>Two more things to see. <code>total</code> and <code>count</code> start at <code>0</code> before the loop and grow by one step per turn — that is the <strong>accumulator pattern</strong>, and you will write it a hundred times. And the <code>if count &gt; 0</code> after the loop: the user may type <code>0</code> first. A <code>while</code> block can run <strong>zero times</strong>, and <code>total / count</code> would then be <code>0 / 0</code>. The margin note from week 1 has come back, and this time you know what to do with it.</p>
+<h3 id="the-loop-that-never-ends">The loop that never ends</h3>
+<p>Open <code>04_forever.py</code>. Read it before running — then run it, and press <strong>Ctrl+C</strong> when you have seen enough:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>n <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="cf">while</span> n <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;n is&quot;</span>, n)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="co"># n = n - 1</span></span></code></pre></div>
+<p>The test looks at <code>n</code>. Nothing inside the block changes <code>n</code>. So the test gives the same answer forever. This is the only kind of bug in this course that does not produce an error message and does not produce wrong output — it produces <em>no end</em>. Thonny’s stop button, or Ctrl+C in a shell, is how you get out. Every one of you will write one this week. That is fine; what matters is recognising it in two seconds: <strong>find the test, find the step, see that the step is missing.</strong></p>
+<p>Now the positive version. How do you <em>know</em> a loop stops? Name the quantity that moves toward the exit on every single repetition. In <code>02</code>, <code>count</code> goes up by one toward 6. In <code>03</code>, every turn consumes one of the user’s finite patience — the user <em>will</em> type 0. In the backoff algorithm, the attempt counter goes up toward 16. If you cannot name the quantity, you do not know your loop stops — you are hoping.</p>
+<h3 id="counting-with-while-and-the-step-order">Counting with <code>while</code> — and the step order</h3>
+<p>Open <code>05_sum_to_n.py</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="language-python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>n <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;Add 1 to what number? &quot;</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="cf">while</span> i <span class="op">&lt;=</span> n:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>    total <span class="op">=</span> total <span class="op">+</span> i</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>    i <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;1 + ... +&quot;</span>, n, <span class="st">&quot;=&quot;</span>, total)</span></code></pre></div>
+<p><code>10</code> → <code>55</code>. <code>1</code> → <code>1</code>. <code>0</code> → <code>0</code> — the block never runs, and that is correct. <code>-3</code> → <code>0</code> too; is <em>that</em> correct? (Specification question. The program is fine; the spec did not say.)</p>
+<p>Now swap the two lines inside the block — step first, then add. Predict, then run <code>10</code>. You get <code>65</code>: <code>i</code> was already 2 when it was first added, and 11 was added at the end. <strong>The order of the step inside the block changes what the loop does.</strong> This is the second source of off-by-one bugs, and Friday is built around it.</p>
+<h3 id="three-accumulators-at-once">Three accumulators at once</h3>
+<p>Open <code>06_max_so_far.py</code> — the same loop as <code>03</code>, now with a maximum and an ignored-negative branch:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="language-python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>maximum <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>...</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="cf">if</span> speed <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;Negative speed ignored.&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>        total <span class="op">=</span> total <span class="op">+</span> speed</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>        count <span class="op">=</span> count <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>        <span class="cf">if</span> maximum <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> speed <span class="op">&gt;</span> maximum:</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>            maximum <span class="op">=</span> speed</span></code></pre></div>
+<p><code>maximum = None</code> says <em>no maximum yet</em>. The first real speed becomes the maximum; after that, only a bigger one replaces it. Read the <code>or</code>: if there is no maximum yet, take this one; else compare. <code>100 -5 140 90 0</code> → count 3, average 110.0, max 140.0.</p>
+<p>Last week’s <code>if</code> lives <em>inside</em> this week’s <code>while</code>, four spaces deeper. Blocks nest. Read the indentation, not your intention.</p>
+<h3 id="a-loop-inside-a-function">A loop inside a function</h3>
+<p>Open <code>07_positive_sum_function.py</code> — Friday’s lab shape, exactly:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="language-python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">def</span> positive_sum(how_many):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>    total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    asked <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    <span class="cf">while</span> asked <span class="op">&lt;</span> how_many:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>        value <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Number: &quot;</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>        <span class="cf">if</span> value <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>            total <span class="op">=</span> total <span class="op">+</span> value</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>        asked <span class="op">=</span> asked <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>    <span class="cf">return</span> total</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="kw">def</span> main():</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>    how_many <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;How many numbers? &quot;</span>))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>    <span class="bu">print</span>(<span class="st">&quot;Sum of the positive ones:&quot;</span>, positive_sum(how_many))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>main()</span></code></pre></div>
+<p>Nothing new, and that is the point: a <code>while</code> inside a <code>def</code> works exactly like an <code>if</code> inside a <code>def</code>. The function returns, <code>main</code> prints. The <code>input()</code> <em>inside</em> the function is the academia’s design for this one (the function asks for its own numbers) — we accept it here because the lab says so, but notice the cost: <code>positive_sum(3)</code> cannot be tested from the shell without typing three numbers. On Friday we talk about whether that is a price worth paying.</p>
+<p>Shell checks after running: <code>positive_sum(0)</code> → <code>0</code> <strong>without asking anything</strong> — the block ran zero times. That is the test that catches <code>while asked &lt;= how_many</code>.</p>
+<h3 id="failure-first-three-loops-that-run-and-are-wrong">Failure-first: three loops that run and are wrong</h3>
+<p>Open <code>08_three_bugs.py</code>. Predict each before running; keep Ctrl+C ready.</p>
+<ol type="1">
+<li><strong>The step outside the block.</strong> <code>i = i + 1</code> at the margin, not indented: it belongs to the program, not to the loop. The loop prints <code>A 1</code> forever. Indentation <em>is</em> the block — week 2’s rule, now with consequences you can watch.</li>
+<li><strong>Off by one.</strong> <code>i = 0 · while i &lt; 5 · i = i + 1 · print(i)</code> prints 1 to 5. Move the print above the step and it prints 0 to 4. Same five lines, different program. Which one did the specification ask for? <em>Read the spec.</em></li>
+<li><strong>The sentinel is also data.</strong> If <code>0</code> ends the loop, nobody can enter a real <code>0</code>. Choose a sentinel outside the data’s range — <code>-1</code> for speeds — or the design is wrong before a single line of Python exists.</li>
+</ol>
+</section>
+<section class="section">
+<h2 id="stretch-if-the-session-was-easy">Stretch — if the session was easy</h2>
+<p>Optional, ungraded, harder than they look. Bring them to asesorías or leave them in the week’s evidence box.</p>
+<ol type="1">
+<li><strong>Prove it stops.</strong> For each of <code>02</code>, <code>03</code>, <code>05</code> and <code>07</code>, write the one quantity that moves toward the exit on every repetition, and the value at which the loop ends. Then write a loop whose test <em>does</em> change every turn and which still never ends. (Hint: a variable that alternates.) Say why your termination argument fails for it.</li>
+<li><strong>Backoff, in Python.</strong> Implement the opener: <code>attempts</code> from 1 to 16, a waiting range that doubles (<code>limit = limit * 2</code>), and <code>random.randint(0, limit)</code> as the wait. Decide “sent” with <code>random.random() &lt; 0.3</code>. Print each attempt. Run it ten times: what is the largest number of attempts you saw, and what is the largest wait? Then answer: why <em>random</em>, and not just “double the wait”?</li>
+<li><strong>The 65.</strong> In <code>05_sum_to_n.py</code>, swapping the two lines in the block turns <code>55</code> into <code>65</code> for <code>n = 10</code>. Without running, write the formula for the wrong answer as a function of <code>n</code>, and check it for <code>n = 1</code>, <code>2</code>, <code>3</code>. Then design one test value that distinguishes the two programs <em>and</em> would have caught the bug in a program that only printed the final sum.</li>
+</ol>
+
+</section>
+<section class="section">
+<h2>Code Examples</h2>
+<h3>01_ask_again.py</h3>
+<pre><code class="language-python"># 01_ask_again.py — the line we could not write on Tuesday&#x27;s exam.
+# QE2 part C said: if the consumption is negative, display a message and stop.
+# Today: do not stop. Ask again, until the answer is acceptable.
+
+cubic_meters = float(input(&quot;Consumption (m3): &quot;))
+while cubic_meters &lt; 0:
+    print(&quot;Consumption cannot be negative. Try again.&quot;)
+    cubic_meters = float(input(&quot;Consumption (m3): &quot;))
+
+print(&quot;Thank you. Billing&quot;, cubic_meters, &quot;m3.&quot;)
+</code></pre>
+<h3>02_count_to_five.py</h3>
+<pre><code class="language-python"># 02_count_to_five.py — the three parts of every loop: start, test, step.
+
+count = 1                 # start
+while count &lt;= 5:         # test — checked BEFORE every repetition, including the first
+    print(count)
+    count = count + 1     # step — without it, the test never changes
+print(&quot;Done. count is now&quot;, count)   # 6, not 5 — the test failed once to stop the loop
+</code></pre>
+<h3>03_sentinel_average.py</h3>
+<pre><code class="language-python"># 03_sentinel_average.py — read speeds until the user types 0. Then the average.
+# 0 is the SENTINEL: a value that cannot be a real measurement, used to say &quot;stop&quot;.
+
+total = 0
+count = 0
+speed = float(input(&quot;Speed (0 to finish): &quot;))
+while speed != 0:
+    total = total + speed
+    count = count + 1
+    speed = float(input(&quot;Speed (0 to finish): &quot;))
+
+if count &gt; 0:
+    print(&quot;Measurements:&quot;, count, &quot;Average:&quot;, total / count)
+else:
+    print(&quot;No measurements.&quot;)
+</code></pre>
+<h3>04_forever.py</h3>
+<pre><code class="language-python"># 04_forever.py — the loop that never ends. Run it; then press Ctrl+C.
+# Nothing inside the block changes the value the test looks at.
+
+n = 10
+while n &gt; 0:
+    print(&quot;n is&quot;, n)
+    # n = n - 1        &lt;- the missing step. Un-comment it and the loop ends in 10 turns.
+</code></pre>
+<h3>05_sum_to_n.py</h3>
+<pre><code class="language-python"># 05_sum_to_n.py — a counting loop: we know how many times. (Next week: `for`.)
+
+n = int(input(&quot;Add 1 to what number? &quot;))
+total = 0
+i = 1
+while i &lt;= n:
+    total = total + i
+    i = i + 1
+print(&quot;1 + ... +&quot;, n, &quot;=&quot;, total)
+# Try 10 -&gt; 55. Try 1 -&gt; 1. Try 0 -&gt; 0 (the block never runs). Try -3 -&gt; 0 too. Is that right?
+</code></pre>
+<h3>06_max_so_far.py</h3>
+<pre><code class="language-python"># 06_max_so_far.py — the accumulator pattern, three times over: total, count, maximum.
+
+total = 0
+count = 0
+maximum = None            # &quot;no maximum yet&quot; — the first speed will become it
+
+speed = float(input(&quot;Speed (0 to finish): &quot;))
+while speed != 0:
+    if speed &lt; 0:
+        print(&quot;Negative speed ignored.&quot;)
+    else:
+        total = total + speed
+        count = count + 1
+        if maximum is None or speed &gt; maximum:
+            maximum = speed
+    speed = float(input(&quot;Speed (0 to finish): &quot;))
+
+if count &gt; 0:
+    print(&quot;Count:&quot;, count, &quot;Average:&quot;, total / count, &quot;Max:&quot;, maximum)
+else:
+    print(&quot;No measurements.&quot;)
+</code></pre>
+<h3>07_positive_sum_function.py</h3>
+<pre><code class="language-python"># 07_positive_sum_function.py — a loop inside a function, with a main. Friday&#x27;s lab shape.
+
+def positive_sum(how_many):
+    &quot;&quot;&quot;Ask for how_many numbers; add only the positive ones; return the sum.&quot;&quot;&quot;
+    total = 0
+    asked = 0
+    while asked &lt; how_many:
+        value = float(input(&quot;Number: &quot;))
+        if value &gt; 0:
+            total = total + value
+        asked = asked + 1
+    return total
+
+
+def main():
+    how_many = int(input(&quot;How many numbers? &quot;))
+    print(&quot;Sum of the positive ones:&quot;, positive_sum(how_many))
+
+
+main()
+# Shell tests after running: positive_sum(0) -&gt; 0.0 without asking anything.
+# positive_sum(3) with 5, -2, 7 -&gt; 12.0
+</code></pre>
+<h3>08_three_bugs.py</h3>
+<pre><code class="language-python"># 08_three_bugs.py — three loops that run, and are wrong. Predict, then run (Ctrl+C ready).
+
+# Bug 1 — the step is outside the block (indentation), so it runs once, after the loop... never.
+i = 1
+while i &lt;= 3:
+    print(&quot;A&quot;, i)
+i = i + 1        # &lt;- look at the indentation
+
+# Bug 2 — off by one: prints 0..4 or 1..5? The spec said &quot;the numbers 1 to 5&quot;.
+# i = 0
+# while i &lt; 5:
+#     i = i + 1
+#     print(&quot;B&quot;, i)     # move this line above the step and see what changes
+
+# Bug 3 — the sentinel is also data: a user whose real measurement is 0 cannot enter it.
+# speed = float(input(&quot;Speed (0 to finish): &quot;))
+# while speed != 0: ...
+</code></pre>
+</section>
+<section class="section">
+<h2>Exercises</h2>
+<p><strong>In-class activity 2 — Speeds, until you stop</strong> <em>(individual, 20 min, graded — the second of the four in-class activities, 4 % of the course)</em></p>
+<p>Week 1’s average, week 2’s checks, today’s loop. One program.</p>
+<ol type="1">
+<li>Read speeds (km/h) from the user, one at a time, <strong>until the user enters 0</strong>.</li>
+<li>A <strong>negative</strong> speed is not a measurement: display <code>Negative speed ignored.</code> and keep going.</li>
+<li>When the user enters 0, display: how many measurements were taken, the <strong>average</strong> speed and the <strong>maximum</strong> speed.</li>
+<li>If <strong>no</strong> measurements were taken, display <code>No measurements.</code> and nothing else.</li>
+</ol>
+<p><strong>Algorithm first, on paper</strong> — <code>INPUT:</code>, <code>OUTPUT:</code>, numbered steps, with the <code>WHILE</code> line and its <code>IF</code> lines written out. <strong>Circle the step that makes the loop stop.</strong> Then the program in the exam format (name in a <code>#</code> comment on line 1, algorithm in <code>"""</code>). Then the tests, under the algorithm:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>you type</th>
+<th>expected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>100</code> <code>90</code> <code>140</code> <code>0</code></td>
+<td>3 measurements · average 110.0 · maximum 140.0</td>
+</tr>
+<tr class="even">
+<td><code>0</code></td>
+<td>No measurements.</td>
+</tr>
+<tr class="odd">
+<td><code>-5</code> <code>60</code> <code>0</code></td>
+<td>Negative speed ignored. · 1 measurement · average 60.0 · maximum 60.0</td>
+</tr>
+<tr class="even">
+<td><code>80</code> <code>80</code> <code>0</code></td>
+<td>2 measurements · average 80.0 · maximum 80.0</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>0</code>-first row is the one that catches <code>total / count</code>. The <code>80 80</code> row catches a maximum written with <code>&gt;=</code> <em>and</em> with <code>&gt;</code> — both are right, and you should be able to say why.</p>
+<p><strong>Submit:</strong> photo of the algorithm + <code>A_Matricula_ic2.py</code> → Canvas → <em>In-class activity 2: while loops — speeds, until you stop</em> — by <strong>Sunday 11 October, 23:59</strong>, but the work happens now, in the room.</p>
+<blockquote>
+<p>Rubric: algorithm with input/output, the <code>WHILE</code> and its <code>IF</code>s stated, and the stopping step circled 40 % · program runs and passes all four tests 40 % · the zero-measurements case and the ignored negative handled on purpose 20 %.</p>
+</blockquote>
+<p><strong>Finished early?</strong> Make <code>0</code> a valid measurement by choosing a different sentinel — and write, in one sentence under the algorithm, why your new sentinel can never be real data.</p>
+
+</div>
+</section>
+<section class="section">
+<h2>After the session</h2>
+<p><strong>Homework 4 — <code>assignments/hw-04-while.md</code>. Due Sunday 11 October, 23:59, on Canvas.</strong> One file, two functions and a <code>main</code>: the Collatz count and the digit reversal. Both are <code>while</code> loops whose exit you must be able to prove. Algorithm on paper, shell tests written down.</p>
+<p>Also before Friday:</p>
+<ol type="1">
+<li><strong>Levelling module — all ten lessons by Thursday 8 October, 23:59.</strong> The module closes. The <strong>final diagnostic (1 %) is Friday 9 October, 16:30, in the lab</strong> — first twenty minutes, bring the laptop. Lessons 9 and 10 (<em>Flowcharts with repetitions</em>, <em>Problem solving</em>) are today’s lecture drawn as diamonds and arrows; do them tonight.</li>
+<li><strong>Lab 3 — Friday 16:30</strong>, with Luis: the final diagnostic, then the academia’s <code>while</code> lab (two functions with loops — <code>C1_matricula.py</code>, <code>C2_matricula.py</code>). Same lab as every group.</li>
+<li><strong>Friday’s session: four exercises plus <code>main</code>, all loops, all with the off-by-one lurking.</strong> Reread <em>Start, test, step</em> before you come.</li>
+<li><strong>Quick exam 3 is Tuesday 13 October</strong>, first 20 minutes: the <code>while</code> loop. Read / predict / fix, and one loop to write.</li>
+</ol>
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

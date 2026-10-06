@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exams &amp; rubrics — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+  <main>
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Exams &amp; rubrics</span>
+    </nav>
+    <header class="lecture-header">
+      <p class="lecture-num">Quick exams · 12 % of the course · five, Tuesdays, first 20 minutes</p>
+      <h1>Exams &amp; rubrics</h1>
+      <div class="chips">
+        <span class="chip chip-blue">Respondus LockDown Browser</span>
+        <span class="chip chip-green">Trinket for the code part</span>
+        <span class="chip chip-orange">no Thonny · no Macs</span>
+      </div>
+      <p class="lecture-objective"><strong>The shape never changes.</strong> 15 points of <em>read and predict</em> — five short programs, you say what they print or where they break. 5 points for one exact output. 80 points for one problem: the algorithm first (30), then the program that implements it (50). Every rubric is published here before the exam; nothing about how you are graded is a surprise.</p>
+    </header>
+<p>Quick exams cover the <strong>previous week</strong>. The midterm (Fri 23 Oct) and the final (Tue 1 Dec) follow the academia's format and are described in Canvas.</p>
+<section class="section"><h2 id="quick-exam-1-algorithms-operators-and-calculations">Quick exam 1 — Algorithms, operators and calculations</h2>
+<p><strong>Tuesday 29 September 2026, 17:35–17:55</strong> · 20 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted. No Macs.</p>
+<p>Covers: <code>01-algorithms-and-programs, 02-program-components</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th style="text-align: right;">Points</th>
+<th>What earns them</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A1–A5</td>
+<td style="text-align: right;">3 each</td>
+<td>Correct choice. No partial credit.</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td style="text-align: right;">5</td>
+<td>Correct value <strong>with</strong> the intermediate step shown. Correct value alone: 3. Intermediate step correct but final arithmetic wrong: 2.</td>
+</tr>
+<tr class="odd">
+<td>C1 algorithm</td>
+<td style="text-align: right;">30</td>
+<td><code>INPUT:</code>/<code>OUTPUT:</code> lines present and correct (10). Numbered steps that compute <em>s</em> before <em>A</em> (10). Every step is a single, unambiguous action a hostile reader could execute (10).</td>
+</tr>
+<tr class="even">
+<td>C2 program</td>
+<td style="text-align: right;">50</td>
+<td>Runs without error on <code>3 4 5</code> (15). Prints <code>6.0</code> or <code>6</code> (15). Inputs converted with <code>float()</code> (10). Implements <em>the algorithm written in C1</em>, not a different one (10).</td>
+</tr>
+<tr class="odd">
+<td>Technical requirements</td>
+<td style="text-align: right;">−2 each</td>
+<td>Name comment · algorithm in multi-line comment · meaningful names · input prompts · labelled output</td>
+</tr>
+</tbody>
+</table>
+<p>A program with no algorithm above it scores <strong>at most 50</strong> — C1 is zero, C2 is graded. An algorithm with no program scores at most 50 the other way. Both halves are the exam.</p>
+</section><section class="section"><h2 id="quick-exam-2-conditionals-and-functions">Quick exam 2 — Conditionals and functions</h2>
+<p><strong>Tuesday 6 October 2026, 17:35–17:55</strong> · 20 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted. No Macs (paper copy).</p>
+<p>Covers: <code>03-conditionals, 04-functions</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th style="text-align: right;">Points</th>
+<th>What earns them</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A1–A5</td>
+<td style="text-align: right;">3 each</td>
+<td>Correct choice. No partial credit.</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td style="text-align: right;">5</td>
+<td><code>23</code>. Nothing else.</td>
+</tr>
+<tr class="odd">
+<td>C1 algorithm</td>
+<td style="text-align: right;">30</td>
+<td><code>INPUT:</code>/<code>OUTPUT:</code> lines present and correct (8). Three tiers as <code>IF</code> lines with the boundaries on the right side — 10 and 30 belong to the lower tier (12). The negative check in <code>main</code>, before the function is used (5). Function steps and <code>main</code> steps clearly separate (5).</td>
+</tr>
+<tr class="even">
+<td>C2 program</td>
+<td style="text-align: right;">50</td>
+<td><code>water_bill</code> returns the right value on the four checks (5 each → 20). No <code>input()</code>/<code>print()</code> inside the function (10). <code>main()</code> reads, rejects negatives with the exact message, otherwise prints the bill; file ends with <code>main()</code> (10). Implements <em>the algorithm written in C1</em>, not a different one (10).</td>
+</tr>
+<tr class="odd">
+<td>Technical requirements</td>
+<td style="text-align: right;">−2 each</td>
+<td>Name comment · algorithm in multi-line comment · meaningful names · input prompt · labelled output</td>
+</tr>
+</tbody>
+</table>
+<p>A program that prints the right numbers from inside <code>water_bill</code> instead of returning them earns the 20 for values and loses the 10 for shape — that is the lesson of Friday’s session, and it is worth exactly what it says.</p>
+</section>
+  </main>
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+</body>
+</html>

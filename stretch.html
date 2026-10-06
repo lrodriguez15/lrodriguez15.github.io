@@ -79,6 +79,28 @@
 <li><strong>A function that takes a function.</strong> <code>apply_twice(f, x)</code> returns <code>f(f(x))</code>. Try it with <code>fahrenheit_to_celsius</code>. What does the result <em>mean</em>, and why is that a warning about what a function’s parameters promise?</li>
 </ol>
 
+</section><section class="section" id="lecture-05">
+<h2>Lecture 05 — The while loop <span class="chip chip-blue">Week 3 · Tue 6 Oct</span></h2>
+<p><a href="lectures/at-05-while-loop.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look. Bring them to asesorías or leave them in the week’s evidence box.</p>
+<ol type="1">
+<li><strong>Prove it stops.</strong> For each of <code>02</code>, <code>03</code>, <code>05</code> and <code>07</code>, write the one quantity that moves toward the exit on every repetition, and the value at which the loop ends. Then write a loop whose test <em>does</em> change every turn and which still never ends. (Hint: a variable that alternates.) Say why your termination argument fails for it.</li>
+<li><strong>Backoff, in Python.</strong> Implement the opener: <code>attempts</code> from 1 to 16, a waiting range that doubles (<code>limit = limit * 2</code>), and <code>random.randint(0, limit)</code> as the wait. Decide “sent” with <code>random.random() &lt; 0.3</code>. Print each attempt. Run it ten times: what is the largest number of attempts you saw, and what is the largest wait? Then answer: why <em>random</em>, and not just “double the wait”?</li>
+<li><strong>The 65.</strong> In <code>05_sum_to_n.py</code>, swapping the two lines in the block turns <code>55</code> into <code>65</code> for <code>n = 10</code>. Without running, write the formula for the wrong answer as a function of <code>n</code>, and check it for <code>n = 1</code>, <code>2</code>, <code>3</code>. Then design one test value that distinguishes the two programs <em>and</em> would have caught the bug in a program that only printed the final sum.</li>
+</ol>
+
+</section><section class="section" id="lecture-06">
+<h2>Lecture 06 — The while loop, in practice <span class="chip chip-blue">Week 3 · Fri 9 Oct</span></h2>
+<p><a href="lectures/at-06-while-practice.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Euclid, faster.</strong> Replace subtraction with <code>%</code>: <code>while b != 0: a, b = b, a % b</code>. Trace <code>gcd(1071, 462)</code> both ways and count the turns. Then argue why the <code>%</code> version also stops — the quantity is different. Which version would you trust with <code>gcd(10**9, 1)</code>?</li>
+<li><strong>The binary search guesser.</strong> Write <code>robot_play(secret)</code> that plays <code>play</code>’s game <em>without a human</em>: it keeps <code>low</code> and <code>high</code>, always guesses the middle, and counts attempts. Run it for every secret from 1 to 100 (a loop around a loop) and report the maximum attempts. Is it 7? Then make the range 1–1000 and predict the maximum before running.</li>
+<li><strong>Reverse, not count.</strong> <code>reverse_digits(n)</code> returns the number with its digits reversed — <code>1234 → 4321</code>, <code>1200 → 21</code>. Same loop as <code>digits</code>, with <code>% 10</code> to pull the last digit and an accumulator built with `* 10 +<code>. Then the question: for which inputs does</code>reverse_digits(reverse_digits(n)) != n`, and is that a bug or the spec?</li>
+</ol>
+
 </section>
   </main>
   <footer class="site-footer">
