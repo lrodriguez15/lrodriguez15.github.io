@@ -101,6 +101,31 @@
 <li><strong>Reverse, not count.</strong> <code>reverse_digits(n)</code> returns the number with its digits reversed — <code>1234 → 4321</code>, <code>1200 → 21</code>. Same loop as <code>digits</code>, with <code>% 10</code> to pull the last digit and an accumulator built with `* 10 +<code>. Then the question: for which inputs does</code>reverse_digits(reverse_digits(n)) != n`, and is that a bug or the spec?</li>
 </ol>
 
+</section><section class="section" id="lecture-07">
+<h2>Lecture 07 — The for loop <span class="chip chip-blue">Week 4 · Tue 13 Oct</span></h2>
+<p><a href="lectures/at-07-for-loop.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>How many darts?</strong> Run <code>estimate_pi(n)</code> ten times each for <code>n</code> = 100, 10 000 and 1 000 000 and write down the spread (largest minus smallest). Then state the rule: when <code>n</code> grows by 100×, the spread shrinks by about how much? (It is a famous and disappointing number.)</li>
+<li><strong>Perfect.</strong> A number is <em>perfect</em> when it equals the sum of its proper divisors: 6 = 1 + 2 +
+<ol start="3" type="1">
+<li>Using <code>sum_of_divisors</code>, find every perfect number below 10 000 with a loop around it. There are four. How long did your program take, and what single change to <code>sum_of_divisors</code> (which <code>range</code> end?) halves that time without changing an answer?</li>
+</ol></li>
+<li><strong>The <code>for</code> that must be a <code>while</code>.</strong> Rewrite <code>play(secret)</code> from lecture 6 as a <code>for</code> loop with at most 7 turns — <code>for attempt in range(7):</code> — that still stops early when the guess is right, <em>without</em> <code>break</code>. You will need a flag in the test of… wait, a <code>for</code> has no test. Explain, in two sentences, what you had to do, and why the <code>while</code> version is better.</li>
+</ol>
+
+</section><section class="section" id="lecture-08">
+<h2>Lecture 08 — The for loop, in practice <span class="chip chip-blue">Week 4 · Fri 16 Oct</span></h2>
+<p><a href="lectures/at-08-for-practice.html#stretch-if-the-session-was-easy">Open the lecture →</a></p>
+
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Belady’s ghost.</strong> LRU is the best rule that does not know the future. Invent a sequence of book requests, for a backpack of two, where LRU evicts the wrong book every single time — and write the rule that, <em>knowing the sequence</em>, would never miss. (That rule is Belady’s; it cannot be run, only admired.)</li>
+<li><strong>The table, transposed.</strong> Print the 10 × 10 multiplication table as a grid — ten numbers per row, aligned — using <code>print(..., end=" ")</code> to stay on the line and <code>print()</code> to end it. Then make the columns line up for every width (hint: <code>str(n * i).rjust(4)</code>).</li>
+<li><strong>Sieve.</strong> <code>count_primes(limit)</code> from Tuesday calls <code>is_prime</code> for every number — a loop inside a loop, <code>n²</code>-ish. Eratosthenes (240 BC) did it with one list and no division. Read about the sieve, write its algorithm on paper (you cannot code it until week 7 — no lists yet), and say why it is faster in one sentence about nested loops.</li>
+</ol>
+
 </section>
   </main>
   <footer class="site-footer">

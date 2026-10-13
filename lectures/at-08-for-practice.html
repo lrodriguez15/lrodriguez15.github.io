@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecture 08: The for loop, in practice — and the project begins — Algorithmic Thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../algorithmic-thinking.html" class="nav-brand">~/algorithmic-thinking</a>
+      <span class="nav-course">Algorithmic Thinking · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../algorithmic-thinking.html">Algorithmic Thinking</a>
+      <span class="sep">/</span>
+      <span class="current">Lecture 08: The for loop, in practice — and the project begins</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Lecture 08 · Python 3</p>
+      <h1>The for loop, in practice — and the project begins</h1>
+      <div class="chips">
+        <span class="chip chip-blue">python</span>
+        <span class="chip chip-green">for</span>
+        <span class="chip chip-orange">nested</span>
+        <span class="chip chip-blue">best-so-far</span>
+        <span class="chip chip-green">strings</span>
+        <span class="chip chip-orange">monte-carlo</span>
+        <span class="chip chip-blue">situacion-problema</span>
+        <span class="chip chip-green">week-04</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Write for loops that read, choose and draw — including a loop inside a loop — and leave with a project partner and a dataset to look for.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Slides</h2>
+<p>The deck projected in class — <a href="../files/at/at-08-slides.pdf">open / download the PDF</a>. The notes below are the full version; the slides are the subset shown on screen. <a href="../files/at/at-08-notes.pdf">Download these notes as PDF</a>.</p>
+<object data="../files/at/at-08-slides.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/at/at-08-slides.pdf">Open the slides (PDF)</a></p></object>
+</section>
+
+
+<section class="section">
+<h2 id="overview">Overview</h2>
+<p>Tuesday gave you <code>for</code>. Today you write four of them, one inside another, and then we stop being a course about loops for fifteen minutes and become a course about <strong>your</strong> data: the Situación problema is formally released, teams are formed, and the first deliverable has a date.</p>
+<p>The four exercises are the four things <code>for</code> is for: <strong>read exactly n things</strong>, <strong>keep the best one</strong>, <strong>do something for every pair</strong> (a loop inside a loop), and <strong>draw</strong>. None is hard. All four have a boundary — <code>n = 0</code>, <code>n = 1</code>, the first row — and the shell is where you check it.</p>
+</section>
+<section class="section">
+<h2 id="opener-which-book-do-you-throw-out-10-min">Opener — Which book do you throw out? (10 min)</h2>
+<p><em>Algorithms to Live By</em>, chapter 4, <em>Caching</em>. Your backpack holds four books. You are carrying four, and you need a fifth. One has to go. Which?</p>
+<p>Take three answers. “The biggest.” “The one I like least.” “The one I used longest ago.” The third one is the computer’s answer, and it has a name: <strong>LRU — Least Recently Used</strong>. Every cache in every computer you own — the processor’s, the browser’s, your phone’s — evicts the item that was touched longest ago, because the best predictor of <em>needing something soon</em> is <em>having needed it recently</em>. Belady proved in 1966 that the truly optimal rule needs to know the future; LRU is the best you can do without it. The book’s extension: your desk, your closet, your phone’s home screen — put what you used last on top, and the thing at the bottom is the one to drop.</p>
+<p>How do you <em>find</em> the least recently used of four books? You look at each one, remember the oldest so far, and replace it when you see an older one. That is a loop over a known number of things with a <strong>best-so-far</strong> inside it — today’s exercise 2, with “oldest” instead of “largest”.</p>
+<p><strong>Your turn, 3 minutes, on paper:</strong> <code>INPUT:</code> four books, each with the date you last opened it. <code>OUTPUT:</code> the one to remove. Numbered steps: the loop, the memory for the oldest so far, the comparison. <strong>Underline the line that says how many times the loop runs.</strong></p>
+</section>
+<section class="section">
+<h2 id="notes">Notes</h2>
+<h3 id="what-broke-in-the-lab">What broke in the lab?</h3>
+<p>Two answers. You want “the menu kept repeating after <em>Salir</em>” (the flag <code>continua</code> never set to <code>False</code>) or “<code>factores_de(12)</code> printed 12” (the <code>range</code> end). Both are today’s <code>+ 1</code> and flag, from Tuesday, meeting real code.</p>
+<h3 id="exercise-1-average_ofn-read-exactly-n-things">Exercise 1 — <code>average_of(n)</code> <em>(read exactly n things)</em></h3>
+<p>Open <code>01_average_of.py</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="language-python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">def</span> average_of(n):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        prompt <span class="op">=</span> <span class="st">&quot;Number &quot;</span> <span class="op">+</span> <span class="bu">str</span>(i <span class="op">+</span> <span class="dv">1</span>) <span class="op">+</span> <span class="st">&quot;: &quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        value <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(prompt))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>        total <span class="op">=</span> total <span class="op">+</span> value</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    <span class="cf">return</span> total <span class="op">/</span> n</span></code></pre></div>
+<p>Shell: <code>average_of(3)</code> with <code>10 20 30</code> → <code>20.0</code>. The <code>for</code> counts the inputs; no <code>asked</code> variable, no step line — compare with lecture 5’s <code>positive_sum</code>. The prompt shows <code>i + 1</code> because <code>range(3)</code> gives 0, 1, 2 and humans count from 1; <code>str(i + 1)</code> turns the number into text so <code>+</code> can join it.</p>
+<p>Now the boundary: <code>average_of(0)</code>. The loop runs zero times — no error — and then <code>0 / 0</code>. The margin note from week 1, for the last time: the loop is safe, the line <em>after</em> it is not, so <code>main</code> refuses <code>n &lt;= 0</code> before calling.</p>
+<h3 id="exercise-2-max_ofn-keep-the-best-one">Exercise 2 — <code>max_of(n)</code> <em>(keep the best one)</em></h3>
+<p>Open <code>02_max_of.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="language-python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">def</span> max_of(n):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    best <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(<span class="st">&quot;Number 1: &quot;</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>        prompt <span class="op">=</span> <span class="st">&quot;Number &quot;</span> <span class="op">+</span> <span class="bu">str</span>(i) <span class="op">+</span> <span class="st">&quot;: &quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        value <span class="op">=</span> <span class="bu">float</span>(<span class="bu">input</span>(prompt))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>        <span class="cf">if</span> value <span class="op">&gt;</span> best:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>            best <span class="op">=</span> value</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    <span class="cf">return</span> best</span></code></pre></div>
+<p>Shell: <code>max_of(3)</code> with <code>4 9 2</code> → <code>9.0</code>. <code>max_of(1)</code> with <code>7</code> → <code>7.0</code>: the loop runs zero times and the first value <em>is</em> the answer. That is the opener’s LRU loop with <code>&gt;</code> instead of “older than”. Compare with lecture 5’s <code>maximum = None</code>: there we did not know whether any value would come; here <code>n ≥ 1</code> is promised, so the first read <em>is</em> the start. <strong>The start of a best-so-far is the first candidate, not an invented one.</strong> (<code>best = 0</code> would be wrong for <code>-4 -9 -2</code>.)</p>
+<h3 id="exercise-3-tablen-and-all_tablesup_to-a-loop-inside-a-loop">Exercise 3 — <code>table(n)</code> and <code>all_tables(up_to)</code> <em>(a loop inside a loop)</em></h3>
+<p>Open <code>03_table.py</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="language-python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">def</span> table(n):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>        <span class="bu">print</span>(n, <span class="st">&quot;x&quot;</span>, i, <span class="st">&quot;=&quot;</span>, n <span class="op">*</span> i)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="kw">def</span> all_tables(up_to):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, up_to <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>        table(n)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>        <span class="bu">print</span>()</span></code></pre></div>
+<p><code>table(7)</code> prints ten lines. <code>all_tables(3)</code> prints the tables of 1, 2 and 3 — <strong>thirty</strong> lines plus three blank ones. Before running <code>all_tables(12)</code>, say how many lines: 12 × 10 = 120. The inner loop runs completely for every single turn of the outer one; turns multiply. When a program is slow, this is where to look first — a loop inside a loop inside a loop is <code>n³</code>, and <code>n = 1000</code> is a billion.</p>
+<p>Notice the shape: the inner loop is <em>a function call</em>. <code>all_tables</code> does not know how <code>table</code> works and does not need to. That is week 2’s lesson applied to loops — and it is how your project’s <code>main()</code> will call <code>grafica1(tablero)</code> without knowing what a plot is.</p>
+<h3 id="exercise-4-barsn-and-pyramidn-draw">Exercise 4 — <code>bars(n)</code> and <code>pyramid(n)</code> <em>(draw)</em></h3>
+<p>Open <code>04_bars.py</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="language-python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">def</span> bars(n):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot;*&quot;</span> <span class="op">*</span> i)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="kw">def</span> pyramid(n):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&quot; &quot;</span> <span class="op">*</span> (n <span class="op">-</span> i) <span class="op">+</span> <span class="st">&quot;*&quot;</span> <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> i <span class="op">-</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><code>bars(3)</code> → <code>*</code>, <code>**</code>, <code>***</code>. <code>"*" * i</code> is a string repeated <code>i</code> times — the thing QE1’s A2 warned you about (<code>"5" + "3"</code> is <code>"53"</code>), now useful. <code>pyramid(3)</code> needs <code>n − i</code> spaces then <code>2i − 1</code> stars; trace row 1 before running: 2 spaces, 1 star. <code>bars(0)</code> prints nothing and raises nothing — <code>range(1, 1)</code> is empty.</p>
+<h3 id="exercise-5-spreadtrials-repeats-monte-carlos-price">Exercise 5 — <code>spread(trials, repeats)</code> <em>(Monte Carlo’s price)</em></h3>
+<p>Open <code>05_spread.py</code> — Tuesday’s stretch 1, as a program: run <code>estimate_pi(trials)</code> ten times, report largest minus smallest, for 100, 10 000 and 1 000 000 darts. Typical: <code>0.7</code>, <code>0.05</code>, <code>0.005</code>. <strong>A hundred times more work buys ten times less spread.</strong> The square root. That is why Monte Carlo is a last resort and why, when it is the only resort, it needs a fast computer. (Your laptop did a million darts in about a second. In 1946 that was the entire budget.)</p>
+</section>
+<section class="section">
+<h2 id="situación-problema-formally-released-12-min">Situación problema — formally released (12 min)</h2>
+<p>Open <code>situacion-problema.html</code> on the projector. Everything there has been public for three weeks; today it becomes real:</p>
+<ol type="1">
+<li><strong>Teams of two, today.</strong> Names to me before you leave — a photo of the list on the board is fine. No team of one; a team of three only if the room is odd, and I pick it.</li>
+<li><strong>Deliverable 1 — the dataset — Friday 6 November.</strong> 30–50 rows, up to 10 columns, half text half numbers, from a real source (Kaggle, datos.gob.mx, the World Bank, a business that lets you). <strong>Start looking this week.</strong> The best projects come from data you already care about.</li>
+<li><strong>The rubric is published</strong> — on the site, under <em>How it is graded</em>. Each deliverable is graded on its own; the final weighs the program, the report and a two-minute oral explanation of <em>your</em> code. A program you cannot explain is not yours.</li>
+<li><strong>The skeleton you already wrote:</strong> this afternoon’s lab — a <code>menu()</code>, a <code>main()</code> with a <code>while</code> that repeats until <em>Salir</em>, <code>if</code>/<code>elif</code> calling functions. That is the final program’s <code>main()</code>, verbatim. The functions it will call — statistics, two charts — are weeks 7 to 9.</li>
+</ol>
+</section>
+<section class="section">
+<h2 id="stretch-if-the-session-was-easy">Stretch — if the session was easy</h2>
+<p>Optional, ungraded, harder than they look.</p>
+<ol type="1">
+<li><strong>Belady’s ghost.</strong> LRU is the best rule that does not know the future. Invent a sequence of book requests, for a backpack of two, where LRU evicts the wrong book every single time — and write the rule that, <em>knowing the sequence</em>, would never miss. (That rule is Belady’s; it cannot be run, only admired.)</li>
+<li><strong>The table, transposed.</strong> Print the 10 × 10 multiplication table as a grid — ten numbers per row, aligned — using <code>print(..., end=" ")</code> to stay on the line and <code>print()</code> to end it. Then make the columns line up for every width (hint: <code>str(n * i).rjust(4)</code>).</li>
+<li><strong>Sieve.</strong> <code>count_primes(limit)</code> from Tuesday calls <code>is_prime</code> for every number — a loop inside a loop, <code>n²</code>-ish. Eratosthenes (240 BC) did it with one list and no division. Read about the sieve, write its algorithm on paper (you cannot code it until week 7 — no lists yet), and say why it is faster in one sentence about nested loops.</li>
+</ol>
+
+</section>
+<section class="section">
+<h2>Code Examples</h2>
+<h3>01_average_of.py</h3>
+<pre><code class="language-python"># 01_average_of.py — read exactly n numbers. A for loop that counts the inputs for you.
+
+def average_of(n):
+    &quot;&quot;&quot;Ask for n numbers and return their average. n must be positive.&quot;&quot;&quot;
+    total = 0
+    for i in range(n):
+        prompt = &quot;Number &quot; + str(i + 1) + &quot;: &quot;
+        value = float(input(prompt))
+        total = total + value
+    return total / n
+
+
+def main():
+    n = int(input(&quot;How many numbers? &quot;))
+    if n &lt;= 0:
+        print(&quot;Need at least one number.&quot;)
+    else:
+        print(&quot;Average:&quot;, average_of(n))
+
+
+main()
+# average_of(3) with 10, 20, 30 -&gt; 20.0.  Why the check in main? average_of(0) would divide by zero —
+# the for loop runs zero times and that is fine; the division after it is not.
+</code></pre>
+<h3>02_max_of.py</h3>
+<pre><code class="language-python"># 02_max_of.py — the best-so-far pattern: remember the winner, replace it only when beaten.
+
+def max_of(n):
+    &quot;&quot;&quot;Ask for n numbers and return the largest. n must be positive.&quot;&quot;&quot;
+    best = float(input(&quot;Number 1: &quot;))         # the first one is the best so far, by definition
+    for i in range(2, n + 1):
+        prompt = &quot;Number &quot; + str(i) + &quot;: &quot;
+        value = float(input(prompt))
+        if value &gt; best:
+            best = value
+    return best
+
+
+def main():
+    n = int(input(&quot;How many numbers? &quot;))
+    if n &lt;= 0:
+        print(&quot;Need at least one number.&quot;)
+    else:
+        print(&quot;Largest:&quot;, max_of(n))
+
+
+main()
+# max_of(3) with 4, 9, 2 -&gt; 9.0   max_of(1) with 7 -&gt; 7.0 (the loop runs zero times)
+# Compare with lecture 5&#x27;s maximum = None: here we know there is at least one value, so no None.
+</code></pre>
+<h3>03_table.py</h3>
+<pre><code class="language-python"># 03_table.py — a loop inside a loop. The inner one runs completely for every turn of the outer one.
+
+def table(n):
+    &quot;&quot;&quot;Print the multiplication table of n, from 1 to 10.&quot;&quot;&quot;
+    for i in range(1, 11):
+        print(n, &quot;x&quot;, i, &quot;=&quot;, n * i)
+
+
+def all_tables(up_to):
+    &quot;&quot;&quot;Every table from 1 to up_to — the inner loop runs 10 times per outer turn.&quot;&quot;&quot;
+    for n in range(1, up_to + 1):
+        table(n)
+        print()                       # a blank line between tables
+
+
+def main():
+    n = int(input(&quot;Which table? &quot;))
+    table(n)
+
+
+main()
+# all_tables(3) prints 30 lines. How many lines does all_tables(12) print? Say it before running.
+</code></pre>
+<h3>04_bars.py</h3>
+<pre><code class="language-python"># 04_bars.py — a picture drawn by a loop. &quot;*&quot; * 3 is &quot;***&quot;: a string repeated, week 2&#x27;s trick with a job.
+
+def bars(n):
+    &quot;&quot;&quot;n rows: 1 star, 2 stars, ..., n stars.&quot;&quot;&quot;
+    for i in range(1, n + 1):
+        print(&quot;*&quot; * i)
+
+
+def pyramid(n):
+    &quot;&quot;&quot;Centred: spaces first, then stars. Row i has 2i - 1 stars.&quot;&quot;&quot;
+    for i in range(1, n + 1):
+        print(&quot; &quot; * (n - i) + &quot;*&quot; * (2 * i - 1))
+
+
+def main():
+    n = int(input(&quot;Rows: &quot;))
+    bars(n)
+    pyramid(n)
+
+
+main()
+# bars(3) -&gt; *, **, ***.   pyramid(3) -&gt; &quot;  *&quot;, &quot; ***&quot;, &quot;*****&quot;.  bars(0) prints nothing, no error.
+</code></pre>
+<h3>05_spread.py</h3>
+<pre><code class="language-python"># 05_spread.py — how many darts? Tuesday&#x27;s stretch 1, measured: a loop around estimate_pi.
+import random
+
+
+def estimate_pi(trials):
+    inside = 0
+    for i in range(trials):
+        x = random.random()
+        y = random.random()
+        if x * x + y * y &lt;= 1:
+            inside = inside + 1
+    return 4 * inside / trials
+
+
+def spread(trials, repeats):
+    &quot;&quot;&quot;Run estimate_pi(trials) `repeats` times; return largest - smallest.&quot;&quot;&quot;
+    smallest = estimate_pi(trials)
+    largest = smallest
+    for i in range(repeats - 1):
+        value = estimate_pi(trials)
+        if value &lt; smallest:
+            smallest = value
+        if value &gt; largest:
+            largest = value
+    return largest - smallest
+
+
+def main():
+    for trials in (100, 10000, 1000000):
+        print(trials, &quot;darts -&gt; spread over 10 runs:&quot;, round(spread(trials, 10), 4))
+
+
+main()
+# 100x more darts -&gt; about 10x less spread. The square root. That is Monte Carlo&#x27;s price.
+</code></pre>
+</section>
+<section class="section">
+<h2>Exercises</h2>
+<p><strong>In class — the four, as files</strong> <em>(individual, from 18:20; what is not finished is yours to finish, evidence box only)</em></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Function(s)</th>
+<th>Shell tests to write down</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>A_Matricula_x1.py</code></td>
+<td><code>average_of(n)</code>; <code>main</code> refuses <code>n &lt;= 0</code> with <code>Need at least one number.</code></td>
+<td><code>average_of(3)</code> with 10 20 30 → 20.0; <code>main</code> with 0 → the message</td>
+</tr>
+<tr class="even">
+<td><code>A_Matricula_x2.py</code></td>
+<td><code>max_of(n)</code>, same <code>main</code> rule</td>
+<td><code>max_of(3)</code> with 4 9 2 → 9.0; <code>max_of(1)</code> with 7 → 7.0; <code>max_of(3)</code> with −4 −9 −2 → −2.0</td>
+</tr>
+<tr class="odd">
+<td><code>A_Matricula_x3.py</code></td>
+<td><code>table(n)</code>, <code>all_tables(up_to)</code></td>
+<td><code>all_tables(3)</code> — count the lines before running: 30</td>
+</tr>
+<tr class="even">
+<td><code>A_Matricula_x4.py</code></td>
+<td><code>bars(n)</code>, <code>pyramid(n)</code></td>
+<td><code>bars(0)</code> → nothing; <code>pyramid(3)</code> → the three rows, exactly</td>
+</tr>
+</tbody>
+</table>
+<p>Algorithm on paper first for 1 and 2 (the other two are short enough to write the <code>FOR</code> line and the range in the comment). Photos + files → <strong>Week 4 evidence box</strong>. Finished? Make <code>pyramid</code> hollow.</p>
+
+</div>
+</section>
+<section class="section">
+<h2>After the session</h2>
+<p><strong>Homework 5 — <code>assignments/hw-05-for.md</code>. Due Sunday 18 October, 23:59, on Canvas.</strong> <code>is_perfect(n)</code> and <code>longest_collatz(limit)</code> — a <code>for</code> around your Homework 4 function — plus a <code>main</code>. One sentence per <code>for</code> saying how many times it runs.</p>
+<p>Also before Tuesday:</p>
+<ol type="1">
+<li><strong>Lab 4 file</strong> — <code>D_matricula.py</code> + the photo of your algorithm → Canvas → <em>Laboratory 4</em>, <strong>Sunday 18 October, 23:59</strong>.</li>
+<li><strong>Quick exam 4 — Tuesday 20 October, first 20 minutes:</strong> the <code>for</code> loop. Then <strong>the midterm, Friday 23 October</strong>, in class: weeks 1 to 4, the academia’s format, 20 minutes of questions plus a program. The <em>Self-study: prepare for your midterm</em> page in Canvas is the map.</li>
+<li><strong>Your team and your data.</strong> Names today; a dataset candidate by Tuesday is early — and early is the whole game with data.</li>
+</ol>
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Algorithmic Thinking · Tec de Monterrey · Leopoldo Rodríguez Salazar</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

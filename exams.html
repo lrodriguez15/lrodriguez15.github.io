@@ -127,6 +127,52 @@
 </tbody>
 </table>
 <p>A program that prints the right numbers from inside <code>water_bill</code> instead of returning them earns the 20 for values and loses the 10 for shape — that is the lesson of Friday’s session, and it is worth exactly what it says.</p>
+</section><section class="section"><h2 id="quick-exam-3-the-while-loop">Quick exam 3 — The while loop</h2>
+<p><strong>Tuesday 13 October 2026, 17:35–17:55</strong> · 20 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted. No Macs (paper copy).</p>
+<p>Covers: <code>05-while-loop, 06-while-practice</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th style="text-align: right;">Points</th>
+<th>What earns them</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A1–A5</td>
+<td style="text-align: right;">3 each</td>
+<td>Correct choice. No partial credit.</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td style="text-align: right;">5</td>
+<td><code>14</code>. Nothing else.</td>
+</tr>
+<tr class="odd">
+<td>C1 algorithm</td>
+<td style="text-align: right;">30</td>
+<td><code>INPUT:</code>/<code>OUTPUT:</code> lines present and correct (6). A <code>WHILE</code> with the right test — <em>balance below goal</em> — and a step that adds the deposit and counts the month (12). The <em>why it stops</em> sentence names the quantity (balance grows by a positive deposit every turn) (6). The non-positive deposit check in <code>main</code>, before the function is called (6).</td>
+</tr>
+<tr class="even">
+<td>C2 program</td>
+<td style="text-align: right;">50</td>
+<td><code>months_to_goal</code> returns the right value on the four checks (5 each → 20). The loop runs <strong>zero times</strong> when the balance already reaches the goal — <code>(1000, 100, 1000)</code> → <code>0</code> (5). No <code>input()</code>/<code>print()</code> inside the function (10). <code>main()</code> reads, refuses a non-positive deposit with the exact message, otherwise prints; file ends with <code>main()</code> (10). Implements <em>the algorithm written in C1</em> (5).</td>
+</tr>
+<tr class="odd">
+<td>Technical requirements</td>
+<td style="text-align: right;">−2 each</td>
+<td>Name comment · algorithm in multi-line comment · meaningful names · input prompts · labelled output</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>0</code> deposit is the whole point of the exam: a loop whose step does not move toward the exit never ends, and the only defence is to refuse the input <em>before</em> the loop. That check is worth 16 of the 80 points between C1 and C2.</p>
 </section>
   </main>
   <footer class="site-footer">
