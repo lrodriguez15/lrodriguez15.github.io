@@ -34,7 +34,20 @@
       </div>
       <p class="lecture-objective"><strong>The shape never changes.</strong> 15 points of <em>read and predict</em> — five short programs, you say what they print or where they break. 5 points for one exact output. 80 points for one problem: the algorithm first (30), then the program that implements it (50). Every rubric is published here before the exam; nothing about how you are graded is a surprise.</p>
     </header>
-<p>Quick exams cover the <strong>previous week</strong>. The midterm (Fri 23 Oct) and the final (Tue 1 Dec) follow the academia's format and are described in Canvas.</p>
+<p>Quick exams cover the <strong>previous week</strong>.</p>
+<section class="section" id="midterm">
+<h2>Midterm — Friday 23 October, 17:35–18:55, on paper</h2>
+<p><strong>20 % of the course. 80 minutes, 100 points, individual, on paper</strong> — no computer, phone, notes or calculator.</p>
+<ul>
+<li><strong>Part I — read and predict (30 points):</strong> six short programs — arithmetic operators, boolean operators, a conditional, functions, a <code>while</code> loop, a <code>for</code> loop. Write <em>exactly</em> what Python prints, every line. 5 points each, all or nothing.</li>
+<li><strong>Part II — write the program (70 points):</strong> one function with a <code>while</code> loop (23), one function with a <code>for</code> loop (23), <code>menu()</code> (3), and a <code>main()</code> that repeats with a <code>while</code> until <em>Exit</em> or an invalid option, reads and validates every input, and calls the functions (20); the last line calls <code>main()</code> (1). Graded with the academia's six-level rubric; −2 per missing technical requirement.</li>
+</ul>
+<p><strong>Practice papers — same format, same difficulty, different problems. Solve them on paper in 80 minutes, then check:</strong></p>
+<ul>
+<li><a href="files/at/practice-midterm-1.pdf">Practice midterm 1</a> · <a href="files/at/practice-midterm-1-solutions.pdf">solutions</a></li>
+<li><a href="files/at/practice-midterm-2.pdf">Practice midterm 2</a> · <a href="files/at/practice-midterm-2-solutions.pdf">solutions</a></li>
+</ul>
+</section>
 <section class="section"><h2 id="quick-exam-1-algorithms-operators-and-calculations">Quick exam 1 — Algorithms, operators and calculations</h2>
 <p><strong>Tuesday 29 September 2026, 17:35–17:55</strong> · 20 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted. No Macs.</p>
 <p>Covers: <code>01-algorithms-and-programs, 02-program-components</code>.</p>
@@ -173,6 +186,51 @@
 </tbody>
 </table>
 <p>The <code>0</code> deposit is the whole point of the exam: a loop whose step does not move toward the exit never ends, and the only defence is to refuse the input <em>before</em> the loop. That check is worth 16 of the 80 points between C1 and C2.</p>
+</section><section class="section"><h2 id="quick-exam-4-the-for-loop">Quick exam 4 — The for loop</h2>
+<p><strong>Tuesday 20 October 2026, 17:55–18:12 (right after QE3)</strong> · 15 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted. No Macs (paper copy).</p>
+<p>Covers: <code>07-for-loop, 08-for-practice</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 40%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th style="text-align: right;">Points</th>
+<th>What earns them</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A1–A5</td>
+<td style="text-align: right;">3 each</td>
+<td>Correct choice.</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td style="text-align: right;">5</td>
+<td><code>80</code>.</td>
+</tr>
+<tr class="odd">
+<td>C1 algorithm</td>
+<td style="text-align: right;">30</td>
+<td><code>INPUT:</code>/<code>OUTPUT:</code> (6) · a <code>FOR</code> whose range <strong>includes n</strong> — <code>range(1, n + 1)</code> or a step-2 equivalent (12) · the “how many times” sentence (6) · the <code>n &lt; 1</code> check in <code>main</code> (6).</td>
+</tr>
+<tr class="even">
+<td>C2 program</td>
+<td style="text-align: right;">50</td>
+<td>Right value on the four checks (5 each → 20) · <code>sum_of_odds(5)</code> and <code>(6)</code> agree — the end of the range is right (5) · no <code>input()</code>/<code>print()</code> inside the function (10) · <code>main</code> checks, prints, file ends with <code>main()</code> (10) · implements C1 (5).</td>
+</tr>
+<tr class="odd">
+<td>Technical requirements</td>
+<td style="text-align: right;">−2 each</td>
+<td>as above</td>
+</tr>
+</tbody>
+</table>
 </section>
   </main>
   <footer class="site-footer">
