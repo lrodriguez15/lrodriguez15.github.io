@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session 1: AI, generative AI and agents — AI for Scientific Writing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../ai-scientific-writing.html" class="nav-brand">~/ai-scientific-writing</a>
+      <span class="nav-course">AI for Scientific Writing · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../ai-scientific-writing.html">AI for Scientific Writing</a>
+      <span class="sep">/</span>
+      <span class="current">Session 1: AI, generative AI and agents</span>
+    </nav>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Session 1 · Monday 26 October 2026 · 07:00–10:00</p>
+      <h1>AI, generative AI and agents — and how to use them well</h1>
+      <div class="chips">
+        <span class="chip chip-blue">AI vs ML vs GenAI</span>
+        <span class="chip chip-green">LLMs</span>
+        <span class="chip chip-orange">hallucination</span>
+        <span class="chip chip-blue">temperature</span>
+        <span class="chip chip-green">RAG</span>
+        <span class="chip chip-orange">agentic AI</span>
+      </div>
+      <p class="lecture-objective"><strong>Objective.</strong> Know what these tools are, the words people use about them, why they fail and the habits that make them useful — and leave with the topic and claim of your paper.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Slides and handout</h2>
+<p><a href="../files/aisw/aisw-01-slides.pdf">Open / download the slides (PDF)</a> · <a href="../files/aisw/aisw-01-handout.pdf">Glossary, ten habits, AI-use log and disclosure templates (PDF)</a></p>
+<object data="../files/aisw/aisw-01-slides.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/aisw/aisw-01-slides.pdf">Open the slides (PDF)</a></p></object>
+</section>
+
+<section class="section">
+<h2>The citation test</h2>
+<p>We open by asking an AI for five peer-reviewed references and checking them. In a 2023 study (Walters &amp; Wilder, <em>Scientific Reports</em>), <strong>55 % of the citations written by GPT-3.5 and 18 % of those written by GPT-4 were fabricated</strong>, and many of the real ones had wrong authors, years or pages. Newer models do better; the rule does not change: <strong>every reference is opened by a human.</strong></p>
+</section>
+
+<section class="section">
+<h2>The map: from AI to agents</h2>
+<ul>
+<li><strong>Artificial intelligence (AI)</strong> — systems doing tasks that normally need human intelligence.</li>
+<li><strong>Machine learning (ML)</strong> — AI that learns patterns from data instead of hand-written rules.</li>
+<li><strong>Deep learning</strong> — ML with many-layer neural networks.</li>
+<li><strong>Generative AI</strong> — models that create new text, images, code or audio.</li>
+<li><strong>Large language models (LLMs)</strong> — generative AI for text, trained to predict the next token.</li>
+<li><strong>Agentic AI</strong> — an LLM plus tools (search, code, browser, files) and a loop: goal → plan → act → observe → check.</li>
+</ul>
+<p>An LLM writes one token at a time, choosing what is <em>plausible</em> — not what is <em>true</em>. That is why it can <strong>hallucinate</strong>: fluent, confident and wrong.</p>
+</section>
+
+<section class="section">
+<h2>Vocabulary</h2>
+<p>The handout has 32 terms. The ones we demonstrate live: <strong>temperature</strong> (low = focused and repeatable, high = varied and riskier), <strong>context window</strong> and <strong>knowledge cutoff</strong>, and <strong>grounding / RAG</strong> (answering from sources you provide instead of from memory). Also: tokens, system prompt, zero-/few-shot, reasoning models, fine-tuning, RLHF, embeddings, multimodal, bias and guardrails.</p>
+</section>
+
+<section class="section">
+<h2>Agents fail in new ways</h2>
+<ul>
+<li><strong>Prompt injection</strong> — instructions hidden in a web page, PDF or email that the agent may obey.</li>
+<li><strong>Acting on errors</strong> — an invented fact becomes an email sent or a file overwritten.</li>
+<li><strong>Data leakage</strong> — unpublished results pasted into a tool whose terms you never read.</li>
+<li><strong>Automation bias</strong> — trusting a report because it looks thorough.</li>
+</ul>
+<p>The more an AI can <em>do</em>, the more you check before it does it.</p>
+</section>
+
+<section class="section">
+<h2>Ten habits</h2>
+<ol>
+<li>Give context: who you are, the goal, the audience, the format.</li>
+<li>Give it your material instead of asking it to recall facts.</li>
+<li>Ask for structure and critique first, prose last.</li>
+<li>Iterate: one change per prompt; keep what works.</li>
+<li>Verify every fact, number and reference at the source.</li>
+<li>Protect data: nothing confidential or unpublished in unknown tools.</li>
+<li>Ask for uncertainty: “what are you least sure about?”</li>
+<li>Keep a log of the prompts and outputs that shaped your work.</li>
+<li>Rewrite in your own words — if you can't explain it, it isn't yours yet.</li>
+<li>Declare your use.</li>
+</ol>
+</section>
+
+<section class="section">
+<h2>Today's evidence (Canvas, 10:00)</h2>
+<p>One per pair: topic and research question; your one-sentence claim — <em>“We show that X does Y under Z, measured by W”</em> — before and after asking an AI to attack it; the data and figures you already have; your AI-use log, started. Then a 10-term matching quiz, individual.</p>
+<p><strong>Tomorrow:</strong> bring your project files — data, photos, reports.</p>
+</section>
+
+  </main>
+
+  <footer>
+    AI for Scientific Writing · Semana Tec · Tec de Monterrey · October 2026
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
