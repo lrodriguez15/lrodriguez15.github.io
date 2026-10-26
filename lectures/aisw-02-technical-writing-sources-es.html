@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesión 2: Redacción técnica y científica — IA para textos científicos</title>
+  <link rel="alternate" hreflang="en" href="https://lrodriguez15.github.io/lectures/aisw-02-technical-writing-sources.html" />
+  <link rel="alternate" hreflang="es" href="https://lrodriguez15.github.io/lectures/aisw-02-technical-writing-sources-es.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lang-switch{display:inline-flex;gap:0;border:1px solid var(--border,#30363d);border-radius:999px;overflow:hidden;font-size:.85rem;margin:.25rem 0 1rem}
+    .lang-switch a,.lang-switch span{padding:.25rem .8rem;text-decoration:none}
+    .lang-switch .on{background:var(--accent,#1f6feb);color:#fff;font-weight:600}
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../ai-scientific-writing-es.html" class="nav-brand">~/ia-textos-cientificos</a>
+      <span class="nav-course">IA para textos científicos · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Inicio</a>
+      <span class="sep">/</span>
+      <a href="../ai-scientific-writing-es.html">IA para textos científicos</a>
+      <span class="sep">/</span>
+      <span class="current">Sesión 2: Redacción técnica y científica</span>
+    </nav>
+    <div class="lang-switch"><a href="aisw-02-technical-writing-sources.html">English</a><span class="on">Español</span></div>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Sesión 2 · martes 27 de octubre de 2026 · 07:00–10:00</p>
+      <h1>Redacción técnica y científica — tu tema, tus fuentes</h1>
+      <div class="chips"><span class="chip chip-blue">principios</span><span class="chip chip-green">IMRyD</span><span class="chip chip-orange">búsqueda</span><span class="chip chip-blue">evaluación de fuentes</span><span class="chip chip-green">matriz de literatura</span><span class="chip chip-orange">Agent Studio</span></div>
+      <p class="lecture-objective"><strong>Objetivo.</strong> Escribir como ingeniero — claro, preciso, verificable — y salir con un tema validado y al menos cinco fuentes verificadas para tu artículo.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Diapositivas y material</h2>
+<p><a href="../files/aisw/aisw-02-slides-es.pdf">Abrir / descargar las diapositivas (PDF)</a> · <a href="../files/aisw/aisw-02-material-es.pdf">Ficha de tema, cadena de búsqueda, seis preguntas, matriz de literatura y prompts (PDF)</a></p>
+<object data="../files/aisw/aisw-02-slides-es.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/aisw/aisw-02-slides-es.pdf">Abrir las diapositivas (PDF)</a></p></object>
+</section>
+
+<section class="section">
+<h2>Principios de la redacción técnica y científica</h2>
+<ol><li><strong>Claridad</strong> — una idea por oración, un tema por párrafo.</li><li><strong>Precisión</strong> — números con unidades e incertidumbre; nada de “muy” o “mucho”.</li><li><strong>Concisión</strong> — quita cada palabra que no aporta.</li><li><strong>Objetividad</strong> — afirmaciones respaldadas por datos o una fuente citada.</li><li><strong>Reproducibilidad</strong> — otra persona podría repetir lo que hiciste.</li><li><strong>Términos definidos</strong> — define al primer uso; escribe completas las siglas.</li><li><strong>Estilo consistente</strong> — tiempo verbal, unidades, formato de citas.</li><li><strong>Honestidad</strong> — limitaciones explícitas; uso de IA declarado.</li></ol><p><em>Vago:</em> “El robot funciona muy bien y es mucho más rápido.” <em>Técnico:</em> “El prototipo limpió un panel de 1.6 m² en 94 s (n = 10, DE 6 s), 31 % más rápido que la limpieza manual.” (Números ilustrativos — cada número sale de tus datos o de una fuente citada, nunca de la IA.)</p>
+</section>
+
+<section class="section">
+<h2>Alcance, objetivo y estructura</h2>
+<p><strong>Revisión</strong> (organiza lo que otros encontraron) · <strong>investigación</strong> (tu método, tus datos y resultados) · <strong>resumen breve</strong> (un resultado, compacto). Define el <strong>alcance</strong> (qué entra y qué no) y un <strong>objetivo</strong> con verbo verificable. Estructura habitual, <strong>IMRyD</strong>: título, resumen (150–250 palabras), introducción (contexto → vacío → objetivo), métodos, resultados, discusión, conclusiones, referencias. Formatos: guías de IEEE y Springer Nature (Canvas, autoestudio).</p>
+</section>
+
+<section class="section">
+<h2>Búsqueda y evaluación de fuentes</h2>
+<p>Dónde: Biblioteca Digital Tec (Scopus, IEEE Xplore, ScienceDirect), Google Scholar, Semantic Scholar, SciELO y Redalyc para investigación en español. Busca también en inglés. Una cadena de búsqueda: <code>("solar panel" OR photovoltaic) AND (cleaning OR soiling) AND robot*</code>.</p><p><strong>Seis preguntas:</strong> ¿existe (abre el DOI)? ¿quién la escribió? ¿dónde (revisión por pares, no depredadora)? ¿cuándo? ¿evidencia? ¿dice eso (leíste los resultados)? <strong>Una respuesta de IA no es una fuente</strong> — la fuente es aquello a lo que apunta, después de abrirlo.</p>
+</section>
+
+<section class="section">
+<h2>La matriz de literatura</h2>
+<p>Un renglón por fuente: referencia (con DOI) · idea principal · método · resultado clave · cómo ayuda a tu artículo · verificada. Agrupa por tema, no por fuente, y resume con tus palabras.</p>
+</section>
+
+<section class="section">
+<h2>Edición e integración con IA</h2>
+<p>Está bien: ortografía, gramática, legibilidad, traducción que tú revisas (los términos técnicos son donde fallan las herramientas — en mecánica “stress” es <em>esfuerzo</em>). Decláralo: texto reestructurado o reescrito. Para integrar fuentes, dale a la IA <em>sólo tus resúmenes</em>, pídele que las agrupe y cite el número de fuente en cada punto — luego abre cada fuente y verifica.</p>
+</section>
+
+<section class="section">
+<h2>En clase y después de clase</h2>
+<p><strong>Actividad 4</strong> (individual): define tu tema — tema, pregunta, objetivo, tipo, público — y valídalo. <strong>Actividad 5</strong> (individual): enfoca con IA, busca, selecciona al menos 5 fuentes (≥ 3 revisadas por pares, ≥ 1 en inglés), llena la matriz. <strong>Actividad 6</strong> (evaluable, 5 %): presenta tus fuentes, 3 minutos — <code>Matrícula_Actividad09.pptx</code>.</p><p><strong>Tarea 3</strong> (5 %): valida ideas y fuentes — <code>Matrícula_Validación_de_ideas.pdf</code>. <strong>Tarea 4</strong> (10 %): primer borrador con <strong>Agent Studio → RigorIA</strong> (MiTec → TECgpt → Agent Studio): primero la estructura, luego sección por sección; tú revisas cada parte — <code>Matrícula_Redacción_del_Articulo_IA.pdf</code>.</p>
+</section>
+
+  </main>
+
+  <footer>
+    IA para textos científicos · Semana Tec · Tec de Monterrey · octubre 2026
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
