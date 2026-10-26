@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesión 1: Herramientas de IA — IA generativa y agentes — IA para textos científicos</title>
+  <link rel="alternate" hreflang="en" href="https://lrodriguez15.github.io/lectures/aisw-01-intro-genai-agents.html" />
+  <link rel="alternate" hreflang="es" href="https://lrodriguez15.github.io/lectures/aisw-01-intro-genai-agents-es.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lang-switch{display:inline-flex;gap:0;border:1px solid var(--border,#30363d);border-radius:999px;overflow:hidden;font-size:.85rem;margin:.25rem 0 1rem}
+    .lang-switch a,.lang-switch span{padding:.25rem .8rem;text-decoration:none}
+    .lang-switch .on{background:var(--accent,#1f6feb);color:#fff;font-weight:600}
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../ai-scientific-writing-es.html" class="nav-brand">~/ia-textos-cientificos</a>
+      <span class="nav-course">IA para textos científicos · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Inicio</a>
+      <span class="sep">/</span>
+      <a href="../ai-scientific-writing-es.html">IA para textos científicos</a>
+      <span class="sep">/</span>
+      <span class="current">Sesión 1: Herramientas de IA</span>
+    </nav>
+    <div class="lang-switch"><a href="aisw-01-intro-genai-agents.html">English</a><span class="on">Español</span></div>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Sesión 1 · lunes 26 de octubre de 2026 · 07:00–10:00</p>
+      <h1>Herramientas de IA: IA generativa, agentes — y cómo usarlos bien</h1>
+      <div class="chips"><span class="chip chip-blue">IA vs ML vs GenAI</span><span class="chip chip-green">LLM</span><span class="chip chip-orange">alucinación</span><span class="chip chip-blue">ingeniería de instrucciones</span><span class="chip chip-green">imágenes</span><span class="chip chip-orange">IA agéntica</span></div>
+      <p class="lecture-objective"><strong>Objetivo.</strong> Saber qué son estas herramientas, el vocabulario que se usa, por qué fallan, cómo darles instrucciones y los hábitos que las hacen útiles — y probarlas en equipo.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Diapositivas y material</h2>
+<p><a href="../files/aisw/aisw-01-slides-es.pdf">Abrir / descargar las diapositivas (PDF)</a> · <a href="../files/aisw/aisw-01-material-es.pdf">Glosario, siglas, diez hábitos, plantillas de bitácora y declaración (PDF)</a></p>
+<object data="../files/aisw/aisw-01-slides-es.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/aisw/aisw-01-slides-es.pdf">Abrir las diapositivas (PDF)</a></p></object>
+</section>
+
+<section class="section">
+<h2>La prueba de las citas</h2>
+<p>Empezamos pidiéndole a una IA cinco referencias revisadas por pares y verificándolas. En un estudio de 2023 (Walters y Wilder, <em>Scientific Reports</em>), <strong>el 55 % de las citas escritas por GPT-3.5 y el 18 % de las escritas por GPT-4 eran inventadas</strong>, y muchas de las reales tenían autores, años o páginas incorrectos. Los modelos nuevos lo hacen mejor; la regla no cambia: <strong>toda referencia la abre un humano.</strong></p>
+</section>
+
+<section class="section">
+<h2>El mapa: de la IA a los agentes</h2>
+<ul><li><strong>Inteligencia artificial (IA)</strong> — sistemas que hacen tareas que normalmente requieren inteligencia humana.</li><li><strong>Aprendizaje automático (ML)</strong> — IA que aprende patrones de los datos en lugar de reglas escritas a mano.</li><li><strong>Aprendizaje profundo (DL)</strong> — aprendizaje automático con redes neuronales de muchas capas.</li><li><strong>IA generativa (GenAI)</strong> — modelos que crean texto, imágenes, código o audio nuevos.</li><li><strong>Modelos de lenguaje grandes (LLM)</strong> — IA generativa para texto, entrenada para predecir el siguiente token.</li><li><strong>IA agéntica</strong> — un LLM más herramientas (búsqueda, código, navegador, archivos) y un ciclo: objetivo → planear → actuar → observar → revisar.</li></ul><p>Un LLM escribe un token a la vez, eligiendo lo <em>plausible</em> — no lo <em>verdadero</em>. Por eso puede <strong>alucinar</strong>: fluido, seguro y falso.</p>
+</section>
+
+<section class="section">
+<h2>Vocabulario</h2>
+<p>El material tiene 32 términos. En vivo mostramos: <strong>temperatura</strong> (baja = enfocada y repetible; alta = variada y más riesgosa), <strong>ventana de contexto</strong> y <strong>fecha de corte de conocimiento</strong>, y <strong>anclaje en fuentes / RAG</strong> (responder con las fuentes que tú das en lugar de con su memoria). También: tokens, prompt de sistema, zero-/few-shot, modelos de razonamiento, ajuste fino, RLHF, embeddings, multimodal, sesgo y salvaguardas.</p>
+</section>
+
+<section class="section">
+<h2>Siglas</h2>
+<table><thead><tr><th>Sigla</th><th>Significa</th></tr></thead><tbody><tr><td>IA (AI)</td><td>inteligencia artificial</td></tr><tr><td>ML</td><td>aprendizaje automático (machine learning)</td></tr><tr><td>DL</td><td>aprendizaje profundo (deep learning)</td></tr><tr><td>GenAI</td><td>inteligencia artificial generativa</td></tr><tr><td>LLM</td><td>modelo de lenguaje grande</td></tr><tr><td>GPT</td><td>transformador generativo preentrenado (los modelos detrás de ChatGPT)</td></tr><tr><td>RAG</td><td>generación aumentada por recuperación</td></tr><tr><td>RLHF</td><td>aprendizaje por refuerzo con retroalimentación humana</td></tr><tr><td>API</td><td>interfaz de programación de aplicaciones</td></tr><tr><td>IEEE</td><td>Instituto de Ingenieros Eléctricos y Electrónicos</td></tr><tr><td>IMRyD</td><td>Introducción, Métodos, Resultados y Discusión</td></tr><tr><td>DOI</td><td>identificador de objeto digital — el ID permanente de un artículo</td></tr><tr><td>APA</td><td>Asociación Estadounidense de Psicología — un estilo de citas</td></tr></tbody></table><p><strong>Regla de escritura #1:</strong> escribe completa cada sigla la primera vez — <em>modelo de lenguaje grande (LLM)</em> — y después usa la forma corta.</p>
+</section>
+
+<section class="section">
+<h2>Los agentes fallan de formas nuevas</h2>
+<ul><li><strong>Inyección de prompts</strong> — instrucciones escondidas en una página web, PDF o correo que el agente podría obedecer.</li><li><strong>Actuar sobre errores</strong> — un dato inventado se vuelve un correo enviado o un archivo sobrescrito.</li><li><strong>Fuga de datos</strong> — resultados inéditos pegados en una herramienta cuyos términos nunca leíste.</li><li><strong>Sesgo de automatización</strong> — confiar en un reporte porque se ve completo.</li></ul>
+</section>
+
+<section class="section">
+<h2>Ingeniería de instrucciones</h2>
+<p>Seis partes de un buen prompt: <strong>rol</strong> (como quién actúa) · <strong>tarea</strong> (un verbo claro) · <strong>contexto</strong> (tema, público, tu material) · <strong>formato</strong> (extensión, secciones) · <strong>ejemplos</strong> (uno o dos) · <strong>restricciones</strong> (qué no hacer; citar fuentes; decir “no sé”). Luego itera: un cambio a la vez. Pide crítica antes que prosa, y pídele que primero <em>te</em> haga preguntas.</p>
+</section>
+
+<section class="section">
+<h2>Generar imágenes</h2>
+<p>Describe el sujeto, el estilo, la composición, los colores y las etiquetas que necesitas. Luego revisa: las imágenes con IA a menudo deforman textos, dibujan piezas imposibles e inventan datos en gráficas. Úsalas sólo como figuras explicativas — nunca como resultado, medición o foto de un experimento — e indica en el pie de figura que la imagen fue generada con IA.</p>
+</section>
+
+<section class="section">
+<h2>Diez hábitos</h2>
+<ol><li>Da contexto: quién eres, el objetivo, el público, el formato.</li><li>Dale tu material en lugar de pedirle que recuerde datos.</li><li>Primero pide estructura y crítica, la prosa al final.</li><li>Itera: un cambio por prompt; conserva lo que funciona.</li><li>Verifica cada dato, número y referencia en la fuente.</li><li>Protege los datos: nada confidencial o inédito en herramientas desconocidas.</li><li>Pide la incertidumbre: “¿de qué estás menos seguro?”</li><li>Lleva una bitácora de los prompts y respuestas que moldearon tu trabajo.</li><li>Reescribe con tus palabras — si no lo puedes explicar, todavía no es tuyo.</li><li>Declara tu uso.</li></ol><p><strong>Herramientas permitidas en este curso:</strong> TECgpt, Agent Studio, Gemini, Copilot (institucionales); Zotero, Mendeley para referencias.</p>
+</section>
+
+<section class="section">
+<h2>En clase y después de clase</h2>
+<p><strong>Actividad 1</strong> (equipos de 4–5, 40 min): con TECgpt, Gemini o Copilot, escriban un texto breve sobre un tema que les interese y generen un apoyo visual — y revísenlo. <strong>Actividad 2</strong> (evaluable, 5 %): preséntenlo al grupo. <strong>Actividad 3</strong>: reflexión — ¿una herramienta que potencia tu pensamiento o un atajo que lo sustituye?</p><p><strong>Trabajo independiente (Canvas):</strong> Tarea 1 — lluvia de ideas y consulta de información (individual, 5 %); Tarea 2 — redacción y apoyos visuales con IA (equipo, 10 %).</p>
+</section>
+
+  </main>
+
+  <footer>
+    IA para textos científicos · Semana Tec · Tec de Monterrey · octubre 2026
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

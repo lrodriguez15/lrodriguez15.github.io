@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Session 1: AI, generative AI and agents — AI for Scientific Writing</title>
+  <title>Session 1: AI tools — generative AI and agents — AI for Scientific Writing</title>
+  <link rel="alternate" hreflang="en" href="https://lrodriguez15.github.io/lectures/aisw-01-intro-genai-agents.html" />
+  <link rel="alternate" hreflang="es" href="https://lrodriguez15.github.io/lectures/aisw-01-intro-genai-agents-es.html" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lang-switch{display:inline-flex;gap:0;border:1px solid var(--border,#30363d);border-radius:999px;overflow:hidden;font-size:.85rem;margin:.25rem 0 1rem}
+    .lang-switch a,.lang-switch span{padding:.25rem .8rem;text-decoration:none}
+    .lang-switch .on{background:var(--accent,#1f6feb);color:#fff;font-weight:600}
+  </style>
 </head>
 <body>
 
@@ -24,21 +31,15 @@
       <span class="sep">/</span>
       <a href="../ai-scientific-writing.html">AI for Scientific Writing</a>
       <span class="sep">/</span>
-      <span class="current">Session 1: AI, generative AI and agents</span>
+      <span class="current">Session 1: AI tools</span>
     </nav>
+    <div class="lang-switch"><span class="on">English</span><a href="aisw-01-intro-genai-agents-es.html">Español</a></div>
 
     <header class="lecture-header">
       <p class="lecture-num">Session 1 · Monday 26 October 2026 · 07:00–10:00</p>
-      <h1>AI, generative AI and agents — and how to use them well</h1>
-      <div class="chips">
-        <span class="chip chip-blue">AI vs ML vs GenAI</span>
-        <span class="chip chip-green">LLMs</span>
-        <span class="chip chip-orange">hallucination</span>
-        <span class="chip chip-blue">temperature</span>
-        <span class="chip chip-green">RAG</span>
-        <span class="chip chip-orange">agentic AI</span>
-      </div>
-      <p class="lecture-objective"><strong>Objective.</strong> Know what these tools are, the words people use about them, why they fail and the habits that make them useful — and leave with the topic and claim of your paper.</p>
+      <h1>AI tools: generative AI, agents — and how to use them well</h1>
+      <div class="chips"><span class="chip chip-blue">AI vs ML vs GenAI</span><span class="chip chip-green">LLMs</span><span class="chip chip-orange">hallucination</span><span class="chip chip-blue">prompt engineering</span><span class="chip chip-green">images</span><span class="chip chip-orange">agentic AI</span></div>
+      <p class="lecture-objective"><strong>Objective.</strong> Know what these tools are, the words people use about them, why they fail, how to prompt them and the habits that make them useful — and try them in teams.</p>
     </header>
 
 <section class="section">
@@ -54,76 +55,42 @@
 
 <section class="section">
 <h2>The map: from AI to agents</h2>
-<ul>
-<li><strong>Artificial intelligence (AI)</strong> — systems doing tasks that normally need human intelligence.</li>
-<li><strong>Machine learning (ML)</strong> — AI that learns patterns from data instead of hand-written rules.</li>
-<li><strong>Deep learning</strong> — ML with many-layer neural networks.</li>
-<li><strong>Generative AI</strong> — models that create new text, images, code or audio.</li>
-<li><strong>Large language models (LLMs)</strong> — generative AI for text, trained to predict the next token.</li>
-<li><strong>Agentic AI</strong> — an LLM plus tools (search, code, browser, files) and a loop: goal → plan → act → observe → check.</li>
-</ul>
-<p>An LLM writes one token at a time, choosing what is <em>plausible</em> — not what is <em>true</em>. That is why it can <strong>hallucinate</strong>: fluent, confident and wrong.</p>
+<ul><li><strong>Artificial intelligence (AI)</strong> — systems doing tasks that normally need human intelligence.</li><li><strong>Machine learning (ML)</strong> — AI that learns patterns from data instead of hand-written rules.</li><li><strong>Deep learning (DL)</strong> — ML with many-layer neural networks.</li><li><strong>Generative AI (GenAI)</strong> — models that create new text, images, code or audio.</li><li><strong>Large language models (LLMs)</strong> — generative AI for text, trained to predict the next token.</li><li><strong>Agentic AI</strong> — an LLM plus tools (search, code, browser, files) and a loop: goal → plan → act → observe → check.</li></ul><p>An LLM writes one token at a time, choosing what is <em>plausible</em> — not what is <em>true</em>. That is why it can <strong>hallucinate</strong>: fluent, confident and wrong.</p>
 </section>
 
 <section class="section">
 <h2>Vocabulary</h2>
-<p>The handout has 32 terms. The ones we demonstrate live: <strong>temperature</strong> (low = focused and repeatable, high = varied and riskier), <strong>context window</strong> and <strong>knowledge cutoff</strong>, and <strong>grounding / RAG</strong> (answering from sources you provide instead of from memory). Also: tokens, system prompt, zero-/few-shot, reasoning models, fine-tuning, RLHF, embeddings, multimodal, bias and guardrails.</p>
+<p>The handout has 32 terms. Demonstrated live: <strong>temperature</strong> (low = focused and repeatable, high = varied and riskier), <strong>context window</strong> and <strong>knowledge cutoff</strong>, and <strong>grounding / RAG</strong> (answering from sources you provide instead of from memory). Also: tokens, system prompt, zero-/few-shot, reasoning models, fine-tuning, RLHF, embeddings, multimodal, bias and guardrails.</p>
 </section>
 
 <section class="section">
 <h2>Acronyms</h2>
-<table>
-<thead><tr><th>Acronym</th><th>Stands for</th></tr></thead>
-<tbody>
-<tr><td>AI</td><td>artificial intelligence</td></tr>
-<tr><td>ML</td><td>machine learning</td></tr>
-<tr><td>DL</td><td>deep learning</td></tr>
-<tr><td>GenAI</td><td>generative artificial intelligence</td></tr>
-<tr><td>LLM</td><td>large language model</td></tr>
-<tr><td>GPT</td><td>generative pre-trained transformer (the models behind ChatGPT)</td></tr>
-<tr><td>RAG</td><td>retrieval-augmented generation</td></tr>
-<tr><td>RLHF</td><td>reinforcement learning from human feedback</td></tr>
-<tr><td>API</td><td>application programming interface — how programs and agents call a service</td></tr>
-<tr><td>IEEE</td><td>Institute of Electrical and Electronics Engineers — publisher of our paper template</td></tr>
-<tr><td>IMRaD</td><td>Introduction, Methods, Results and Discussion — the usual shape of a paper</td></tr>
-<tr><td>DOI</td><td>digital object identifier — a paper's permanent ID</td></tr>
-<tr><td>APA</td><td>American Psychological Association — a citation style (IEEE uses numbered references)</td></tr>
-</tbody>
-</table>
-<p><strong>Writing rule #1:</strong> spell out every acronym the first time — <em>large language model (LLM)</em> — then use the short form.</p>
+<table><thead><tr><th>Acronym</th><th>Stands for</th></tr></thead><tbody><tr><td>AI</td><td>artificial intelligence</td></tr><tr><td>ML</td><td>machine learning</td></tr><tr><td>DL</td><td>deep learning</td></tr><tr><td>GenAI</td><td>generative artificial intelligence</td></tr><tr><td>LLM</td><td>large language model</td></tr><tr><td>GPT</td><td>generative pre-trained transformer (the models behind ChatGPT)</td></tr><tr><td>RAG</td><td>retrieval-augmented generation</td></tr><tr><td>RLHF</td><td>reinforcement learning from human feedback</td></tr><tr><td>API</td><td>application programming interface</td></tr><tr><td>IEEE</td><td>Institute of Electrical and Electronics Engineers</td></tr><tr><td>IMRaD</td><td>Introduction, Methods, Results and Discussion</td></tr><tr><td>DOI</td><td>digital object identifier — a paper's permanent ID</td></tr><tr><td>APA</td><td>American Psychological Association — a citation style</td></tr></tbody></table><p><strong>Writing rule #1:</strong> spell out every acronym the first time — <em>large language model (LLM)</em> — then use the short form.</p>
 </section>
 
 <section class="section">
 <h2>Agents fail in new ways</h2>
-<ul>
-<li><strong>Prompt injection</strong> — instructions hidden in a web page, PDF or email that the agent may obey.</li>
-<li><strong>Acting on errors</strong> — an invented fact becomes an email sent or a file overwritten.</li>
-<li><strong>Data leakage</strong> — unpublished results pasted into a tool whose terms you never read.</li>
-<li><strong>Automation bias</strong> — trusting a report because it looks thorough.</li>
-</ul>
-<p>The more an AI can <em>do</em>, the more you check before it does it.</p>
+<ul><li><strong>Prompt injection</strong> — instructions hidden in a web page, PDF or email that the agent may obey.</li><li><strong>Acting on errors</strong> — an invented fact becomes an email sent or a file overwritten.</li><li><strong>Data leakage</strong> — unpublished results pasted into a tool whose terms you never read.</li><li><strong>Automation bias</strong> — trusting a report because it looks thorough.</li></ul>
+</section>
+
+<section class="section">
+<h2>Prompt engineering</h2>
+<p>Six parts of a good prompt: <strong>role</strong> (who it acts as) · <strong>task</strong> (one clear verb) · <strong>context</strong> (topic, audience, your material) · <strong>format</strong> (length, sections) · <strong>examples</strong> (one or two) · <strong>constraints</strong> (what not to do; cite sources; say “I don’t know”). Then iterate: one change at a time. Ask for critique before prose, and ask it to ask <em>you</em> questions first.</p>
+</section>
+
+<section class="section">
+<h2>Generating images</h2>
+<p>Describe the subject, style, composition, colours and the labels you need. Then check: AI images often garble text, draw impossible parts and invent data in charts. Use them only for explanatory figures — never as a result, measurement or photo of an experiment — and say in the caption that the image is AI-generated.</p>
 </section>
 
 <section class="section">
 <h2>Ten habits</h2>
-<ol>
-<li>Give context: who you are, the goal, the audience, the format.</li>
-<li>Give it your material instead of asking it to recall facts.</li>
-<li>Ask for structure and critique first, prose last.</li>
-<li>Iterate: one change per prompt; keep what works.</li>
-<li>Verify every fact, number and reference at the source.</li>
-<li>Protect data: nothing confidential or unpublished in unknown tools.</li>
-<li>Ask for uncertainty: “what are you least sure about?”</li>
-<li>Keep a log of the prompts and outputs that shaped your work.</li>
-<li>Rewrite in your own words — if you can't explain it, it isn't yours yet.</li>
-<li>Declare your use.</li>
-</ol>
+<ol><li>Give context: who you are, the goal, the audience, the format.</li><li>Give it your material instead of asking it to recall facts.</li><li>Ask for structure and critique first, prose last.</li><li>Iterate: one change per prompt; keep what works.</li><li>Verify every fact, number and reference at the source.</li><li>Protect data: nothing confidential or unpublished in unknown tools.</li><li>Ask for uncertainty: “what are you least sure about?”</li><li>Keep a log of the prompts and outputs that shaped your work.</li><li>Rewrite in your own words — if you can’t explain it, it isn’t yours yet.</li><li>Declare your use.</li></ol><p><strong>Allowed tools in this course:</strong> TECgpt, Agent Studio, Gemini, Copilot (institutional); Zotero, Mendeley for references.</p>
 </section>
 
 <section class="section">
-<h2>Today's evidence (Canvas, 10:00)</h2>
-<p>One per pair: topic and research question; your one-sentence claim — <em>“We show that X does Y under Z, measured by W”</em> — before and after asking an AI to attack it; the data and figures you already have; your AI-use log, started. Then a 10-term matching quiz, individual.</p>
-<p><strong>Tomorrow:</strong> bring your project files — data, photos, reports.</p>
+<h2>In class and after class</h2>
+<p><strong>Activity 1</strong> (teams of 4–5, 40 min): with TECgpt, Gemini or Copilot, write a short text on a topic you care about and generate one visual for it — then check it. <strong>Activity 2</strong> (graded, 5 %): present it to the group. <strong>Activity 3</strong>: reflection — a tool that amplifies your thinking, or a shortcut that replaces it?</p><p><strong>Independent work (Canvas):</strong> Task 1 — brainstorm and research (individual, 5 %); Task 2 — drafting and visuals with AI (team, 10 %).</p>
 </section>
 
   </main>
