@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session 4: Reference management with Mendeley — AI for Scientific Writing</title>
+  <link rel="alternate" hreflang="en" href="https://lrodriguez15.github.io/lectures/aisw-04-reference-managers.html" />
+  <link rel="alternate" hreflang="es" href="https://lrodriguez15.github.io/lectures/aisw-04-reference-managers-es.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lang-switch{display:inline-flex;gap:0;border:1px solid var(--border,#30363d);border-radius:999px;overflow:hidden;font-size:.85rem;margin:.25rem 0 1rem}
+    .lang-switch a,.lang-switch span{padding:.25rem .8rem;text-decoration:none}
+    .lang-switch .on{background:var(--accent,#1f6feb);color:#fff;font-weight:600}
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../ai-scientific-writing.html" class="nav-brand">~/ai-scientific-writing</a>
+      <span class="nav-course">AI for Scientific Writing · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <a href="../ai-scientific-writing.html">AI for Scientific Writing</a>
+      <span class="sep">/</span>
+      <span class="current">Session 4: Reference management</span>
+    </nav>
+    <div class="lang-switch"><span class="on">English</span><a href="aisw-04-reference-managers-es.html">Español</a></div>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Session 4 · Thursday 29 October 2026 · 07:00–10:05 · online (Google Meet, link in Canvas)</p>
+      <h1>Reference management with Mendeley — and a first step into LaTeX</h1>
+      <div class="chips"><span class="chip chip-blue">Mendeley</span><span class="chip chip-green">Mendeley Cite</span><span class="chip chip-orange">APA 7 / IEEE</span><span class="chip chip-blue">BibTeX</span><span class="chip chip-green">Overleaf</span><span class="chip chip-orange">LaTeX</span></div>
+      <p class="lecture-objective"><strong>Objective.</strong> Leave with your sources in Mendeley, automatic citations and bibliography in your article, and a working idea of how the same thing is done in LaTeX.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Slides and LaTeX template</h2>
+<p><a href="../files/aisw/aisw-04-slides.pdf">Open / download the slides (PDF)</a> · <a href="../files/aisw/aisw-04-plantilla-latex.zip">LaTeX template for Overleaf (main.tex + refs.bib, ZIP)</a></p>
+<object data="../files/aisw/aisw-04-slides.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/aisw/aisw-04-slides.pdf">Open the slides (PDF)</a></p></object>
+</section>
+
+<section class="section">
+<h2>Why a reference manager</h2>
+<p>By hand: misspelt authors, wrong years, citations missing from the list, and redoing everything when the journal asks for another style. A manager keeps your sources and PDFs in one database and generates citations and bibliography automatically. <strong>But it copies the data you give it</strong> — if a field is wrong, the citation is wrong.</p>
+</section>
+
+<section class="section">
+<h2>The Mendeley toolkit</h2>
+<ul><li><strong>Mendeley Reference Manager</strong> (desktop and web, syncs) — Mendeley Desktop can no longer be downloaded (since 1 September 2022).</li><li><strong>Mendeley Web Importer</strong> — browser extension for Chrome, Edge and Firefox.</li><li><strong>Mendeley Cite</strong> — Word add-in (Word 2016+, Word online).</li><li>Export to <strong>BibTeX (.bib)</strong> for LaTeX. Free and open-source alternative: <strong>Zotero</strong>.</li></ul>
+</section>
+
+<section class="section">
+<h2>Adding and checking references</h2>
+<p>Four ways: Web Importer on the article page, drag the PDF in, import a .bib/.ris from Scopus or Google Scholar, or type it by hand. Then check every field: full authors, exact title, journal or conference, volume, pages, year, a DOI that opens, and the right type.</p>
+</section>
+
+<section class="section">
+<h2>Citing in Word with Mendeley Cite</h2>
+<p>Insert citation → insert bibliography → switch style (APA 7 or IEEE) and everything updates. Don’t edit the bibliography by hand, use one manager per document, and update citations after fixing a field in Mendeley.</p>
+</section>
+
+<section class="section">
+<h2>LaTeX and BibTeX in 20 minutes</h2>
+<p>LaTeX is the standard in engineering; IEEE, Springer and Elsevier provide templates. <strong>Overleaf</strong> runs it in the browser. Flow: Mendeley → File → Export → BibTeX → upload <code>refs.bib</code> to Overleaf → <code>\cite{key}</code> → compile. Download the course template above: Overleaf → New project → Upload project → the ZIP. Submitting in LaTeX is optional this week.</p>
+</section>
+
+<section class="section">
+<h2>In class and after class</h2>
+<p><strong>Activity 11</strong> (40 min): your library — collection “Artículo Semana Tec”, your 5+ sources from Activity 5, metadata checked, one note per source. <strong>Activity 12</strong> (50 min): at least 5 citations and the bibliography in your article with Mendeley Cite; switch IEEE ↔ APA 7 and check.</p><p><strong>Task 7</strong> (5 %): practice with the reference manager. <strong>Task 8</strong> (5 %): reference review. Both due <strong>Friday 30, 18:00</strong>. Letter (Act. 10) and Tasks 5–6: <strong>today, 18:00</strong>.</p>
+</section>
+
+  </main>
+
+  <footer>
+    AI for Scientific Writing · Semana Tec · Tec de Monterrey · October 2026
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

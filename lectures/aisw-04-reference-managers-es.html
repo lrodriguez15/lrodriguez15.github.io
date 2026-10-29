@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesión 4: Gestión de referencias con Mendeley — IA para textos científicos</title>
+  <link rel="alternate" hreflang="en" href="https://lrodriguez15.github.io/lectures/aisw-04-reference-managers.html" />
+  <link rel="alternate" hreflang="es" href="https://lrodriguez15.github.io/lectures/aisw-04-reference-managers-es.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .lang-switch{display:inline-flex;gap:0;border:1px solid var(--border,#30363d);border-radius:999px;overflow:hidden;font-size:.85rem;margin:.25rem 0 1rem}
+    .lang-switch a,.lang-switch span{padding:.25rem .8rem;text-decoration:none}
+    .lang-switch .on{background:var(--accent,#1f6feb);color:#fff;font-weight:600}
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="../ai-scientific-writing-es.html" class="nav-brand">~/ia-textos-cientificos</a>
+      <span class="nav-course">IA para textos científicos · Tec de Monterrey</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="../index.html">Inicio</a>
+      <span class="sep">/</span>
+      <a href="../ai-scientific-writing-es.html">IA para textos científicos</a>
+      <span class="sep">/</span>
+      <span class="current">Sesión 4: Gestión de referencias</span>
+    </nav>
+    <div class="lang-switch"><a href="aisw-04-reference-managers.html">English</a><span class="on">Español</span></div>
+
+    <header class="lecture-header">
+      <p class="lecture-num">Sesión 4 · jueves 29 de octubre de 2026 · 07:00–10:05 · en línea (Google Meet, enlace en Canvas)</p>
+      <h1>Gestión de referencias con Mendeley — y un primer paso en LaTeX</h1>
+      <div class="chips"><span class="chip chip-blue">Mendeley</span><span class="chip chip-green">Mendeley Cite</span><span class="chip chip-orange">APA 7 / IEEE</span><span class="chip chip-blue">BibTeX</span><span class="chip chip-green">Overleaf</span><span class="chip chip-orange">LaTeX</span></div>
+      <p class="lecture-objective"><strong>Objetivo.</strong> Salir con tus fuentes en Mendeley, citas y bibliografía automáticas en tu artículo, y una idea clara de cómo se hace lo mismo en LaTeX.</p>
+    </header>
+
+<section class="section">
+<h2 id="slides">Diapositivas y plantilla de LaTeX</h2>
+<p><a href="../files/aisw/aisw-04-slides-es.pdf">Abrir / descargar las diapositivas (PDF)</a> · <a href="../files/aisw/aisw-04-plantilla-latex.zip">Plantilla de LaTeX para Overleaf (main.tex + refs.bib, ZIP)</a></p>
+<object data="../files/aisw/aisw-04-slides-es.pdf#view=FitH" type="application/pdf" style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border,#30363d);border-radius:8px"><p><a href="../files/aisw/aisw-04-slides-es.pdf">Abrir las diapositivas (PDF)</a></p></object>
+</section>
+
+<section class="section">
+<h2>Por qué un gestor de referencias</h2>
+<p>A mano: autores mal escritos, años equivocados, citas que no están en la lista y rehacer todo cuando la revista pide otro estilo. Un gestor guarda tus fuentes y sus PDF en una base de datos y genera citas y bibliografía automáticamente. <strong>Pero copia los datos que le das</strong>: si un campo está mal, la cita sale mal.</p>
+</section>
+
+<section class="section">
+<h2>Las herramientas de Mendeley</h2>
+<ul><li><strong>Mendeley Reference Manager</strong> (escritorio y web, sincroniza) — Mendeley Desktop ya no se puede descargar (desde el 1 de septiembre de 2022).</li><li><strong>Mendeley Web Importer</strong> — extensión para Chrome, Edge y Firefox.</li><li><strong>Mendeley Cite</strong> — complemento de Word (Word 2016 o posterior, Word en línea).</li><li>Exportar a <strong>BibTeX (.bib)</strong> para LaTeX. Alternativa libre y de código abierto: <strong>Zotero</strong>.</li></ul>
+</section>
+
+<section class="section">
+<h2>Agregar y revisar referencias</h2>
+<p>Cuatro caminos: Web Importer en la página del artículo, arrastrar el PDF, importar un .bib/.ris de Scopus o Google Scholar, o capturarla a mano. Después revisa cada campo: autores completos, título exacto, revista o congreso, volumen, páginas, año, un DOI que abre y el tipo correcto.</p>
+</section>
+
+<section class="section">
+<h2>Citar en Word con Mendeley Cite</h2>
+<p>Insertar cita → insertar bibliografía → cambiar estilo (APA 7 o IEEE) y todo se actualiza. No edites la bibliografía a mano, usa un solo gestor por documento y actualiza las citas después de corregir un campo en Mendeley.</p>
+</section>
+
+<section class="section">
+<h2>LaTeX y BibTeX en 20 minutos</h2>
+<p>LaTeX es el estándar en ingeniería; IEEE, Springer y Elsevier dan plantillas. <strong>Overleaf</strong> lo corre en el navegador. Flujo: Mendeley → Archivo → Exportar → BibTeX → sube <code>refs.bib</code> a Overleaf → <code>\cite{clave}</code> → compilar. Descarga la plantilla del curso (arriba): Overleaf → Nuevo proyecto → Subir proyecto → el ZIP. Entregar en LaTeX es opcional esta semana.</p>
+</section>
+
+<section class="section">
+<h2>En clase y después de clase</h2>
+<p><strong>Actividad 11</strong> (40 min): tu biblioteca — colección “Artículo Semana Tec”, tus 5+ fuentes de la Actividad 5, metadatos revisados, una nota por fuente. <strong>Actividad 12</strong> (50 min): al menos 5 citas y la bibliografía en tu artículo con Mendeley Cite; cambia IEEE ↔ APA 7 y revisa.</p><p><strong>Tarea 7</strong> (5 %): práctica con el gestor de referencias. <strong>Tarea 8</strong> (5 %): revisión de referencias. Ambas vencen el <strong>viernes 30 a las 18:00</strong>. Carta (Act. 10) y Tareas 5–6: <strong>hoy, 18:00</strong>.</p>
+</section>
+
+  </main>
+
+  <footer>
+    IA para textos científicos · Semana Tec · Tec de Monterrey · octubre 2026
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
