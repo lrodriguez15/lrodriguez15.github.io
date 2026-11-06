@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Profesional sin Complicaciones · Nivel Intermedio — ESFE Querétaro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.9rem;margin:1rem 0}
+    .dl{display:flex;gap:.75rem;align-items:flex-start;padding:.9rem 1rem;border:1px solid var(--border,#30363d);
+        border-radius:10px;text-decoration:none;transition:border-color .15s}
+    .dl:hover{border-color:#c08a2e}
+    .dl .ext{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.04em;
+             padding:.2rem .45rem;border-radius:4px;background:#00353d;color:#fff;flex:none;margin-top:.15rem}
+    .dl .ext.xls{background:#1a7f37}.dl .ext.pdf{background:#b3261e}
+    .dl b{display:block;font-size:.95rem;margin-bottom:.15rem}
+    .dl span{font-size:.82rem;opacity:.75;line-height:1.35}
+    .callout{border-left:3px solid #c08a2e;padding:.8rem 1rem;margin:1.2rem 0;background:rgba(192,138,46,.07);border-radius:0 8px 8px 0}
+    .callout b{color:#c08a2e}
+    .sesion{border:1px solid var(--border,#30363d);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.8rem}
+    .sesion .n{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;opacity:.6;text-transform:uppercase}
+    .sesion h3{margin:.25rem 0 .4rem;font-size:1.05rem}
+    .sesion p{margin:0;font-size:.9rem;opacity:.85}
+  </style>
+</head>
+<body>
+<!--
+  ══════════════════════════════════════════════════════════════════════
+   EDITAR DOS COSAS Y LISTO
+   1) ENCUESTA_URL  → la liga de tu formulario.
+      Si NO vas a usar encuesta, borra la sección marcada <!-- ENCUESTA -->
+   2) Los archivos deben estar en  files/word-institucional/
+  ══════════════════════════════════════════════════════════════════════
+-->
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">~/teaching</a>
+      <span class="nav-course">Word Institucional · ESFE Querétaro</span>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="index.html">Inicio</a>
+      <span class="sep">/</span>
+      <span class="current">Word Profesional sin Complicaciones</span>
+    </nav>
+
+    <header class="hero">
+      <p class="hero-eyebrow">ESFE Querétaro · IEEF — Formación Continua 2026 · 3 sesiones de 2 h</p>
+      <h1>Word Profesional sin Complicaciones<br />· Nivel Intermedio ·</h1>
+      <p class="hero-sub">Automatizar lo que hoy se hace a mano. Un documento institucional se construye en vivo,
+      de la hoja en blanco a la entrega: plantilla, estilos, secciones, tablas desde Excel, índices
+      automáticos, revisión entre varias personas y limpieza final.</p>
+      <div class="chips"><span class="chip chip-blue">documentos extensos</span><span class="chip chip-green">colaboración</span><span class="chip chip-orange">control de versiones</span></div>
+    </header>
+
+    <!-- ENCUESTA · borrar desde aquí si no hay formulario -->
+    <section class="section">
+      <h2>Antes del curso: cuéntenos qué hace en Word</h2>
+      <p>Once preguntas, tres minutos, y no pide su nombre. <strong>Lo que conteste decide qué vemos
+      en las seis horas</strong> — si algo que hace todos los días no aparece en las opciones, escríbalo
+      en la última pregunta.</p>
+      <p><a class="btn" href="ENCUESTA_URL">Contestar la encuesta</a></p>
+      <div class="callout">
+        <b>¿Por qué importa?</b> El curso se diseñó sobre un temario institucional. Sus respuestas son
+        lo que lo ancla a los documentos que ustedes realmente elaboran: oficios, informes, cédulas, actas.
+      </div>
+    </section>
+
+    <!-- ENCUESTA · hasta aquí -->
+
+    <!-- ════════ DESCARGAS ════════ -->
+    <section class="section">
+      <h2>Material de práctica</h2>
+      <p id="dl"><strong>Descárguelos antes de la sesión 1.</strong> Son los archivos sobre los que trabajamos
+      durante todo el curso.</p>
+      <div class="dl-grid">
+        <a class="dl" href="files/word-institucional/oficio-sucio.docx" download>
+          <span class="ext">DOCX</span>
+          <span><b>Informe de práctica</b><span>El documento tal como suele venir: formato manual, numeración tecleada, índice que miente. El punto de partida.</span></span>
+        </a>
+        <a class="dl" href="files/word-institucional/documento-limpio.docx" download>
+          <span class="ext">DOCX</span>
+          <span><b>El mismo, bien hecho</b><span>Mismo texto y mismas cifras, con estilos, secciones, índice automático y metadatos limpios. El destino.</span></span>
+        </a>
+        <a class="dl" href="files/word-institucional/padron-entidades.xlsx" download>
+          <span class="ext xls">XLSX</span>
+          <span><b>Padrón de entidades</b><span>Base de datos de práctica para combinar correspondencia. <strong>Datos ficticios</strong> — ver la hoja LEEME.</span></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ════════ SESIONES ════════ -->
+    <section class="unit">
+      <h2>Las tres sesiones</h2>
+      <p class="unit-desc">Es un solo documento que nace, crece y se entrega. Las diapositivas se publican
+      conforme se imparte cada sesión.</p>
+
+      <div class="sesion">
+        <p class="n">Sesión 1 · Temas 1–2</p>
+        <h3>Nace el documento</h3>
+        <p>De la hoja en blanco a una plantilla institucional con estilos. Configuración correcta,
+        y por qué cambiar el formato de un documento entero debe costar un solo gesto.</p>
+      </div>
+
+      <div class="sesion">
+        <p class="n">Sesión 2 · Temas 3–5</p>
+        <h3>Crece el documento</h3>
+        <p>Secciones y numeración que no se rompen, tablas que vienen de Excel y sobreviven al cruzar
+        de página, e índices y referencias que se generan y se actualizan solos.</p>
+      </div>
+
+      <div class="sesion">
+        <p class="n">Sesión 3 · Temas 6–8</p>
+        <h3>Se entrega el documento</h3>
+        <p>Control de cambios, comentarios y <strong>combinar</strong> las revisiones de varias personas en
+        un solo archivo. Limpieza final e Inspector de documento. Taller de transformación.</p>
+      </div>
+    </section>
+
+    <!-- ════════ RECURSOS ════════ -->
+    <section class="section">
+      <h2>Para llevarse</h2>
+      <p>No hace falta apuntar rutas de menú durante el curso: todo queda aquí.</p>
+      <div class="dl-grid">
+        <a class="dl" href="files/word-institucional/lista-verificacion-entrega.pdf" download>
+          <span class="ext pdf">PDF</span>
+          <span><b>Lista de verificación de entrega</b><span>Once comprobaciones antes de mandar un documento a firma. Para pegar junto al escritorio.</span></span>
+        </a>
+        <a class="dl" href="files/word-institucional/auditoria-8-puntos.pdf" download>
+          <span class="ext pdf">PDF</span>
+          <span><b>Auditoría de documentos</b><span>Ocho comprobaciones para diagnosticar cualquier PDF publicado en menos de un minuto.</span></span>
+        </a>
+      </div>
+      <div class="callout">
+        <b>Sobre los documentos de práctica.</b> Combinan nombres reales y ficticios y
+        <strong>no corresponden a ninguna auditoría real</strong>. Son material didáctico.
+        Ningún dato de una auditoría real se usa en el curso ni se captura en herramientas de IA.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Quién lo imparte</h2>
+      <p><strong>Dr. Leopoldo Rodríguez Salazar.</strong> Ingeniero con doctorado; trabajó en Ford,
+      GE Aviation y Jaguar Land Rover. Dirige Helgen Technologies en Querétaro y da clases en el
+      Tec de Monterrey. Ha escrito artículos, tesis, informes técnicos y propuestas — documentos
+      largos, con referencias, revisados por varias manos antes de firmarse.</p>
+      <p class="muted" style="font-size:.85rem;opacity:.7">ESFE Querétaro · IEEF — Formación Continua 2026.
+      Impartido por IDEA · Instituto Digital de Estudios Avanzados.</p>
+    </section>
+
+  </main>
+</body>
+</html>
