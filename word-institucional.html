@@ -3,47 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Word Profesional sin Complicaciones · Nivel Intermedio — ESFE Querétaro</title>
+  <title>Word Profesional sin Complicaciones — ESFE Querétaro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    .dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.9rem;margin:1rem 0}
-    .dl{display:flex;gap:.75rem;align-items:flex-start;padding:.9rem 1rem;border:1px solid var(--border,#30363d);
-        border-radius:10px;text-decoration:none;transition:border-color .15s}
-    .dl:hover{border-color:#c08a2e}
-    .dl .ext{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.04em;
-             padding:.2rem .45rem;border-radius:4px;background:#00353d;color:#fff;flex:none;margin-top:.15rem}
-    .dl .ext.xls{background:#1a7f37}.dl .ext.pdf{background:#b3261e}
-    .dl b{display:block;font-size:.95rem;margin-bottom:.15rem}
-    .dl span{font-size:.82rem;opacity:.75;line-height:1.35}
-    /* Panel privado: sólo aparece si la URL termina en #resultados */
+    /* ── QR de la encuesta ── */
+    .qr-box{display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;
+            border:1px solid #30363d;border-radius:12px;padding:1.3rem;margin:1.2rem 0}
+    .qr-link{flex:0 0 auto;display:block;line-height:0;background:#fff;
+             padding:10px;border-radius:10px;text-decoration:none}
+    .qr-link img{width:190px;height:190px;display:block}
+    .qr-side{flex:1 1 15rem;min-width:14rem}
+    .qr-side p{margin:.3rem 0 .9rem}
+    .qr-url{font-family:"JetBrains Mono",monospace;font-size:.8rem;opacity:.6;word-break:break-all}
+    @media (max-width:560px){ .qr-link img{width:150px;height:150px} }
+
+    /* ── El formulario embebido va plegado: así no atrapa el scroll ── */
+    details.embed{border:1px solid #30363d;border-radius:10px;padding:.5rem .9rem;margin:1rem 0}
+    details.embed summary{cursor:pointer;font-weight:600;padding:.35rem 0}
+    details.embed iframe{display:block;width:100%;height:1500px;border:0;margin-top:.8rem}
+
+    /* ── Panel privado: sólo si la dirección termina en #resultados ── */
     #resultados{display:none}
     #resultados:target{display:block}
-    #resultados .priv{border:1px solid #c08a2e;border-radius:10px;padding:1rem 1.1rem;background:rgba(192,138,46,.06)}
-    #resultados h2{color:#c08a2e}
-    .form-wrap{border:1px solid var(--border,#30363d);border-radius:10px;overflow:hidden;margin:1.2rem 0;background:#fff}
-    .form-wrap iframe{display:block;width:100%;border:0}
-    .callout{border-left:3px solid #c08a2e;padding:.8rem 1rem;margin:1.2rem 0;background:rgba(192,138,46,.07);border-radius:0 8px 8px 0}
-    .callout b{color:#c08a2e}
-    .sesion{border:1px solid var(--border,#30363d);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.8rem}
-    .sesion .n{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;opacity:.6;text-transform:uppercase}
-    .sesion h3{margin:.25rem 0 .4rem;font-size:1.05rem}
-    .sesion p{margin:0;font-size:.9rem;opacity:.85}
+    #resultados .box{border:1px solid #c08a2e;border-radius:12px;padding:1.1rem 1.2rem;
+                     background:rgba(192,138,46,.06)}
+    #resultados h2{color:#c08a2e;margin-top:0}
+    #resultados iframe{display:block;width:100%;height:1100px;border:0;margin:.8rem 0}
   </style>
 </head>
 <body>
-<!--
-  ══════════════════════════════════════════════════════════════════════
-   EDITAR DOS COSAS Y LISTO
-   1) 1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w  → el id de tu formulario de Google (aparece dos veces).
-      Si NO vas a usar encuesta, borra la sección marcada <!-- ENCUESTA -->
-   2) Los archivos deben estar en  files/word-institucional/
-   3) Panel privado de resultados:  word-institucional.html#resultados
-      (oculto en la página normal; activar "Ver resumen de respuestas" en el formulario)
-  ══════════════════════════════════════════════════════════════════════
--->
 
   <nav class="site-nav">
     <div class="nav-inner">
@@ -61,156 +52,158 @@
 
     <header class="hero">
       <p class="hero-eyebrow">ESFE Querétaro · IEEF — Formación Continua 2026 · 3 sesiones de 2 h</p>
-      <h1>Word Profesional sin Complicaciones<br />· Nivel Intermedio ·</h1>
-      <p class="hero-sub">Automatizar lo que hoy se hace a mano. Un documento institucional se construye en vivo,
-      de la hoja en blanco a la entrega: plantilla, estilos, secciones, tablas desde Excel, índices
-      automáticos, revisión entre varias personas y limpieza final.</p>
+      <h1>Word Profesional sin Complicaciones</h1>
+      <p class="hero-sub">Automatizar lo que hoy se hace a mano. Un documento institucional se construye
+      en vivo, de la hoja en blanco a la entrega: plantilla, estilos, secciones, tablas desde Excel,
+      índices automáticos, revisión entre varias personas y limpieza final.</p>
       <div class="chips"><span class="chip chip-blue">documentos extensos</span><span class="chip chip-green">colaboración</span><span class="chip chip-orange">control de versiones</span></div>
     </header>
 
-    <!-- ENCUESTA · pegar el ID del formulario en el iframe de abajo -->
+    <!-- ════════════════ ENCUESTA ════════════════ -->
     <section class="section" id="encuesta">
       <h2>Antes de empezar: ¿qué hace usted en Word?</h2>
-      <p>Cinco preguntas, dos minutos, <strong>sin nombre</strong>. No hay respuestas
-      equivocadas — y la de malos hábitos la hemos contestado todos que sí.</p>
-      <p><strong>Lo que conteste decide qué vemos en las seis horas.</strong></p>
+      <p>Cinco preguntas, dos minutos, <strong>sin nombre</strong>. No hay respuestas equivocadas
+      — y la de malos hábitos la hemos contestado todos que sí.
+      <strong>Lo que contesten decide qué vemos en las seis horas.</strong></p>
 
-      <div class="form-wrap">
-        <!-- ══ EDITAR: sustituir 1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w por el de su formulario ══ -->
-        <iframe
-          src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform?embedded=true"
-          width="100%" height="900" frameborder="0" marginheight="0" marginwidth="0"
-          title="Encuesta previa del curso">Cargando la encuesta…</iframe>
-      </div>
-
-      <p class="muted" style="font-size:.85rem;opacity:.7">¿No carga? Ábrala directo:
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform">encuesta del curso</a>.</p>
-    </section>
-    <!-- ENCUESTA · hasta aquí -->
-
-    <!-- ══════ PANEL PRIVADO · sólo visible en  ...word-institucional.html#resultados  ══════ -->
-    <section class="section" id="resultados">
-      <div class="priv">
-        <h2>Resultados en vivo</h2>
-        <p style="font-size:.9rem">Esta sección no aparece en la página normal: sólo se ve si la
-        dirección termina en <code>#resultados</code>.</p>
-
-        <div class="form-wrap">
-          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics"
-            width="100%" height="900" frameborder="0" title="Resultados">Cargando resultados…</iframe>
+      <div class="qr-box">
+        <a class="qr-link" href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform" target="_blank" rel="noopener">
+          <img src="files/word-institucional/qr-encuesta.svg" alt="Código QR de la encuesta del curso" width="190" height="190" />
+        </a>
+        <div class="qr-side">
+          <p><strong>Apunte la cámara del teléfono al código.</strong> El código es un enlace:
+          también se puede tocar desde el teléfono o la computadora.</p>
+          <a class="slide-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform" target="_blank" rel="noopener">Abrir la encuesta →</a>
+          <p class="qr-url">docs.google.com/forms/…/viewform</p>
         </div>
+      </div>
 
-        <p style="font-size:.88rem"><b>Para proyectar:</b>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics" target="_blank">abrir los resultados en pantalla completa</a>
-        · <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform" target="_blank">el formulario</a></p>
+      <details class="embed">
+        <summary>Contestarla aquí mismo, sin salir de la página</summary>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform?embedded=true" loading="lazy" title="Encuesta previa del curso">Cargando la encuesta…</iframe>
+      </details>
+    </section>
 
-        <p style="font-size:.88rem"><b>Para borrar las respuestas</b> (después de probar, o entre
-        grupos): en el formulario, pestaña <b>Respuestas</b> → menú <b>⋮</b> →
-        <b>Eliminar todas las respuestas</b>. No se puede deshacer, y es justo lo que se quiere
-        antes de empezar en serio.</p>
-
-        <p style="font-size:.85rem;opacity:.75">Para que esta vista funcione hay que activar en el
-        formulario: <b>Configuración → Respuestas → Ver resumen de respuestas</b>. Sin eso, el
-        resumen queda privado y el recuadro de arriba sale vacío.</p>
+    <!-- ══════ PANEL PRIVADO · sólo en  word-institucional.html#resultados  ══════ -->
+    <section class="section" id="resultados">
+      <div class="box">
+        <h2>Resultados en vivo</h2>
+        <p>Esta sección no aparece en la página normal: sólo se ve si la dirección termina en
+        <code>#resultados</code>.</p>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics" loading="lazy" title="Resultados">Cargando resultados…</iframe>
+        <p><strong>Para proyectar:</strong>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics" target="_blank" rel="noopener">resultados en pantalla completa</a>
+        · <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform" target="_blank" rel="noopener">el formulario</a></p>
+        <p><strong>Para borrar las respuestas</strong> (después de probar, o entre grupos): en el
+        formulario, pestaña <strong>Respuestas</strong> → menú <strong>⋮</strong> →
+        <strong>Eliminar todas las respuestas</strong>. No se puede deshacer.</p>
+        <p>Requisito: activar en el formulario <strong>Configuración → Respuestas → Ver resumen de
+        respuestas</strong>. Sin eso el recuadro sale vacío.</p>
       </div>
     </section>
 
-    <!-- ════════ DESCARGAS ════════ -->
+    <!-- ════════════════ MATERIAL DE PRÁCTICA ════════════════ -->
+    <p class="section-label">Material de práctica</p>
     <section class="section">
-      <h2>Material de práctica</h2>
-      <p id="dl"><strong>Descárguelos antes de la sesión 1.</strong> Son los archivos sobre los que trabajamos
-      durante todo el curso.</p>
-      <div class="dl-grid">
-        <a class="dl" href="files/word-institucional/oficio-sucio.docx" download>
-          <span class="ext">DOCX</span>
-          <span><b>Informe de práctica</b><span>El documento tal como suele venir: formato manual, numeración tecleada, índice que miente. El punto de partida.</span></span>
-        </a>
-        <a class="dl" href="files/word-institucional/documento-limpio.docx" download>
-          <span class="ext">DOCX</span>
-          <span><b>El mismo, bien hecho</b><span>Mismo texto y mismas cifras, con estilos, secciones, índice automático y metadatos limpios. El destino.</span></span>
-        </a>
-        <a class="dl" href="files/word-institucional/padron-entidades.xlsx" download>
-          <span class="ext xls">XLSX</span>
-          <span><b>Padrón de entidades</b><span>Base de datos de práctica para combinar correspondencia. <strong>Datos ficticios</strong> — ver la hoja LEEME.</span></span>
-        </a>
+      <p><strong>Descárguelos antes de la sesión 1.</strong> Son los archivos sobre los que
+      trabajamos durante todo el curso.</p>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-num">DOCX · punto de partida</span>
+          <span class="card-title">Informe de práctica</span>
+          <span class="card-desc">El documento tal como suele venir: formato aplicado a mano,
+          numeración tecleada, índice que miente. Es el que arreglamos en vivo.</span>
+          <a class="card-link" href="files/word-institucional/oficio-sucio.docx">Descargar DOCX →</a>
+        </div>
+        <div class="card">
+          <span class="card-num">DOCX · destino</span>
+          <span class="card-title">El mismo, bien hecho</span>
+          <span class="card-desc">Mismo texto y mismas cifras, con estilos reales, secciones,
+          índice automático y metadatos limpios. Para comparar.</span>
+          <a class="card-link" href="files/word-institucional/documento-limpio.docx">Descargar DOCX →</a>
+        </div>
+        <div class="card">
+          <span class="card-num">XLSX · datos ficticios</span>
+          <span class="card-title">Padrón de entidades</span>
+          <span class="card-desc">Base de práctica para combinar correspondencia.
+          <strong>Datos completamente inventados</strong> — ver la hoja LEEME.</span>
+          <a class="card-link" href="files/word-institucional/padron-entidades.xlsx">Descargar XLSX →</a>
+        </div>
+      </div>
+      <div class="note">
+        <strong>Sobre los documentos de práctica.</strong> Son material didáctico con datos
+        ficticios. No corresponden a ningún expediente, auditoría ni ente fiscalizado real.
       </div>
     </section>
 
-    <!-- ════════ SESIONES ════════ -->
+    <!-- ════════════════ LAS TRES SESIONES ════════════════ -->
     <section class="unit">
       <h2>Las tres sesiones</h2>
-      <p class="unit-desc">Es un solo documento que nace, crece y se entrega. Las diapositivas de cada
-      sesión se pueden descargar abajo.</p>
-
-      <div class="sesion">
-        <p class="n">Sesión 1 · Temas 1–2</p>
-        <h3>Nace el documento</h3>
-        <p>De la hoja en blanco a una plantilla institucional con estilos. Configuración correcta,
-        y por qué cambiar el formato de un documento entero debe costar un solo gesto.</p>
-      </div>
-
-      <div class="sesion">
-        <p class="n">Sesión 2 · Temas 3–5</p>
-        <h3>Crece el documento</h3>
-        <p>Secciones y numeración que no se rompen, tablas que vienen de Excel y sobreviven al cruzar
-        de página, e índices y referencias que se generan y se actualizan solos.</p>
-      </div>
-
-      <div class="sesion">
-        <p class="n">Sesión 3 · Temas 6–8</p>
-        <h3>Se entrega el documento</h3>
-        <p>Control de cambios, comentarios y <strong>combinar</strong> las revisiones de varias personas en
-        un solo archivo. Limpieza final e Inspector de documento. Taller de transformación.</p>
-      </div>
-
-      <h3 style="margin-top:2rem">Diapositivas</h3>
-      <div class="dl-grid">
-        <a class="dl" href="files/word-institucional/sesion-1-nace-el-documento.pdf" download>
-          <span class="ext pdf">PDF</span>
-          <span><b>Sesión 1 · Nace el documento</b><span>Configuración del documento y estilos. Temas 1 y 2.</span></span>
-        </a>
-        <a class="dl" href="files/word-institucional/sesion-2-crece-el-documento.pdf" download>
-          <span class="ext pdf">PDF</span>
-          <span><b>Sesión 2 · Crece el documento</b><span>Secciones, numeración, tablas desde Excel, índices y referencias. Temas 3 a 5.</span></span>
-        </a>
-        <a class="dl" href="files/word-institucional/sesion-3-se-entrega-el-documento.pdf" download>
-          <span class="ext pdf">PDF</span>
-          <span><b>Sesión 3 · Se entrega el documento</b><span>Control de cambios, combinar revisiones, limpieza final y taller. Temas 6 a 8.</span></span>
-        </a>
+      <p class="unit-desc">Es un solo documento que nace, crece y se entrega. Las diapositivas de
+      cada sesión se descargan aquí.</p>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-num">Sesión 1 · Temas 1–2</span>
+          <span class="card-title">Nace el documento</span>
+          <span class="card-desc">De la hoja en blanco a una plantilla institucional con estilos.
+          Configuración correcta, y por qué cambiar el formato de un documento entero debe costar
+          un solo gesto.</span>
+          <a class="card-link" href="files/word-institucional/sesion-1-nace-el-documento.pdf">Diapositivas (PDF) →</a>
+        </div>
+        <div class="card">
+          <span class="card-num">Sesión 2 · Temas 3–5</span>
+          <span class="card-title">Crece el documento</span>
+          <span class="card-desc">Secciones y numeración que no se rompen, tablas que vienen de
+          Excel y sobreviven al cruzar de página, e índices y referencias que se actualizan solos.</span>
+          <a class="card-link" href="files/word-institucional/sesion-2-crece-el-documento.pdf">Diapositivas (PDF) →</a>
+        </div>
+        <div class="card">
+          <span class="card-num">Sesión 3 · Temas 6–8</span>
+          <span class="card-title">Se entrega el documento</span>
+          <span class="card-desc">Control de cambios, comentarios y <strong>combinar</strong> las
+          revisiones de varias personas en un solo archivo. Limpieza final, Inspector de documento
+          y taller de transformación.</span>
+          <a class="card-link" href="files/word-institucional/sesion-3-se-entrega-el-documento.pdf">Diapositivas (PDF) →</a>
+        </div>
       </div>
     </section>
 
-    <!-- ════════ RECURSOS ════════ -->
+    <!-- ════════════════ PARA LLEVARSE ════════════════ -->
+    <p class="section-label">Para llevarse</p>
     <section class="section">
-      <h2>Para llevarse</h2>
       <p>No hace falta apuntar rutas de menú durante el curso: todo queda aquí.</p>
-      <div class="dl-grid">
-        <a class="dl" href="files/word-institucional/lista-verificacion-entrega.pdf" download>
-          <span class="ext pdf">PDF</span>
-          <span><b>Lista de verificación de entrega</b><span>Once comprobaciones antes de mandar un documento a firma. Para pegar junto al escritorio.</span></span>
-        </a>
-        <a class="dl" href="files/word-institucional/auditoria-8-puntos.pdf" download>
-          <span class="ext pdf">PDF</span>
-          <span><b>Auditoría de documentos</b><span>Ocho comprobaciones para diagnosticar cualquier PDF publicado en menos de un minuto.</span></span>
-        </a>
-      </div>
-      <div class="callout">
-        <b>Sobre los documentos de práctica.</b> Combinan nombres reales y ficticios y
-        <strong>no corresponden a ninguna auditoría real</strong>. Son material didáctico.
-        Ningún dato de una auditoría real se usa en el curso ni se captura en herramientas de IA.
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-num">PDF · una hoja</span>
+          <span class="card-title">Lista de verificación de entrega</span>
+          <span class="card-desc">Once comprobaciones antes de mandar un documento a firma.
+          Para pegar junto al escritorio.</span>
+          <a class="card-link" href="files/word-institucional/lista-verificacion-entrega.pdf">Descargar PDF →</a>
+        </div>
+        <div class="card">
+          <span class="card-num">PDF · instrumento</span>
+          <span class="card-title">Auditoría de documentos</span>
+          <span class="card-desc">Ocho comprobaciones para diagnosticar cualquier PDF publicado
+          en menos de un minuto, y el tema del curso que corrige cada hallazgo.</span>
+          <a class="card-link" href="files/word-institucional/auditoria-8-puntos.pdf">Descargar PDF →</a>
+        </div>
       </div>
     </section>
 
+    <!-- ════════════════ QUIÉN LO IMPARTE ════════════════ -->
     <section class="section">
       <h2>Quién lo imparte</h2>
-      <p><strong>Dr. Leopoldo Rodríguez Salazar.</strong> Ingeniero con doctorado; trabajó en Ford,
-      GE Aviation y Jaguar Land Rover. Dirige Helgen Technologies en Querétaro y da clases en el
-      Tec de Monterrey. Ha escrito artículos, tesis, informes técnicos y propuestas — documentos
-      largos, con referencias, revisados por varias manos antes de firmarse.</p>
-      <p class="muted" style="font-size:.85rem;opacity:.7">ESFE Querétaro · IEEF — Formación Continua 2026.
-      Impartido por IDEA · Instituto Digital de Estudios Avanzados.</p>
+      <p><strong>Dr. Leopoldo Rodríguez Salazar</strong> — Ingeniero, doctor en ingeniería y
+      director de Helgen Technologies. Imparte a través de <strong>IDEA · Instituto Digital de
+      Estudios Avanzados</strong>.</p>
+      <p><a class="card-link" href="index.html">Ver los demás cursos →</a></p>
     </section>
-
   </main>
+
+  <footer>
+    ESFE Querétaro · IEEF — Formación Continua 2026 · IDEA
+  </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
