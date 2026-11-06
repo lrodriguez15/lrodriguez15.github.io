@@ -18,6 +18,13 @@
     .dl .ext.xls{background:#1a7f37}.dl .ext.pdf{background:#b3261e}
     .dl b{display:block;font-size:.95rem;margin-bottom:.15rem}
     .dl span{font-size:.82rem;opacity:.75;line-height:1.35}
+    /* Panel privado: sólo aparece si la URL termina en #resultados */
+    #resultados{display:none}
+    #resultados:target{display:block}
+    #resultados .priv{border:1px solid #c08a2e;border-radius:10px;padding:1rem 1.1rem;background:rgba(192,138,46,.06)}
+    #resultados h2{color:#c08a2e}
+    .form-wrap{border:1px solid var(--border,#30363d);border-radius:10px;overflow:hidden;margin:1.2rem 0;background:#fff}
+    .form-wrap iframe{display:block;width:100%;border:0}
     .callout{border-left:3px solid #c08a2e;padding:.8rem 1rem;margin:1.2rem 0;background:rgba(192,138,46,.07);border-radius:0 8px 8px 0}
     .callout b{color:#c08a2e}
     .sesion{border:1px solid var(--border,#30363d);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.8rem}
@@ -30,9 +37,11 @@
 <!--
   ══════════════════════════════════════════════════════════════════════
    EDITAR DOS COSAS Y LISTO
-   1) ENCUESTA_URL  → la liga de tu formulario.
+   1) 1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w  → el id de tu formulario de Google (aparece dos veces).
       Si NO vas a usar encuesta, borra la sección marcada <!-- ENCUESTA -->
    2) Los archivos deben estar en  files/word-institucional/
+   3) Panel privado de resultados:  word-institucional.html#resultados
+      (oculto en la página normal; activar "Ver resumen de respuestas" en el formulario)
   ══════════════════════════════════════════════════════════════════════
 -->
 
@@ -59,20 +68,52 @@
       <div class="chips"><span class="chip chip-blue">documentos extensos</span><span class="chip chip-green">colaboración</span><span class="chip chip-orange">control de versiones</span></div>
     </header>
 
-    <!-- ENCUESTA · borrar desde aquí si no hay formulario -->
-    <section class="section">
-      <h2>Antes del curso: cuéntenos qué hace en Word</h2>
-      <p>Once preguntas, tres minutos, y no pide su nombre. <strong>Lo que conteste decide qué vemos
-      en las seis horas</strong> — si algo que hace todos los días no aparece en las opciones, escríbalo
-      en la última pregunta.</p>
-      <p><a class="btn" href="ENCUESTA_URL">Contestar la encuesta</a></p>
-      <div class="callout">
-        <b>¿Por qué importa?</b> El curso se diseñó sobre un temario institucional. Sus respuestas son
-        lo que lo ancla a los documentos que ustedes realmente elaboran: oficios, informes, cédulas, actas.
+    <!-- ENCUESTA · pegar el ID del formulario en el iframe de abajo -->
+    <section class="section" id="encuesta">
+      <h2>Antes de empezar: ¿qué hace usted en Word?</h2>
+      <p>Cinco preguntas, dos minutos, <strong>sin nombre</strong>. No hay respuestas
+      equivocadas — y la de malos hábitos la hemos contestado todos que sí.</p>
+      <p><strong>Lo que conteste decide qué vemos en las seis horas.</strong></p>
+
+      <div class="form-wrap">
+        <!-- ══ EDITAR: sustituir 1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w por el de su formulario ══ -->
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform?embedded=true"
+          width="100%" height="900" frameborder="0" marginheight="0" marginwidth="0"
+          title="Encuesta previa del curso">Cargando la encuesta…</iframe>
+      </div>
+
+      <p class="muted" style="font-size:.85rem;opacity:.7">¿No carga? Ábrala directo:
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform">encuesta del curso</a>.</p>
+    </section>
+    <!-- ENCUESTA · hasta aquí -->
+
+    <!-- ══════ PANEL PRIVADO · sólo visible en  ...word-institucional.html#resultados  ══════ -->
+    <section class="section" id="resultados">
+      <div class="priv">
+        <h2>Resultados en vivo</h2>
+        <p style="font-size:.9rem">Esta sección no aparece en la página normal: sólo se ve si la
+        dirección termina en <code>#resultados</code>.</p>
+
+        <div class="form-wrap">
+          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics"
+            width="100%" height="900" frameborder="0" title="Resultados">Cargando resultados…</iframe>
+        </div>
+
+        <p style="font-size:.88rem"><b>Para proyectar:</b>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewanalytics" target="_blank">abrir los resultados en pantalla completa</a>
+        · <a href="https://docs.google.com/forms/d/e/1FAIpQLSd5gfPpq-C_2pTmV_5GWFQaRR-Woz0cWfcN9rUtMDGbNGj42w/viewform" target="_blank">el formulario</a></p>
+
+        <p style="font-size:.88rem"><b>Para borrar las respuestas</b> (después de probar, o entre
+        grupos): en el formulario, pestaña <b>Respuestas</b> → menú <b>⋮</b> →
+        <b>Eliminar todas las respuestas</b>. No se puede deshacer, y es justo lo que se quiere
+        antes de empezar en serio.</p>
+
+        <p style="font-size:.85rem;opacity:.75">Para que esta vista funcione hay que activar en el
+        formulario: <b>Configuración → Respuestas → Ver resumen de respuestas</b>. Sin eso, el
+        resumen queda privado y el recuadro de arriba sale vacío.</p>
       </div>
     </section>
-
-    <!-- ENCUESTA · hasta aquí -->
 
     <!-- ════════ DESCARGAS ════════ -->
     <section class="section">

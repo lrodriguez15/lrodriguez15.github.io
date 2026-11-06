@@ -8,19 +8,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Conmutador de idioma — SÓLO para el bio. Sin JavaScript. */
+    .about input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+    .bio-switch{display:inline-flex;border:1px solid var(--border,#30363d);border-radius:999px;
+                overflow:hidden;font-size:.8rem;margin:0 0 .9rem}
+    .bio-switch label{padding:.22rem .8rem;cursor:pointer;user-select:none;opacity:.7}
+    .bio-switch label:hover{opacity:1}
+    #bio-en:checked ~ .about-body .bio-switch label[for=bio-en],
+    #bio-es:checked ~ .about-body .bio-switch label[for=bio-es]{
+      background:#c08a2e;color:#fff;font-weight:600;opacity:1}
+    #bio-en:checked ~ .about-body .lang-es{display:none}
+    #bio-es:checked ~ .about-body .lang-en{display:none}
+  </style>
 </head>
 <body>
 
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-brand">~/teaching</a>
-      <span class="nav-course">Leopoldo Rodriguez · Tec de Monterrey</span>
+      <span class="nav-course">Leopoldo Rodriguez · Tec de Monterrey · IDEA</span>
     </div>
   </nav>
 
   <main>
     <header class="hero">
-      <p class="hero-eyebrow">Tec de Monterrey · Independent courses</p>
+      <p class="hero-eyebrow">Tec de Monterrey · IDEA · Independent courses</p>
       <h1>Courses</h1>
       <p class="hero-sub">
         Lecture notes, code examples, and exercises from the classes I teach. Pick a course to start.
@@ -29,32 +42,65 @@
 
     <!-- ════════════════════════════════════════════════════════════════════════
          ABOUT THE INSTRUCTOR  —  EDIT ME
-         • Swap the "LR" avatar for a photo: replace the <div class="about-avatar">
-           with  <img class="about-avatar" src="assets/leo.jpg" alt="Leopoldo Rodriguez">
-         • Edit the bio paragraphs / role line / links below.
+         El conmutador EN/ES aplica SÓLO a esta sección.
+         Para cambiar el idioma por omisión, mueve el  checked  al otro input.
          ════════════════════════════════════════════════════════════════════════ -->
     <section class="about">
+      <input type="radio" name="biolang" id="bio-en" checked>
+      <input type="radio" name="biolang" id="bio-es">
       <div class="about-avatar">LR</div>
       <div class="about-body">
-        <h2>Hey, I'm Leopoldo! 👋</h2>
-        <p class="about-role">Engineer · PhD · CEO of Helgen Technologies</p>
-        <p>
-          I'm an engineer, PhD, and the CEO of Helgen Technologies — but more importantly, I've
-          been exactly where you are now, figuring out how to turn a passion for technology into
-          a real career.
-        </p>
-        <p>
-          My journey took me from Mexico to the UK, the US, Ireland, and Spain, working on
-          everything from autonomous cars at Jaguar Land Rover to flight systems at GE Aviation.
-          I even got to research drone navigation as a Marie Curie Fellow — which is just a fancy
-          way of saying I spent years making robots fly smarter. 🚁
-        </p>
-        <p>
-          I built my career one skill, one project, and one challenge at a time — and that's
-          exactly what this platform is about. Whether you're just getting started or already deep
-          in the weeds, I'm here to share what I've learned so you can go further, faster.
-        </p>
-        <p>Let's build something great together. 🚀</p>
+
+        <div class="bio-switch">
+          <label for="bio-en">English</label><label for="bio-es">Español</label>
+        </div>
+
+        <!-- ───────── EN ───────── -->
+        <div class="lang-en">
+          <h2>Hey, I'm Leopoldo! 👋</h2>
+          <p class="about-role">Engineer · Doctor of Engineering · CEO of Helgen Technologies</p>
+          <p>
+            I'm an engineer and I run Helgen Technologies — but more importantly, I've been
+            exactly where you are now, figuring out how to turn a passion for technology into a
+            real career.
+          </p>
+          <p>
+            My journey took me from Mexico to the UK, the US, Ireland, and Spain, working on
+            everything from autonomous cars at Jaguar Land Rover to flight systems at GE Aviation,
+            and a few years researching drone navigation — which is a fancy way of saying I spent
+            a while making robots fly smarter. 🚁
+          </p>
+          <p>
+            I built my career one skill, one project, and one challenge at a time — and that's
+            exactly what this platform is about. Whether you're just getting started or already
+            deep in the weeds, I'm here to share what I've learned so you can go further, faster.
+          </p>
+          <p>Let's build something great together. 🚀</p>
+        </div>
+
+        <!-- ───────── ES ───────── -->
+        <div class="lang-es">
+          <h2>¡Hola, soy Leopoldo! 👋</h2>
+          <p class="about-role">Ingeniero · Doctor en Ingeniería · Director de Helgen Technologies</p>
+          <p>
+            Soy ingeniero y dirijo Helgen Technologies — pero más importante que eso: estuve
+            exactamente donde estás tú ahora, tratando de convertir el gusto por la tecnología en
+            una carrera de verdad.
+          </p>
+          <p>
+            El camino me llevó de México al Reino Unido, Estados Unidos, Irlanda y España,
+            trabajando en cosas que van de los autos autónomos en Jaguar Land Rover a los sistemas
+            de vuelo en GE Aviation, y unos años investigando navegación de drones — que es una
+            forma elegante de decir que me la pasé haciendo que los robots volaran mejor. 🚁
+          </p>
+          <p>
+            Construí mi carrera una habilidad, un proyecto y un problema a la vez — y de eso se
+            trata este sitio. Si vas empezando o ya andas metido hasta el cuello, aquí comparto lo
+            que he aprendido para que llegues más lejos, más rápido.
+          </p>
+          <p>Hagamos algo que valga la pena. 🚀</p>
+        </div>
+
         <div class="about-links">
           <a href="https://helgen.tech" target="_blank" rel="noopener">helgen.tech ↗</a>
           <a href="mailto:leo@helgen.tech">leo@helgen.tech</a>
@@ -63,7 +109,8 @@
       </div>
     </section>
 
-    <p class="section-label">Available courses</p>
+    <!-- ═══════════════ TEC DE MONTERREY ═══════════════ -->
+    <p class="section-label">Tec de Monterrey</p>
     <div class="card-grid">
 
       <div class="card">
@@ -103,6 +150,30 @@
         <a class="card-link" href="ai-scientific-writing-es.html">Ver curso en español →</a>
       </div>
 
+    </div>
+
+    <!-- ═══════════════ IDEA ═══════════════ -->
+    <p class="section-label">IDEA · Instituto Digital de Estudios Avanzados</p>
+    <div class="card-grid">
+
+      <div class="card">
+        <span class="card-num">ESFE Querétaro · IEEF · Formación Continua 2026</span>
+        <span class="card-title">Word Profesional sin Complicaciones · Nivel Intermedio</span>
+        <span class="card-desc">Automatizar lo que hoy se hace a mano: un documento institucional se construye en vivo, de la hoja en blanco a la entrega — plantilla, estilos, secciones, tablas desde Excel, índices automáticos, revisión entre varias personas y limpieza final.</span>
+        <div class="chips">
+          <span class="chip chip-blue">documentos extensos</span>
+          <span class="chip chip-green">colaboración</span>
+          <span class="chip chip-orange">6 h · 3 sesiones</span>
+        </div>
+        <a class="card-link" href="word-institucional.html">Ver curso y materiales →</a>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════ INDEPENDENT ═══════════════ -->
+    <p class="section-label">Independent</p>
+    <div class="card-grid">
+
       <div class="card card-soon">
         <span class="card-num">Independent</span>
         <span class="card-title">Workshops &amp; short courses</span>
@@ -117,7 +188,7 @@
   </main>
 
   <footer>
-    Leopoldo Rodriguez · Tec de Monterrey · Helgen Technologies
+    Leopoldo Rodriguez · Tec de Monterrey · IDEA · Helgen Technologies
   </footer>
 
   <script src="js/main.js"></script>
