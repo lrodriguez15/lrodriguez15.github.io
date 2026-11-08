@@ -1,0 +1,20 @@
+Oficio: ⟨NUMERO⟩
+Santiago de Querétaro, Qro., a ⟨FECHA⟩
+Asunto: ⟨ASUNTO⟩
+
+⟨TITULAR⟩
+⟨CARGO⟩
+⟨ENTE⟩
+P r e s e n t e
+
+En el marco de la auditoría ⟨AUDITORIA⟩ que esta Entidad practica a ⟨ENTE⟩, y con fundamento en las disposiciones aplicables, le solicito remitir, en un plazo de ⟨PLAZO⟩ contados a partir de la recepción del presente, la documentación que se detalla en el anexo de este oficio.
+
+La información deberá entregarse en la Oficialía de Partes de esta Entidad, en horario de 8:30 a 16:00 horas, en medio impreso y digital.
+
+Sin otro particular, aprovecho la ocasión para enviarle un cordial saludo.
+
+Atentamente
+
+
+⟨FIRMA⟩
+⟨CARGO_FIRMA⟩
