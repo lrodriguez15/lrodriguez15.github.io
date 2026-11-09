@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Las listas que usa el machote del curso, para copiarlas a sus controles
+     desplegables (Programador > Propiedades > Agregar...). Todas son
+     genéricas o públicas: ningún dato de auditoría. -->
+<listas>
+  <tratamientos>
+    <opcion>Lic.</opcion>
+    <opcion>Mtra.</opcion>
+    <opcion>Mtro.</opcion>
+    <opcion>Ing.</opcion>
+    <opcion>Dr.</opcion>
+    <opcion>Dra.</opcion>
+    <opcion>C.</opcion>
+  </tratamientos>
+  <plazos>
+    <opcion>cinco días hábiles</opcion>
+    <opcion>diez días hábiles</opcion>
+    <opcion>quince días hábiles</opcion>
+    <opcion>veinte días hábiles</opcion>
+  </plazos>
+  <cargos>
+    <opcion>Auditor Especial de Cumplimiento</opcion>
+    <opcion>Auditora Especial de Cumplimiento</opcion>
+    <opcion>Director General de Auditoría</opcion>
+    <opcion>Director de Administración</opcion>
+    <opcion>Directora General de Auditoría</opcion>
+    <opcion>Directora de Administración</opcion>
+    <opcion>Presidenta Municipal</opcion>
+    <opcion>Presidente Municipal</opcion>
+    <opcion>Titular del Órgano Interno de Control</opcion>
+  </cargos>
+  <otros-entes>
+    <opcion>Poder Ejecutivo del Estado</opcion>
+    <opcion>Poder Judicial del Estado</opcion>
+    <opcion>Organismo Público de Ejemplo</opcion>
+  </otros-entes>
+  <municipios>
+    <opcion>Municipio de Amealco de Bonfil</opcion>
+    <opcion>Municipio de Arroyo Seco</opcion>
+    <opcion>Municipio de Cadereyta de Montes</opcion>
+    <opcion>Municipio de Colón</opcion>
+    <opcion>Municipio de Corregidora</opcion>
+    <opcion>Municipio de Ezequiel Montes</opcion>
+    <opcion>Municipio de Huimilpan</opcion>
+    <opcion>Municipio de Jalpan de Serra</opcion>
+    <opcion>Municipio de Landa de Matamoros</opcion>
+    <opcion>Municipio de El Marqués</opcion>
+    <opcion>Municipio de Pedro Escobedo</opcion>
+    <opcion>Municipio de Peñamiller</opcion>
+    <opcion>Municipio de Pinal de Amoles</opcion>
+    <opcion>Municipio de Querétaro</opcion>
+    <opcion>Municipio de San Joaquín</opcion>
+    <opcion>Municipio de San Juan del Río</opcion>
+    <opcion>Municipio de Tequisquiapan</opcion>
+    <opcion>Municipio de Tolimán</opcion>
+  </municipios>
+</listas>

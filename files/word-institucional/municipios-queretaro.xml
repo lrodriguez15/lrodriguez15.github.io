@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Los 18 municipios del Estado de Querétaro.
+     Información pública. Úsela libremente en sus plantillas.
+
+     Dos formas de aprovecharla:
+     a) Como lista de un control desplegable: copie los nombres de
+        municipios-queretaro.txt y péguelos uno por uno en
+        Programador > Propiedades > Agregar...
+     b) Como parte XML: Programador > Panel de asignación XML >
+        Agregar nueva parte > este archivo. Luego asigne el control
+        al nodo <municipio> y quedará vinculado en todos los lugares
+        donde aparezca. -->
+<entes>
+  <municipio>Municipio de Amealco de Bonfil</municipio>
+  <!-- Municipio de Arroyo Seco -->
+  <!-- Municipio de Cadereyta de Montes -->
+  <!-- Municipio de Colón -->
+  <!-- Municipio de Corregidora -->
+  <!-- Municipio de Ezequiel Montes -->
+  <!-- Municipio de Huimilpan -->
+  <!-- Municipio de Jalpan de Serra -->
+  <!-- Municipio de Landa de Matamoros -->
+  <!-- Municipio de El Marqués -->
+  <!-- Municipio de Pedro Escobedo -->
+  <!-- Municipio de Peñamiller -->
+  <!-- Municipio de Pinal de Amoles -->
+  <!-- Municipio de Querétaro -->
+  <!-- Municipio de San Joaquín -->
+  <!-- Municipio de San Juan del Río -->
+  <!-- Municipio de Tequisquiapan -->
+  <!-- Municipio de Tolimán -->
+</entes>
