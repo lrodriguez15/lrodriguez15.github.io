@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<oficio>
+  <numero_oficio>ESFE/AEC/000/2026</numero_oficio>
+  <fecha>9 de noviembre de 2026</fecha>
+  <tratamiento_destinatario>Lic.</tratamiento_destinatario>
+  <titular>Nombre de la persona titular</titular>
+  <cargo_titular>Cargo de la persona titular</cargo_titular>
+  <ente_fiscalizado>Municipio de Ejemplo</ente_fiscalizado>
+  <numero_auditoria>AUD-000/2026</numero_auditoria>
+  <ejercicio_fiscal>2024</ejercicio_fiscal>
+  <plazo>diez días hábiles</plazo>
+  <tratamiento_firmante>Lic.</tratamiento_firmante>
+  <firmante>Nombre de quien firma</firmante>
+  <cargo_firmante>Cargo de quien firma</cargo_firmante>
+  
+</oficio>
