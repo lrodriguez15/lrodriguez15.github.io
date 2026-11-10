@@ -432,3 +432,38 @@ footer {
                  padding: .35rem .8rem; color: var(--green); white-space: nowrap; }
 .empiece .baja:hover { background: var(--green); color: #0d1117; }
 @media (max-width: 560px) { .empiece .paso { flex-wrap: wrap; } .empiece .baja { margin-left: 2.8rem; } }
+
+/* ── Paso a paso en la página (details, sin JavaScript) ────────────────────── */
+.pasos { display: flex; flex-direction: column; gap: .5rem; margin: 1.2rem 0; }
+.paso-d { border: 1px solid var(--border); border-radius: var(--radius);
+          background: var(--surface); }
+.paso-d[open] { border-color: var(--accent-dim); }
+.paso-d > summary { cursor: pointer; list-style: none; padding: .8rem 1rem;
+                    display: flex; gap: .75rem; align-items: center;
+                    font-weight: 600; color: var(--text); }
+.paso-d > summary::-webkit-details-marker { display: none; }
+.paso-d > summary::after { content: '+'; margin-left: auto; color: var(--muted);
+                           font-size: 1.3rem; line-height: 1; }
+.paso-d[open] > summary::after { content: '–'; }
+.paso-d > summary:hover { background: rgba(88,166,255,.07); }
+.paso-d .pn { flex: 0 0 1.75rem; height: 1.75rem; border-radius: 50%;
+              background: var(--accent-dim); color: #fff; display: flex;
+              align-items: center; justify-content: center;
+              font-size: .85rem; font-weight: 700; }
+.paso-c { padding: 0 1rem 1.1rem; border-top: 1px solid var(--border); }
+.paso-c .ruta { font-family: var(--font-mono); font-size: .8rem; color: var(--accent);
+                background: rgba(88,166,255,.08); border-left: 3px solid var(--accent-dim);
+                padding: .5rem .7rem; margin: .9rem 0;
+                border-radius: 0 var(--radius) var(--radius) 0; }
+.paso-c ol { margin: .9rem 0 .9rem 1.4rem; }
+.paso-c ol li { margin-bottom: .5rem; }
+.paso-c .meta { font-size: .9rem; color: var(--green); background: rgba(63,185,80,.07);
+                border-radius: var(--radius); padding: .55rem .75rem; margin: .9rem 0; }
+.paso-c .ojo { font-size: .9rem; background: rgba(210,153,34,.08);
+               border-left: 3px solid var(--orange); padding: .65rem .8rem;
+               border-radius: 0 var(--radius) var(--radius) 0; margin-top: 1rem; }
+.paso-c figure { margin: 1rem 0; }
+.paso-c figure img { width: 100%; display: block; border: 1px solid var(--border);
+                     border-radius: var(--radius); background: #fff; }
+.paso-c figcaption { font-size: .8rem; color: var(--muted); margin-top: .4rem; }
+.cierre-pasos { font-size: .9rem; color: var(--muted); margin-top: 1.2rem; }
