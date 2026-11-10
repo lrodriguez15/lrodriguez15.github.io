@@ -413,3 +413,22 @@ footer {
   .slide-link-box { flex-direction: column; align-items: flex-start; }
   .nav-course { display: none; }
 }
+
+/* ─── Bloque "Empiece aquí": lo imprescindible, sin que haya que buscarlo ─── */
+.empiece { border: 2px solid var(--green); background: rgba(63,185,80,.06);
+           border-radius: var(--radius); padding: 1.1rem 1.2rem; margin: 1.5rem 0 2rem; }
+.empiece h2 { margin-top: 0; border-bottom: none; color: var(--green); }
+.empiece .paso { display: flex; gap: .9rem; align-items: flex-start;
+                 padding: .75rem 0; border-top: 1px solid var(--border); }
+.empiece .paso:first-of-type { border-top: none; }
+.empiece .n { flex: 0 0 1.9rem; height: 1.9rem; border-radius: 50%;
+              background: var(--green); color: #0d1117; font-weight: 700;
+              display: flex; align-items: center; justify-content: center; font-size: .95rem; }
+.empiece .qué { flex: 1; }
+.empiece .qué strong { display: block; color: var(--text); }
+.empiece .qué span { font-size: .875rem; color: var(--muted); }
+.empiece .baja { flex: 0 0 auto; align-self: center; font-weight: 600;
+                 border: 1px solid var(--green); border-radius: var(--radius);
+                 padding: .35rem .8rem; color: var(--green); white-space: nowrap; }
+.empiece .baja:hover { background: var(--green); color: #0d1117; }
+@media (max-width: 560px) { .empiece .paso { flex-wrap: wrap; } .empiece .baja { margin-left: 2.8rem; } }
