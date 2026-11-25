@@ -35,6 +35,23 @@
       <p class="lecture-objective"><strong>The shape never changes.</strong> 15 points of <em>read and predict</em> — five short programs, you say what they print or where they break. 5 points for one exact output. 80 points for one problem: the algorithm first (30), then the program that implements it (50). Every rubric is published here before the exam; nothing about how you are graded is a surprise.</p>
     </header>
 <p>Quick exams cover the <strong>previous week</strong>.</p>
+<section class="section" id="final">
+<h2>Final exam — Tuesday 1 December, in class, on paper</h2>
+<p><strong>30 % of the course. 90 minutes, 100 points, individual, on paper</strong> — no computer, phone, notes or calculator. It covers <strong>everything from week 1</strong>.</p>
+<ul>
+<li><strong>Part I — read and predict (30 points):</strong> six short programs — arithmetic operators, boolean operators, a conditional, a function, a <code>while</code> loop, and one over lists or a table. Write <em>exactly</em> what Python prints, every line, in order. 5 points each, all or nothing.</li>
+<li><strong>Part II — write the program (70 points):</strong> two functions over a list or a table (25 + 45): the algorithm first, then the code. Same six-level rubric as the midterm; −2 per missing technical requirement (name on line 1, algorithm in a comment, meaningful names, a prompt on every <code>input()</code>, labelled output).</li>
+<li>Suggested time: 25 minutes for Part I, 65 for Part II.</li>
+</ul>
+<p><strong>Three practice papers — same format, same difficulty, different problems. Sit one under the clock before you read its solutions:</strong></p>
+<ul>
+<li><a href="files/at/practice-final-1.pdf">Practice final 1</a> · <a href="files/at/practice-final-1-solutions.pdf">solutions</a></li>
+<li><a href="files/at/practice-final-2.pdf">Practice final 2</a> · <a href="files/at/practice-final-2-solutions.pdf">solutions</a></li>
+<li><a href="files/at/practice-final-3.pdf">Practice final 3</a> · <a href="files/at/practice-final-3-solutions.pdf">solutions</a></li>
+</ul>
+<p><a href="files/at/survival-guide.pdf"><strong>Python survival guide</strong></a> — everything in TC1037 on two pages: the patterns, the ten traps, two worked examples and where the marks actually are. Print it and write on it.</p>
+<p><strong>Friday 4 December is the last session:</strong> we go through every question of the exam and clear up where every grade stands.</p>
+</section>
 <section class="section" id="midterm">
 <h2>Midterm — Friday 23 October, 17:35–18:55, on paper</h2>
 <p><strong>20 % of the course. 80 minutes, 100 points, individual, on paper</strong> — no computer, phone, notes or calculator.</p>
@@ -237,6 +254,88 @@
 </tr>
 </tbody>
 </table>
+</section><section class="section"><h2 id="quick-exam-5-lists">Quick exam 5 — Lists</h2>
+<p><strong>Tuesday 10 November 2026, 17:35–17:55</strong> · 20 min · 100 points · Closed environment — Respondus LockDown Browser. Code section in the embedded Trinket editor. Thonny not permitted.</p>
+<p>Covers: <code>10-midterm-debrief, 11-lists-practice</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th></th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>Five read-and-predict items, 3 each</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>The exact printed value</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>C1</td>
+<td>Algorithm: INPUT/OUTPUT named, numbered steps, the <code>FOR</code> written out, function and <code>main()</code> separate, and the <em>how many times</em> sentence</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>C2</td>
+<td><code>maximum</code> returns the right value on all four checks — including <code>[-3, -8, -1]</code> and <code>[]</code> — written as a loop, no <code>print</code> or <code>input</code> inside; <code>main()</code> reads until <code>fin</code>, labels the output and prints <code>No values.</code> on the empty case; file ends with <code>main()</code></td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p>Partial credit on C2: a function that is correct on the three non-empty checks but returns <code>0</code> or crashes on <code>[]</code> keeps 35 of the 50. A function that starts the best-so-far at <code>0</code> instead of <code>xs[0]</code> fails <code>[-3, -8, -1]</code> and keeps 30.</p>
+</section><section class="section"><h2 id="quick-exam-6-lists-and-plots">Quick exam 6 — Lists and plots</h2>
+<p><strong>Tuesday 17 November 2026, 17:35–17:55</strong> · 20 min · 100 points · ON PAPER for everyone. No Respondus, no Trinket, no computer — after the LockDown failures on Quick exam 5.</p>
+<p>Covers: <code>11-lists-practice, 12-plots, 13-driving-questions, 13b-plots-recap</code>.</p>
+<h3 id="how-it-is-graded">How it is graded</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th></th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>Five read-and-predict items, 3 each</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>The exact printed value</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td>C1</td>
+<td>Algorithm: INPUT/OUTPUT named, numbered steps, the <code>FOR</code> written out, function and <code>main()</code> separate, and the <em>how many times</em> sentence</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>C2</td>
+<td><code>columna</code> builds and <strong>returns</strong> a new list, correct on all three checks including the empty table, no <code>print</code> or <code>input</code> inside; <code>main()</code> calls it twice, draws <code>plt.bar</code> with title and both labels, and the file ends with <code>main()</code></td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p>Partial credit on C2: a function that returns the right values but prints instead of returning keeps 30 of the 50. A <code>main()</code> that draws the chart but omits the title or the axis labels loses the technical-requirement points only, not the 50.</p>
 </section>
   </main>
   <footer class="site-footer">
